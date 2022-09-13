@@ -38,6 +38,7 @@ enum MyFlutterErrorCode{
     var info: VTProInfo? = nil
     var userList : [VTProUser]? = nil
     var xuserList: [VTProXuser]? = nil
+    var ecgList :[ VTProEcg ]? = nil;
     var isConnected: Bool = false
     
     
@@ -111,6 +112,14 @@ enum MyFlutterErrorCode{
           }else if( "checkmepro/beginReadFileListSPC" == call.method ){
             self?.beginReadFileListSPC( result: result )
               
+          }else if( "checkmepro/beginReadFileListDetailsECG" == call.method ){
+              
+              guard let args = call.arguments as? [String:Any] else {return}
+              let index = args["index"] as! Int
+              
+              VTProCommunicate.sharedInstance().beginReadDetailFile(with: (self!.ecgList?[index])!, fileType: VTProFileTypeEcgDetail )
+              result("isSync")
+                
           }else{
             // not implemented
             result( FlutterMethodNotImplemented )
@@ -341,8 +350,9 @@ enum MyFlutterErrorCode{
         if fileData.fileType == VTProFileTypeEcgList{
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
                let arr = VTProFileParser.parseEcgList_(withFileData: fileData.fileData as Data)
+               self.ecgList = arr
                 // MARK: ECG
-                for ecg in arr ?? [] {
+               for ecg in arr ?? [] {
                     
                     let ecgTemp :[String:String] = [
                         "type": "ECG",
@@ -467,8 +477,31 @@ enum MyFlutterErrorCode{
             }
         }else if (fileData.fileType) == VTProFileTypeEcgDetail {
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
+                // MARK: ECG DETAILS
                 let detail = VTProFileParser.parseEcg_(withFileData: fileData.fileData as Data)
-                print( detail ?? "Nulo para ECGDetail List" )
+                
+                let ecgDetailTemp :[String: Any] = [
+                    "type": "DETAILS_EKG",
+                    "arrEcgContent": detail?.arrEcgContent ?? [],
+                    "arrEcgHeartRate": detail?.arrEcgHeartRate ?? [],
+                    "hrValue": detail?.hrValue ?? 0,
+                    "stValue": detail?.stValue ?? 0,
+                    "qrsValue": detail?.qrsValue ?? 0,
+                    "pvcsValue": detail?.pvcsValue ?? 0,
+                    "qtcValue": detail?.qtcValue ?? 0,
+                    "ecgResult": detail?.ecgResult ?? "Des",
+                    "timeLength": detail?.timeLength ?? 0,
+                    "enFilterKind": detail?.enFilterKind.rawValue ?? 0,
+                    "enLeadKind": detail?.enLeadKind.rawValue ?? 0,
+                    "qtValue": detail?.qtValue ?? 0,
+                    "isQT": detail?.isQT ?? false
+                ]
+               
+                if let jsonData = try? JSONSerialization.data(withJSONObject: ecgDetailTemp, options: [] ){
+                    let jsonText = String( data: jsonData, encoding: .ascii )
+                    self.eventSink?( jsonText )
+                }
+                
             } else {
                 print("Detail Error %ld", fileData.enLoadResult)
             }

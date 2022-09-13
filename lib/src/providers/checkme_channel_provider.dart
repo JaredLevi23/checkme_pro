@@ -10,19 +10,23 @@ class CheckmeChannelProvider with ChangeNotifier{
   static const platform = MethodChannel("checkmepro.connection");
   static const EventChannel eventChannel = EventChannel('checkmepro.listener');
 
-  bool _isSyncTime = false;
+  bool _isSync = false;
   bool _isConnected = false;
 
+  // Data List
   List<TemperatureModel> temperaturesList = [];
   List<Spo2Model> spo2sList = [];
   List<SmlModel> smlList = [];
-  List<EcgModel> ecgList = [];
   List<UserModel> userList = [];
 
-  bool get isSyncTime => _isSyncTime;
+  late EcgModel currentEcg;
+  List<EcgModel> ecgList = [];
+  Map<String, EcgDetailsModel> ecgDetailsList = {};
 
-  set isSyncTime(bool isSyncTime) {
-    _isSyncTime = isSyncTime;
+  bool get isSync => _isSync;
+
+  set isSync(bool isSync) {
+    _isSync = isSync;
     notifyListeners();
   }
 
@@ -189,6 +193,19 @@ class CheckmeChannelProvider with ChangeNotifier{
       }
   }
 
+  Future<void> detailsECG( { required int index } )async{
+    try{
+      final res = await platform.invokeMethod('checkmepro/beginReadFileListDetailsECG', { 'index': index });
+      
+      if( res == "isSync"){
+        isSync = true;
+      }
+
+    }catch( err ){
+      log( '$err' );
+    }
+  }
+
   // events 
 
   void startEvents(){
@@ -197,7 +214,7 @@ class CheckmeChannelProvider with ChangeNotifier{
   
   void _onEvent(Object? event) {
 
-    log( 'EVENT_FLUTTER: $event' );
+    //log( 'EVENT_FLUTTER: $event' );
 
     if( event.toString() == "SyncTime: OK" ){
       // Todo: mostrar mensaje
@@ -205,12 +222,11 @@ class CheckmeChannelProvider with ChangeNotifier{
 
     if( event.toString() == "ONLINE: ON" ){
       isConnected = true;
-      log('CONNECTED !!! BLUE');
+      
     }
 
     if( event.toString() == "ONLINE: OFF" ){
       isConnected = false;
-      log('DISCONNECTED !! BLUE ');
     }
 
     // TM
@@ -252,6 +268,18 @@ class CheckmeChannelProvider with ChangeNotifier{
         userList.add( userTemp );
       }
     }    
+
+    // DETAILS_EKG
+    if( event.toString().contains('DETAILS_EKG') ){
+      final detailECGTemp = EcgDetailsModel.fromRawJson( event.toString() );
+      
+      if( !ecgDetailsList.containsKey( currentEcg.dtcDate )){
+        ecgDetailsList.addAll( {currentEcg.dtcDate : detailECGTemp} );
+        isSync = false;
+        notifyListeners();
+      }
+
+    }
 
     notifyListeners();
   }

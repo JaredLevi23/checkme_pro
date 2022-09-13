@@ -31,6 +31,15 @@ class EcgResultsPage extends StatelessWidget {
                 foregroundColor: Colors.white,
                 child: Text( '${index + 1}' ),
               ),
+              onTap: ()async {
+                // Details ECG 
+                if( !checkmeProvider.ecgDetailsList.containsKey( ecg.dtcDate ) ){
+                  await checkmeProvider.detailsECG( index: index );
+                }
+                checkmeProvider.currentEcg = ecg;
+                Navigator.pushNamed(context, 'checkme/ecg/details');
+
+              },
             ),
           );
         }

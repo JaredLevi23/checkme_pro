@@ -10,6 +10,7 @@ Map<String, Widget Function(BuildContext)> routes(){
     'checkme/temp': (_) => const TemperaturesResultsPage(),
     'checkme/spo2': (_) => const Spo2ResultsPage(),
     'checkme/sml': (_) => const SmlResultsPage(),
-    'checkme/users': (_) => const UserResultPage()
+    'checkme/users': (_) => const UserResultPage(),
+    'checkme/ecg/details': (_) => const EcgDetailResultPage()
   };
 }

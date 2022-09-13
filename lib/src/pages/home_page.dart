@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           Icon(
             Icons.circle,
-            color: checkmeProvider.isConnected ? Colors.blue : Colors.red,
+            color: checkmeProvider.isConnected ? Colors.greenAccent : Colors.red,
           ),
           IconButton(
             icon: const Icon(Icons.sync),

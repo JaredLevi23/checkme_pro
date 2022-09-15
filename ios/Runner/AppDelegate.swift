@@ -40,6 +40,8 @@ enum MyFlutterErrorCode{
     var xuserList: [VTProXuser]? = nil
     var ecgList :[ VTProEcg ]? = nil;
     var isConnected: Bool = false
+    var indexUser = 0
+    var user: NSObject? = nil
     
     
   override func application(
@@ -58,89 +60,83 @@ enum MyFlutterErrorCode{
       //  checkmePRO Connection
       let checkmePROConnection = FlutterMethodChannel( name: ChannelName.connection, binaryMessenger: controller.binaryMessenger )
       
-      // Invoke methods
+      // MARK: Methods channel
       checkmePROConnection.setMethodCallHandler({
           [weak self] (call: FlutterMethodCall, result: FlutterResult) -> Void in
-            // MARK: call methods
+          
           if( "checkmepro/isConnected" == call.method ){
-            // obtiene informacion por bluetooth del checkmePRO
+              // MARK: status
               result( self?.isConnected )
               
           }else if( "checkmepro/beginGetInfo" == call.method ){
-            // obtiene informacion por bluetooth del checkmePRO
+              // MARK: begin get info device
             self?.beginGetInfo(result: result )
               
           } else if( "checkmepro/getInfoCheckmePRO" == call.method ){
-            // envia a flutter la informacion del dispositivo
+              // MARK: set info
             self?.getInfoCheckmePRO( result: result )
               
           }else if( "checkmepro/beginSyncTime" == call.method ){
-              // sincroniza la hora del dispositivo
+              // MARK: sync Time
               self?.beginSyncTime( result: result )
               
-          }else if( "checkmepro/beginReadFileListUser" == call.method ){
-            self?.beginReadFileListUser( result: result )
+          }else if( "checkmepro/beginReadFileList" == call.method ){
+              // MARK: begin read File
+              /// @param int indexTypeFile
+              guard let args = call.arguments as? [ String: Any ] else { return }
+              let indexTypeFile = args["indexTypeFile"] as! Int
+              
+              if indexTypeFile == 1 || indexTypeFile == 3 || indexTypeFile == 4 || indexTypeFile == 7 || indexTypeFile == 8 {
+                  self?.beginReadFileList( result: result, dataType: indexTypeFile )
+              }else{
+                  let idUser = args["idUser"] as! Int
+                  self?.downloadList( idUser , fileType: indexTypeFile )
+              }
                 
-          }else if( "checkmepro/beginReadFileListXUser" == call.method ){
-            self?.beginReadFileListXUser( result: result )
-            result("Error: beginReadFileListXUser")
-              
-          }else if( "checkmepro/beginReadFileListDLC" == call.method ){
-            self?.beginReadFileListDLC( result: result )
-              
-          }else if( "checkmepro/beginReadFileListECG" == call.method ){
-            self?.beginReadFileListECG( result: result )
-              
-          }else if( "checkmepro/beginReadFileListSPO" == call.method ){
-            self?.beginReadFileListSPO( result: result )
-              
-          }else if( "checkmepro/beginReadFileListBG" == call.method ){
-            self?.beginReadFileListBG( result: result )
-              
-          }else if( "checkmepro/beginReadFileListBP" == call.method ){
-            self?.beginReadFileListBP( result: result )
-              
-          }else if( "checkmepro/beginReadFileListTM" == call.method ){
-            self?.beginReadFileListTM( result: result )
-              
-          }else if( "checkmepro/beginReadFileListSM" == call.method ){
-            self?.beginReadFileListSM( result: result )
-              
-          }else if( "checkmepro/beginReadFileListPED" == call.method ){
-            self?.beginReadFileListPED( result: result )
-              
-          }else if( "checkmepro/beginReadFileListSPC" == call.method ){
-            self?.beginReadFileListSPC( result: result )
-              
           }else if( "checkmepro/beginReadFileListDetailsECG" == call.method ){
-              
+              // MARK: begin read details ECG
+              /// @params id as Datetime
               guard let args = call.arguments as? [String:Any] else {return}
-              let index = args["index"] as! Int
+              let dtcDate = args["id"] as! String
               
-              VTProCommunicate.sharedInstance().beginReadDetailFile(with: (self!.ecgList?[index])!, fileType: VTProFileTypeEcgDetail )
-              result("isSync")
+              let currentEcg = self?.ecgList?.firstIndex{ "\($0.dtcDate)" == dtcDate }
+              
+              if currentEcg != nil{
+                  // comienza la lectura del archivo
+                  VTProCommunicate.sharedInstance().beginReadDetailFile(
+                    with: (self!.ecgList?[ currentEcg! ])!,
+                    fileType: VTProFileTypeEcgDetail
+                  )
+                  result("isSync")
+              }else{
+                  result("no sync")
+              }
                 
           }else{
             // not implemented
             result( FlutterMethodNotImplemented )
           }
     })
-      
-      let eventListener = FlutterEventChannel(name: ChannelName.listener,
-                                                    binaryMessenger: controller.binaryMessenger)
+    
+    // event channel
+    let eventListener = FlutterEventChannel(
+        name: ChannelName.listener,
+        binaryMessenger: controller.binaryMessenger
+    )
     eventListener.setStreamHandler(self)
       
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
-    
-    // MARK: get info from checkme pro
-    
 
+// MARK: FUNCTIONS VT
+    
+    // MARK: get info from checkme pro VT
     func beginGetInfo( result: FlutterResult ){
         VTProCommunicate.sharedInstance().beginGetInfo()
         result("beginGetInfo: OK")
     }
     
+    // MARK: set basic info
     func getInfoCheckmePRO( result:FlutterResult ) {
         
         let details = self.info
@@ -165,132 +161,52 @@ enum MyFlutterErrorCode{
         }
         
         result("getInfoChecmePRo info not found! ")
-
-        //let res = details?.filter{ !$0.isWhitespace }
     }
     
-    func beginReadFileListUser( result:FlutterResult ) {
-        beginReadFileList( dataType: 2 )
-        result("beginReadFileUserList: OK")
-    }
-    
-    func beginReadFileListXUser( result:FlutterResult ){
-        beginReadFileList( dataType: 1 )
-        result("beginReadFileXUserList: OK")
-    }
-    
+    // MARK: syncTime VT
     func beginSyncTime( result: FlutterResult ){
         VTProCommunicate.sharedInstance().beginSyncTime(Date())
         result("beginSyncTime: OK")
     }
     
-    func beginReadFileListDLC( result:FlutterResult ){
-        beginReadFileList( dataType: 3 )
-        result("beginReadFileListDLC: OK")
-    }
-    
-    func beginReadFileListECG( result:FlutterResult ){
-        beginReadFileList( dataType: 4 )
-        result("beginReadFileListECG: OK")
-    }
-    
-    func beginReadFileListSPO( result:FlutterResult ){
-        beginReadFileList( dataType: 5 )
-        result("beginReadFileListSPO: OK")
-    }
-    
-    func beginReadFileListBP( result:FlutterResult ){
-        beginReadFileList( dataType: 6 )
-        result("beginReadFileListBP: OK")
-    }
-    
-    func beginReadFileListBG( result:FlutterResult ){
-        beginReadFileList( dataType: 7 )
-        result("beginReadFileListBG: OK")
-    }
-    
-    func beginReadFileListTM( result:FlutterResult ){
-        print( "beginReadFileListTM - IOS " )
-        beginReadFileList( dataType: 8 )
-        result("getInfoChecmePRo info not found! ")
-
-    }
-    
-    func beginReadFileListSM( result:FlutterResult ){
-        beginReadFileList( dataType: 9 )
-        result("beginReadFileListSM: OK")
-    }
-    
-    func beginReadFileListPED( result:FlutterResult ){
-        beginReadFileList( dataType: 10 )
-        result("beginReadFileListPED: OK")
-    }
-    
-    func beginReadFileListSPC( result:FlutterResult ){
-        beginReadFileList( dataType: 12 )
-        result("beginReadFileListSPC: OK")
-    }
-    
-
-    // MARK: ble states
-    func update(_ state: VTBLEState) {
-        print("update- estado ")
-        if state == .poweredOn {
-            VTBLEUtils.sharedInstance().startScan()
-        }
-    }
-    
-    func didDiscover(_ device: VTDevice) {
-        print("didDiscover: " + (device.rawPeripheral.name ?? "Error"))
-        periArray.add(device)
-    }
-    
-    func didConnectedDevice(_ device: VTDevice) {
-        print("didConnectedDevice - estado ")
-        VTProCommunicate.sharedInstance().peripheral = device.rawPeripheral
-        VTProCommunicate.sharedInstance().delegate = self
-        self.isConnected = true
-        self.eventSink?("ONLINE: ON")
-    }
-    func didDisconnectedDevice(_ device: VTDevice, andError error: Error) {
-        print("didDisconnectedDevice - estado")
-        VTBLEUtils.sharedInstance().startScan()
-        self.isConnected = false
-        self.eventSink?("ONLINE: OFF")
-    }
-    
-    func serviceDeployed(_ completed: Bool) {
-        print("Good - serviceDeployed")
-        state = VTProStateSyncData
+    // MARK: beginReadFileList VT
+    func beginReadFileList( result:FlutterResult, dataType: Int ) {
         
-        if !VTProCommunicate.sharedInstance().peripheral.name!.hasPrefix("Checkme") {
-            initFuncArray()
-        }
-        VTProCommunicate.sharedInstance().delegate = self
-        VTProCommunicate.sharedInstance().beginPing()
-        isInitialRequest = true
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(0.5 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: {
-            VTProCommunicate.sharedInstance().beginGetInfo()
-        })
+        VTProCommunicate.sharedInstance().beginReadFileList(
+            with: nil,
+            fileType: dataTypeMapToFileType( datatype: dataType  )
+        )
         
+        result(" DateTypeRead ")
     }
     
-    // MARK: functions
-   
-    func initFuncArray(){
-        print("initFuncArray called!!! - este debemos ver que hace xd")
-        if funcArray.count > 0 {
+    // MARK: download list VT
+    func downloadList(_ idUser: Int, fileType: Int ) {
+        
+        print( fileType as Any )
+        print( self.userList as Any )
+        
+        self.indexUser = idUser
+        
+        let currentUser = self.userList?.firstIndex{ idUser == $0.userID }
+        
+        if currentUser == nil {
+            self.indexUser = 0
             return
         }
-                
+        
+        print( self.userList?[ currentUser! ] as Any )
+        
+        VTProCommunicate.sharedInstance().beginReadFileList(with: self.userList?[ currentUser! ] , fileType: dataTypeMapToFileType( datatype: fileType ) )
     }
     
+    // MARK: ???
     func getInfoWithResultData(_ infoData: Data?) {
         print("getInfoWithResultData called!!!")
         if isInitialRequest && (infoData != nil) {
             isInitialRequest = false
             self.info = VTProFileParser.parseProInfo(with: infoData)
-            initFuncArray()
+            // initFuncArray()
             return
         }
 
@@ -302,15 +218,16 @@ enum MyFlutterErrorCode{
     }
     
     func commonResponse(_ cmdType: VTProCmdType, andResult result: VTProCommonResult) {
-        print("commonResponse Called")
-        if cmdType == VTProCmdTypeSyncTime {
-            
-            if result == VTProCommonResultSuccess {
-                self.eventSink?("SyncTime: OK")
-            }
+      print("commonResponse Called")
+      if cmdType == VTProCmdTypeSyncTime {
+        if result == VTProCommonResultSuccess {
+            self.eventSink?("SyncTime: OK")
+        }
       }
     }
     
+    
+    // MARK: READ COMPLETE
     func readComplete(withData fileData: VTProFileToRead) {
         print("readComplete called! TYPE: \(fileData.fileType)")
         
@@ -318,7 +235,8 @@ enum MyFlutterErrorCode{
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
                 // MARK: User List
                 let userList = VTProFileParser.parseUserList_(withFileData: fileData.fileData as Data)
-           
+                self.userList = userList
+                
                 for user in userList ?? [] {
                     
                     let userTemp :[String:String] = [
@@ -328,9 +246,9 @@ enum MyFlutterErrorCode{
                         "birthday": "\( user.birthday)",
                         "height": "\( user.height)",
                         "iconID": "\( user.iconID)",
-                        "userName": "\( user.userName)",
-                        "weight": "\( user.weight)",
-                        "age": "\( user.age)",
+                        "userName": "\(user.userName)" ,
+                        "weight":  "\(user.weight)",
+                        "age": "\(user.age)",
                     ]
                    
                     if let jsonData = try? JSONSerialization.data(withJSONObject: userTemp, options: [] ){
@@ -452,6 +370,7 @@ enum MyFlutterErrorCode{
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
                 let arr = VTProFileParser.parsePedList_(withFileData: fileData.fileData as Data)
                 
+                print( arr as Any )
                 // MARK: PED
                 for ped in arr ?? [] {
                     let pedTemp :[String:String] = [
@@ -475,6 +394,39 @@ enum MyFlutterErrorCode{
             } else {
                 print("Error %ld", fileData.enLoadResult)
             }
+        }else if (fileData.fileType) == VTProFileTypeBgList {
+            if fileData.enLoadResult == VTProFileLoadResultSuccess {
+                let arr = VTProFileParser.parsePedList_(withFileData: fileData.fileData as Data)
+                print( arr as Any )
+                // MARK: BG
+                
+            } else {
+                print("Error %ld", fileData.enLoadResult)
+            }
+        }else if (fileData.fileType) == VTProFileTypeBpList {
+            if fileData.enLoadResult == VTProFileLoadResultSuccess {
+                let arr = VTProFileParser.parsePedList_(withFileData: fileData.fileData as Data)
+                print( arr as Any )
+                // MARK: BP
+            } else {
+                print("Error %ld", fileData.enLoadResult)
+            }
+        }else if (fileData.fileType) == VTProFileTypeSpcList {
+            if fileData.enLoadResult == VTProFileLoadResultSuccess {
+                let arr = VTProFileParser.parsePedList_(withFileData: fileData.fileData as Data)
+                print( arr as Any )
+                // MARK: DLC
+            } else {
+                print("Error %ld", fileData.enLoadResult)
+            }
+        }else if (fileData.fileType) == VTProFileTypeDlcList {
+            if fileData.enLoadResult == VTProFileLoadResultSuccess {
+                let arr = VTProFileParser.parsePedList_(withFileData: fileData.fileData as Data)
+                print( arr as Any )
+                // MARK: SPC
+            } else {
+                print("Error %ld", fileData.enLoadResult)
+            }
         }else if (fileData.fileType) == VTProFileTypeEcgDetail {
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
                 // MARK: ECG DETAILS
@@ -489,7 +441,7 @@ enum MyFlutterErrorCode{
                     "qrsValue": detail?.qrsValue ?? 0,
                     "pvcsValue": detail?.pvcsValue ?? 0,
                     "qtcValue": detail?.qtcValue ?? 0,
-                    "ecgResult": detail?.ecgResult ?? "Des",
+                    "ecgResult": detail?.ecgResult ?? "-",
                     "timeLength": detail?.timeLength ?? 0,
                     "enFilterKind": detail?.enFilterKind.rawValue ?? 0,
                     "enLeadKind": detail?.enLeadKind.rawValue ?? 0,
@@ -507,6 +459,7 @@ enum MyFlutterErrorCode{
             }
         }else if (fileData.fileType) == VTProFileTypeSlmDetail {
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
+            // MARK: SLM DETAILs
                 let detail = VTProFileParser.parseSLMData_(withFileData: fileData.fileData as Data)
                 print( detail ?? "Nulo para SMLDETAL List" )
             } else {
@@ -531,47 +484,107 @@ enum MyFlutterErrorCode{
         self.state = state
     }
     
-    // MARK: readFile
-    
-    func beginReadFileList( dataType:Int ){
-        VTProCommunicate.sharedInstance().beginReadFileList(with: nil, fileType: dataTypeMapToFileType( datatype: dataType  ))
-    }
-    
-    func downloadList(_ index: Int) {
-        let user = userList![index]
-        VTProCommunicate.sharedInstance().beginReadFileList(with: user , fileType: dataTypeMapToFileType( datatype: index ))
-    }
     
     // MARK: DataListView
     func dataTypeMapToFileType( datatype:Int ) -> VTProFileType {
         switch datatype {
         case 1:
-            return VTProFileTypeXuserList
-        case 2:
             return VTProFileTypeUserList
-        case 3:
+        case 2:
             return VTProFileTypeDlcList
-        case 4:
+        case 3:
             return VTProFileTypeEcgList
-        case 5:
+        case 4:
             return VTProFileTypeSpO2List
-        case 6:
+        case 5:
             return VTProFileTypeBpList
-        case 7:
+        case 6:
             return VTProFileTypeBgList
-        case 8:
+        case 7:
             return VTProFileTypeTmList
-        case 9:
+        case 8:
             return VTProFileTypeSlmList
-        case 10:
+        case 9:
             return VTProFileTypePedList
-        case 12:
+        case 10:
+            return VTProFileTypeXuserList
+        case 11:
             return VTProFileTypeSpcList
+        case 12:
+            return VTProFileTypeEXHistoryList
+        case 13:
+            return VTProFileTypeEXHistoryDetail
+        case 14:
+            return VTProFileTypeEcgDetail
+        case 15:
+            return VTProFileTypeEcgVoice
+        case 16:
+            return VTProFileTypeSlmDetail
+        case 17:
+            return VTProFileTypeLangPkg
+        case 18:
+            return VTProFileTypeAppPkg
         default:
             break
         }
         return VTProFileTypeNone
     }
+   
+
+    // MARK: ble states
+    func update(_ state: VTBLEState) {
+        print("update- estado ")
+        if state == .poweredOn {
+            VTBLEUtils.sharedInstance().startScan()
+        }
+    }
+    
+    func didDiscover(_ device: VTDevice) {
+        print("didDiscover: " + (device.rawPeripheral.name ?? "Error"))
+        periArray.add(device)
+    }
+    
+    func didConnectedDevice(_ device: VTDevice) {
+        print("didConnectedDevice - estado ")
+        VTProCommunicate.sharedInstance().peripheral = device.rawPeripheral
+        VTProCommunicate.sharedInstance().delegate = self
+        self.isConnected = true
+        self.eventSink?("ONLINE: ON")
+    }
+    func didDisconnectedDevice(_ device: VTDevice, andError error: Error) {
+        print("didDisconnectedDevice - estado")
+        VTBLEUtils.sharedInstance().startScan()
+        self.isConnected = false
+        self.eventSink?("ONLINE: OFF")
+    }
+    
+    func serviceDeployed(_ completed: Bool) {
+        print("Good - serviceDeployed")
+        state = VTProStateSyncData
+        
+//        if !VTProCommunicate.sharedInstance().peripheral.name!.hasPrefix("Checkme") {
+//            initFuncArray()
+//        }
+        VTProCommunicate.sharedInstance().delegate = self
+        VTProCommunicate.sharedInstance().beginPing()
+        isInitialRequest = true
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(0.5 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: {
+            VTProCommunicate.sharedInstance().beginGetInfo()
+        })
+        
+    }
+    
+    // MARK: functions
+//
+//    func initFuncArray(){
+//        print("initFuncArray called!!! - este debemos ver que hace xd")
+//        if funcArray.count > 0 {
+//            return
+//        }
+//
+//    }
+    
+    
     
     // MARK: Events
     public func onListen(withArguments arguments: Any?,

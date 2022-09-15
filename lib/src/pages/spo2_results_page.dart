@@ -1,4 +1,5 @@
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +14,9 @@ class Spo2ResultsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('SPO2 Results'),
+        actions: const [
+          ConnectionIndicator()
+        ],
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(10),

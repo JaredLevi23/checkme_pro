@@ -1,6 +1,9 @@
+import 'package:checkme_pro_develop/src/models/ecg_details_model.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../widgets/widgets.dart';
 
 class EcgResultsPage extends StatelessWidget {
   const EcgResultsPage({Key? key}) : super(key: key);
@@ -8,23 +11,39 @@ class EcgResultsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
+    final checkmeProvider = Provider.of<CheckmeChannelProvider>(context); 
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Resultados de ECG'),
+        actions: const [
+          ConnectionIndicator()
+        ],
       ),
       body: ListView.builder(
         itemCount: checkmeProvider.ecgList.length,
         itemBuilder: (_, index){
 
           final ecg = checkmeProvider.ecgList[ index ];
-          final date = ecg.dtcDate.split(' ');
+          EcgDetailsModel? checkmeDetails = checkmeProvider.ecgDetailsList[ ecg.dtcDate ];
 
           return Card(
             child: ListTile(
-              title: Text( ecg.type ),
-              subtitle: Text( 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}'),
+              title: Row(
+                children: [
+                  const Icon( Icons.favorite, color: Colors.red ),
+                  const SizedBox( width:  5,),
+                  Text( 'HR: ${checkmeDetails?.hrValue ?? 'Unknown'}' ),
+                  if( ecg.isSync == true )
+                    //const Spacer(),
+                    const SizedBox(
+                    child: LinearProgressIndicator(),
+                    width: 30,
+                    height: 5,
+                  ),
+                ],
+              ),
+              subtitle: Text( '${getMeasurementDateTime( measurementDate: ecg.dtcDate )}' ),
               leading: CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.cyan,
@@ -32,13 +51,50 @@ class EcgResultsPage extends StatelessWidget {
                 child: Text( '${index + 1}' ),
               ),
               onTap: ()async {
-                // Details ECG 
-                if( !checkmeProvider.ecgDetailsList.containsKey( ecg.dtcDate ) ){
-                  await checkmeProvider.detailsECG( index: index );
-                }
-                checkmeProvider.currentEcg = ecg;
-                Navigator.pushNamed(context, 'checkme/ecg/details');
 
+                checkmeProvider.currentEcg = ecg;
+
+                if( !checkmeProvider.ecgDetailsList.containsKey( ecg.dtcDate ) ){
+
+                  if(checkmeProvider.isConnected){
+
+                    if( !checkmeProvider.isSync ){
+                      //checkmeProvider.currentEcg.isSync = true;
+                      checkmeProvider.currentSyncEcg ??= ecg;
+                      await checkmeProvider.detailsECG( model: ecg );
+                    }
+
+                  }else{
+
+                    showDialog(context: context, builder: (_){
+                      return AlertDialog(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                        content: Container(
+                          width: 200,
+                          height: 200,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle
+                          ),
+                          child: Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(Icons.bluetooth_audio ),
+                                Text('Verifica la conexion del dispositivo', textAlign: TextAlign.center,),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    });
+                    return;
+                  }
+                }
+
+                Navigator.pushNamed(context, 'checkme/ecg/details');
               },
             ),
           );

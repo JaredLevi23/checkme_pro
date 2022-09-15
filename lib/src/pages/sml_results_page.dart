@@ -1,6 +1,7 @@
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../widgets/widgets.dart';
 
 class SmlResultsPage extends StatelessWidget {
   const SmlResultsPage({Key? key}) : super(key: key);
@@ -13,6 +14,9 @@ class SmlResultsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('SML Results'),
+        actions: const [
+          ConnectionIndicator(),
+        ],
       ),
 
       body: ListView.builder(

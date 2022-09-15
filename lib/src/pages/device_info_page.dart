@@ -2,6 +2,7 @@
 // Date: 12-SEP
 // Function: Show device information
 
+import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:checkme_pro_develop/src/models/models.dart';
 
@@ -16,7 +17,7 @@ class DeviceInfoPage extends StatelessWidget {
   final DeviceInformationModel device = DeviceInformationModel.fromRawJson( jsonInfo! );
 
     return Scaffold(
-      appBar: AppBar( title: const Text('Device information')),
+      appBar: AppBar( title: const Text('Device information'), actions: const [ ConnectionIndicator() ],),
       body: ListView(
         padding: const EdgeInsets.only( left: 15, right: 15, top: 10, bottom: 10),
         children: [

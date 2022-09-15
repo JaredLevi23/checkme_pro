@@ -33,10 +33,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Checkme PRO'),
         actions: [
-          Icon(
-            Icons.circle,
-            color: checkmeProvider.isConnected ? Colors.greenAccent : Colors.red,
-          ),
+          const ConnectionIndicator(),
           IconButton(
             icon: const Icon(Icons.sync),
             onPressed: ()async{
@@ -92,7 +89,7 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'User List',
             iconData: Icons.group,
             onPressed: ()async {
-              final res = await checkmeProvider.beginReadFileListUser();
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
               log( res );
               Navigator.pushNamed(context, 'checkme/users');
             },
@@ -102,7 +99,7 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'X User List',
             iconData: Icons.group_rounded,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileListXUser();
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 10 );
               log( res );
             },
           ),
@@ -111,7 +108,7 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'Temperature',
             iconData: Icons.thermostat,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileListTM();
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 7 );
               Navigator.pushNamed(context, 'checkme/temp');
               log( res );
             },
@@ -121,7 +118,7 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'SPO2',
             iconData: Icons.air,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileListSPO();
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 4 );
               log( res );
               Navigator.pushNamed(context, 'checkme/spo2');
             },
@@ -131,7 +128,7 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'Sleep Monitor',
             iconData: Icons.bed,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileListSM();
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 8 );
               log( res );
               Navigator.pushNamed(context, 'checkme/sml');
             },
@@ -141,7 +138,7 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'ECG',
             iconData: Icons.monitor_heart,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileListECG();
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
               log( res );
               Navigator.pushNamed(context, 'checkme/ecg');
             },
@@ -151,7 +148,7 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'PET',
             iconData: Icons.air,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileListPED();
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 9 );
               log( res );
             },
           ),
@@ -160,7 +157,7 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'DLC',
             iconData: Icons.monitor_heart,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileListDLC();
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 2 );
               log( res );
             },
           ),
@@ -169,7 +166,7 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'BP',
             iconData: Icons.air,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileListBP();
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 5 );
               log( res );
             },
           ),
@@ -178,7 +175,7 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'BG',
             iconData: Icons.air,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileListBG();
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 6 );
               log( res );
             },
           ),
@@ -187,7 +184,7 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'SPC',
             iconData: Icons.air,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileListSPC();
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 11 );
               log( res );
             },
           ),

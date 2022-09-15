@@ -1,4 +1,5 @@
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +14,7 @@ class UserResultPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('User List'),
+        actions: const [ ConnectionIndicator() ],
       ),
 
       body: ListView.builder(

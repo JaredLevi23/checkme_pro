@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 
@@ -15,7 +17,8 @@ class EcgGrap extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         child: CustomPaint(
-          painter: PaintGraph( graph: graphData )
+          painter: PaintGraph( graph: graphData ),
+          size: Size(200, 200 ),
         ),
       ),
     );
@@ -31,6 +34,7 @@ class PaintGraph extends CustomPainter{
 
   @override
   void paint(Canvas canvas, Size size) {
+    log( '${size.width}' );
     final paint = Paint();
     paint.color = Colors.black;
     paint.strokeWidth = 2;
@@ -39,6 +43,14 @@ class PaintGraph extends CustomPainter{
     final path = Path();
     path.moveTo(0, size.height/2);
 
+    double x = 0;
+
+    for (var coord in graph) {
+      path.lineTo(x, coord);
+      x++;
+    }
+
+    canvas.drawPath(path, paint);
 
   }
 

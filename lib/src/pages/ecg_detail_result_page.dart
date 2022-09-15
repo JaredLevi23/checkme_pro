@@ -1,10 +1,10 @@
-
-import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
-import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import '../models/models.dart';
+import '../utils/utils_date.dart';
 
 class EcgDetailResultPage extends StatelessWidget {
   const EcgDetailResultPage({Key? key}) : super(key: key);
@@ -13,19 +13,22 @@ class EcgDetailResultPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
-    final EcgModel currentModel = checkmeProvider.currentEcg;
-    final date = currentModel.dtcDate.split(' ');
+    final EcgModel currentEcgModel = checkmeProvider.currentEcg;
+    EcgDetailsModel? ecgDetails = checkmeProvider.ecgDetailsList[ currentEcgModel.dtcDate ];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text( 'ECG Detail' ),
+        actions: const [
+          ConnectionIndicator()
+        ],
       ),
 
       body: Column(
         children: [
           Card(
             child: ListTile(
-              title: Text( 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}'),
+              title: Text( '${ getMeasurementDateTime( measurementDate: currentEcgModel.dtcDate )}'),
               trailing: const CircleAvatar( 
                 child: Icon(Icons.emoji_emotions,),
                 backgroundColor: Colors.white,
@@ -34,7 +37,7 @@ class EcgDetailResultPage extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: checkmeProvider.isSync 
+            child: checkmeProvider.isSync && ecgDetails == null
             ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
@@ -42,24 +45,21 @@ class EcgDetailResultPage extends StatelessWidget {
                     Text('Please wait')
                   ],
               )
-            : listResults( context, currentModel )
+            : listResults( ecgDetails! )
           )
         ],
       )
     );
   }
 
-  Widget listResults( context, EcgModel ecgModel ){
-
-    final ecgDetails = Provider.of<CheckmeChannelProvider>(context).ecgDetailsList[ecgModel.dtcDate];
-
+  Widget listResults( EcgDetailsModel ecgDetails ){
     return ListView(
       children: [
         Row(
           children: [
             Expanded(
               child: cardResult( 
-                value: ecgDetails?.hrValue, 
+                value: ecgDetails.hrValue, 
                 title: 'HR', 
                 unitMeasurement: "/min",
                 icon: Icons.favorite
@@ -67,7 +67,7 @@ class EcgDetailResultPage extends StatelessWidget {
             ),
             Expanded(
               child: cardResult( 
-                value: ecgDetails?.qrsValue, 
+                value: ecgDetails.qrsValue, 
                 title: 'QRS', 
                 unitMeasurement: "ms",
                 icon: Icons.monitor
@@ -79,14 +79,14 @@ class EcgDetailResultPage extends StatelessWidget {
           children: [
             Expanded(
               child: cardResult( 
-                value: ecgDetails?.qtValue, 
+                value: ecgDetails.qtValue, 
                 title: 'QT', 
                 unitMeasurement: "ms" 
               ),
             ),
             Expanded(
               child: cardResult( 
-                value: ecgDetails?.qtcValue, 
+                value: ecgDetails.qtcValue, 
                 title: 'QTc', 
                 unitMeasurement: "ms" 
               ),
@@ -97,7 +97,7 @@ class EcgDetailResultPage extends StatelessWidget {
           children: [
             Expanded(
               child: cardResult( 
-                value: ecgDetails?.timeLength, 
+                value: ecgDetails.timeLength, 
                 title: 'Duration', 
                 unitMeasurement: "s", 
                 icon: Icons.timer, 
@@ -125,10 +125,10 @@ class EcgDetailResultPage extends StatelessWidget {
           ],
         ),
 
-        EcgGrap(graphData: ecgDetails?.arrEcgContent ?? [] ) ,
+        EcgGrap(graphData: ecgDetails.arrEcgContent ) ,
 
-        Text( 'ARR_HEART_RATE:[${ecgDetails?.arrEcgHeartRate}]'),
-        Text( 'ARR_ECG_CONTENT:[${ecgDetails?.arrEcgContent}]'),
+        Text( 'ARR_HEART_RATE:${ecgDetails.arrEcgHeartRate}'),
+        Text( 'ARR_ECG_CONTENT:${ecgDetails.arrEcgContent}'),
     ]);
   }
 

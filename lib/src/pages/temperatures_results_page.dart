@@ -1,6 +1,7 @@
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../widgets/widgets.dart';
 
 class TemperaturesResultsPage extends StatelessWidget {
   const TemperaturesResultsPage({Key? key}) : super(key: key);
@@ -11,7 +12,10 @@ class TemperaturesResultsPage extends StatelessWidget {
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
 
     return Scaffold(
-      appBar: AppBar( title: const Text( 'Temperatures' ),),
+      appBar: AppBar( 
+        title: const Text( 'Temperatures' ),
+        actions: const[ ConnectionIndicator(), ],
+      ),
       body: ListView.builder(
         itemCount: checkmeProvider.temperaturesList.length,
         itemBuilder: (context, index){

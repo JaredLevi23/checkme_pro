@@ -1,4 +1,3 @@
-import 'package:checkme_pro_develop/src/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:developer';
@@ -20,6 +19,7 @@ class CheckmeChannelProvider with ChangeNotifier{
   List<UserModel> userList = [];
 
   late EcgModel currentEcg;
+  EcgModel? currentSyncEcg;
   List<EcgModel> ecgList = [];
   Map<String, EcgDetailsModel> ecgDetailsList = {};
 
@@ -78,124 +78,26 @@ class CheckmeChannelProvider with ChangeNotifier{
       }
   }
 
-  Future<String> beginReadFileListUser ()async{
+  Future<String> beginReadFileList ({ required int indexTypeFile } )async{
       try{
-        final String result = await platform.invokeMethod('checkmepro/beginReadFileListUser');
-        userList = [];
+        
+        final String result = await platform.invokeMethod(
+          'checkmepro/beginReadFileList', 
+          { 'indexTypeFile': indexTypeFile, 'idUser': 2 }
+        );
+
         return result;
       }catch( err ){
         log( '$err' );
         return "$err";
+      }finally{
+        cleanData(indexTypeFile: indexTypeFile);
       }
   }
 
-  Future<String> beginReadFileListXUser ()async{
-      try{
-        final String result = await platform.invokeMethod('checkmepro/beginReadFileListXUser');
-        return result;
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<String> beginReadFileListDLC()async{
+  Future<void> detailsECG( { required EcgModel model } )async{
     try{
-        final String result = await platform.invokeMethod('checkmepro/beginReadFileListDLC');
-        return result;
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<String> beginReadFileListECG()async{
-    try{
-        final String result = await platform.invokeMethod('checkmepro/beginReadFileListECG');
-        ecgList = [];
-        return result;
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<String> beginReadFileListSPO()async{
-    try{
-        final String result = await platform.invokeMethod('checkmepro/beginReadFileListSPO');
-        spo2sList = [];
-        return result;
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<String> beginReadFileListBG()async{
-    try{
-        final String result = await platform.invokeMethod('checkmepro/beginReadFileListBG');
-        return result;
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<String> beginReadFileListBP()async{
-    try{
-        final String result = await platform.invokeMethod('checkmepro/beginReadFileListBP');
-        return result;
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<String> beginReadFileListTM()async{
-    try{
-        final String result = await platform.invokeMethod('checkmepro/beginReadFileListTM');
-        temperaturesList = [];
-        return result;
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<String> beginReadFileListSM()async{
-    try{
-        final String result = await platform.invokeMethod('checkmepro/beginReadFileListSM');
-        smlList = [];
-        return result;
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<String> beginReadFileListPED()async{
-    try{
-        final String result = await platform.invokeMethod('checkmepro/beginReadFileListPED');
-        return result;
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<String> beginReadFileListSPC()async{
-    try{
-        final String result = await platform.invokeMethod('checkmepro/beginReadFileListSPC');
-        return result;
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<void> detailsECG( { required int index } )async{
-    try{
-      final res = await platform.invokeMethod('checkmepro/beginReadFileListDetailsECG', { 'index': index });
+      final res = await platform.invokeMethod('checkmepro/beginReadFileListDetailsECG', { 'id': model.dtcDate });
       
       if( res == "isSync"){
         isSync = true;
@@ -204,6 +106,42 @@ class CheckmeChannelProvider with ChangeNotifier{
     }catch( err ){
       log( '$err' );
     }
+  }
+
+  cleanData( { required int indexTypeFile} ){
+    switch( indexTypeFile ){
+      case 1:
+        userList = [];
+      break;
+      case 2:
+        
+      break;
+      case 3:
+        ecgList = [];
+      break;
+      case 4:
+        spo2sList = [];
+      break;
+      case 5:
+      break;
+      case 6:
+      break;
+      case 7:
+        temperaturesList = [];
+      break;
+      case 8:
+        smlList = [];
+      break;
+      case 9:
+      break;
+      case 10:
+      break;
+      case 11:
+      break;
+      case 12:
+      break;
+    }
+    notifyListeners();
   }
 
   // events 
@@ -271,23 +209,27 @@ class CheckmeChannelProvider with ChangeNotifier{
 
     // DETAILS_EKG
     if( event.toString().contains('DETAILS_EKG') ){
-      final detailECGTemp = EcgDetailsModel.fromRawJson( event.toString() );
-      
-      if( !ecgDetailsList.containsKey( currentEcg.dtcDate )){
-        ecgDetailsList.addAll( {currentEcg.dtcDate : detailECGTemp} );
-        isSync = false;
-        notifyListeners();
-      }
+      try{
+        final detailECGTemp = EcgDetailsModel.fromRawJson( event.toString() );
 
+        if( currentSyncEcg != null && !ecgDetailsList.containsKey( currentSyncEcg!.dtcDate )){
+          ecgDetailsList.addAll( {currentSyncEcg!.dtcDate : detailECGTemp} );
+        }
+
+      }catch( err ){
+        log('$err');
+      } finally{
+        currentSyncEcg = null;
+        isSync = false;
+      }
     }
 
     notifyListeners();
+
   }
 
   void _onError(Object error) {
     log('$error');
    notifyListeners();
   }
-
-
 }

@@ -12,6 +12,7 @@ class EcgModel {
         required this.dtcDate,
         required this.userId,
         required this.haveVoice,
+        this.isSync
     });
 
     final String type;
@@ -20,6 +21,7 @@ class EcgModel {
     final String dtcDate;
     final String userId;
     final String haveVoice;
+    bool? isSync;
 
     factory EcgModel.fromRawJson(String str) => EcgModel.fromJson(json.decode(str));
 
@@ -32,6 +34,7 @@ class EcgModel {
         dtcDate: json["dtcDate"],
         userId: json["userID"],
         haveVoice: json["haveVoice"],
+        isSync: false
     );
 
     Map<String, dynamic> toJson() => {

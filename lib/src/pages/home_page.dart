@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
         children: [
 
           CheckmeOption(
-            titleOption: 'Ver informacion',
+            titleOption: 'Get Info',
             iconData: Icons.info,
             onPressed: ()async{
               final res = await checkmeProvider.getInfoCheckmePRO();
@@ -86,12 +86,52 @@ class _HomePageState extends State<HomePage> {
           ),
 
           CheckmeOption(
-            titleOption: 'User List',
+            titleOption: 'Read User List',
             iconData: Icons.group,
             onPressed: ()async {
               final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
               log( res );
               Navigator.pushNamed(context, 'checkme/users');
+            },
+          ),
+
+          CheckmeOption(
+            titleOption: 'Daily Check',
+            iconData: Icons.how_to_reg_rounded,
+            onPressed: ()async{
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
+              log( res );
+              Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'DLC'});
+            },
+          ),
+
+          CheckmeOption(
+            titleOption: 'Ecg Recorder',
+            iconData: Icons.monitor_heart,
+            onPressed: ()async{
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
+              log( res );
+              Navigator.pushNamed(context, 'checkme/ecg');
+            },
+          ),
+
+          CheckmeOption(
+            titleOption: 'Pulse Oxymeter',
+            iconData: Icons.invert_colors_on_sharp,
+            onPressed: ()async{
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 4 );
+              log( res );
+              Navigator.pushNamed(context, 'checkme/spo2');
+            },
+          ),
+
+          CheckmeOption(
+            titleOption: 'Thermometer',
+            iconData: Icons.thermostat,
+            onPressed: ()async{
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 7 );
+              Navigator.pushNamed(context, 'checkme/temp');
+              log( res );
             },
           ),
 
@@ -104,26 +144,6 @@ class _HomePageState extends State<HomePage> {
           //   },
           // ),
 
-          CheckmeOption(
-            titleOption: 'Temperature',
-            iconData: Icons.thermostat,
-            onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 7 );
-              Navigator.pushNamed(context, 'checkme/temp');
-              log( res );
-            },
-          ),
-
-          CheckmeOption(
-            titleOption: 'SPO2',
-            iconData: Icons.air,
-            onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 4 );
-              log( res );
-              Navigator.pushNamed(context, 'checkme/spo2');
-            },
-          ),
-
            CheckmeOption(
             titleOption: 'Sleep Monitor',
             iconData: Icons.bed,
@@ -135,32 +155,12 @@ class _HomePageState extends State<HomePage> {
           ),
 
           CheckmeOption(
-            titleOption: 'ECG',
-            iconData: Icons.monitor_heart,
-            onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
-              log( res );
-              Navigator.pushNamed(context, 'checkme/ecg');
-            },
-          ),
-
-          CheckmeOption(
-            titleOption: 'PET',
-            iconData: Icons.air,
+            titleOption: 'Pedometer',
+            iconData: Icons.directions_walk_outlined,
             onPressed: ()async{
               final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
               Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'PED'});
               log( res );
-            },
-          ),
-
-          CheckmeOption(
-            titleOption: 'DLC',
-            iconData: Icons.monitor_heart,
-            onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
-              log( res );
-              Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'DLC'});
             },
           ),
 
@@ -184,7 +184,7 @@ class _HomePageState extends State<HomePage> {
 
           CheckmeOption(
             titleOption: 'SPC',
-            iconData: Icons.air,
+            iconData: Icons.developer_mode_rounded,
             onPressed: ()async{
               final res = await checkmeProvider.beginReadFileList( indexTypeFile: 16 );
               log( res );

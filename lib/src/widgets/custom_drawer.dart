@@ -9,23 +9,44 @@ class CustomDrawer extends StatelessWidget {
       child: ListView(
         children: [
 
-          //TODO: Agregar logo de hoyhealth
+          //TODO: add hoyhealth icon
 
-          ListTile(
-            title: const Text('Acerca de'),
-            onTap: (){
+          const DrawerHeader(
+            child: CircleAvatar(
+              backgroundColor: Colors.cyan,
+              child: Icon( Icons.person, size: 90, color: Colors.white,),
+            )
+          ),
 
-            },
+          _optionDrawer(
+            iconData: Icons.settings,
+            title: 'Settings',
+            onPressed: (){}
+          ),
+          _optionDrawer(
+            iconData: Icons.info,
+            title: 'About',
+            onPressed: (){}
+          ),
+          _optionDrawer(
+            iconData: Icons.logout,
+            title: 'Logout',
+            onPressed: (){}
           ),
           
-          ListTile(
-            title: const Text('Cerrar sesión'),
-            onTap: (){
-
-            },
-          )
+          
         ],
       ),
     );
   }
+
+  // Option Drawer 
+  Widget _optionDrawer( { required IconData iconData, required String title, required Function()? onPressed } ){
+    return ListTile(
+      leading: Icon( iconData , size: 30, color: Colors.cyan,),
+      title: Text( title , style: const TextStyle( fontSize: 17, color: Colors.blueGrey),),
+      onTap: onPressed
+    ); 
+  }
+
 }

@@ -95,14 +95,14 @@ class _HomePageState extends State<HomePage> {
             },
           ),
 
-          CheckmeOption(
-            titleOption: 'X User List',
-            iconData: Icons.group_rounded,
-            onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 10 );
-              log( res );
-            },
-          ),
+          // CheckmeOption(
+          //   titleOption: 'X User List',
+          //   iconData: Icons.group_rounded,
+          //   onPressed: ()async{
+          //     final res = await checkmeProvider.beginReadFileList( indexTypeFile: 10 );
+          //     log( res );
+          //   },
+          // ),
 
           CheckmeOption(
             titleOption: 'Temperature',
@@ -148,7 +148,8 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'PET',
             iconData: Icons.air,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 9 );
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
+              Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'PED'});
               log( res );
             },
           ),
@@ -157,34 +158,35 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'DLC',
             iconData: Icons.monitor_heart,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 2 );
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
               log( res );
+              Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'DLC'});
             },
           ),
 
-          CheckmeOption(
-            titleOption: 'BP',
-            iconData: Icons.air,
-            onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 5 );
-              log( res );
-            },
-          ),
+          // CheckmeOption(
+          //   titleOption: 'Blood Preassure',
+          //   iconData: Icons.air,
+          //   onPressed: ()async{
+          //     final res = await checkmeProvider.beginReadFileList( indexTypeFile: 5 );
+          //     log( res );
+          //   },
+          // ),
 
-          CheckmeOption(
-            titleOption: 'BG',
-            iconData: Icons.air,
-            onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 6 );
-              log( res );
-            },
-          ),
+          // CheckmeOption(
+          //   titleOption: 'Blood Glucose',
+          //   iconData: Icons.air,
+          //   onPressed: ()async{
+          //     final res = await checkmeProvider.beginReadFileList( indexTypeFile: 6 );
+          //     log( res );
+          //   },
+          // ),
 
           CheckmeOption(
             titleOption: 'SPC',
             iconData: Icons.air,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 11 );
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 16 );
               log( res );
             },
           ),

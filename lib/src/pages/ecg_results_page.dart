@@ -61,7 +61,7 @@ class EcgResultsPage extends StatelessWidget {
                     if( !checkmeProvider.isSync ){
                       //checkmeProvider.currentEcg.isSync = true;
                       checkmeProvider.currentSyncEcg ??= ecg;
-                      await checkmeProvider.detailsECG( model: ecg );
+                      await checkmeProvider.getMeasurementDetails( dtcDate: ecg.dtcDate, detail: 'ECG' );
                     }
 
                   }else{

@@ -29,7 +29,6 @@ enum MyFlutterErrorCode{
     var periArray: NSMutableArray = NSMutableArray.init( capacity: 10 )
     // var vbleUtils = VTBLEUtils()
     
-    var funcArray = [NameEventModel]()
     var state: VTProState?
     var currNEModel: NameEventModel?
     var isInitialRequest = false
@@ -39,6 +38,7 @@ enum MyFlutterErrorCode{
     var userList : [VTProUser]? = nil
     var xuserList: [VTProXuser]? = nil
     var ecgList :[ VTProEcg ]? = nil;
+    var dlcList :[ VTProDlc ]? = nil;
     var isConnected: Bool = false
     var indexUser = 0
     var user: NSObject? = nil
@@ -86,11 +86,12 @@ enum MyFlutterErrorCode{
               guard let args = call.arguments as? [ String: Any ] else { return }
               let indexTypeFile = args["indexTypeFile"] as! Int
               
-              if indexTypeFile == 1 || indexTypeFile == 3 || indexTypeFile == 4 || indexTypeFile == 7 || indexTypeFile == 8 {
+              if indexTypeFile == 1 || indexTypeFile == 3 || indexTypeFile == 4 || indexTypeFile == 7 || indexTypeFile == 8 || indexTypeFile == 16{
                   self?.beginReadFileList( result: result, dataType: indexTypeFile )
               }else{
                   let idUser = args["idUser"] as! Int
                   self?.downloadList( idUser , fileType: indexTypeFile )
+                  result("DOWNLOADLIST")
               }
                 
           }else if( "checkmepro/beginReadFileListDetailsECG" == call.method ){
@@ -98,18 +99,35 @@ enum MyFlutterErrorCode{
               /// @params id as Datetime
               guard let args = call.arguments as? [String:Any] else {return}
               let dtcDate = args["id"] as! String
+              let typeDetail = args["detail"] as! String
               
-              let currentEcg = self?.ecgList?.firstIndex{ "\($0.dtcDate)" == dtcDate }
-              
-              if currentEcg != nil{
-                  // comienza la lectura del archivo
-                  VTProCommunicate.sharedInstance().beginReadDetailFile(
-                    with: (self!.ecgList?[ currentEcg! ])!,
-                    fileType: VTProFileTypeEcgDetail
-                  )
-                  result("isSync")
-              }else{
-                  result("no sync")
+              if typeDetail == "ECG"{
+                  let currentEcg = self?.ecgList?.firstIndex{ "\($0.dtcDate)" == dtcDate }
+                  
+                  if currentEcg != nil{
+                      // comienza la lectura del archivo
+                      VTProCommunicate.sharedInstance().beginReadDetailFile(
+                        with: (self!.ecgList?[ currentEcg! ])!,
+                        fileType: VTProFileTypeEcgDetail
+                      )
+                      result("isSync")
+                  }else{
+                      result("no sync")
+                  }
+              } else if typeDetail == "DLC"{
+                  
+                  let currentDlc = self?.dlcList?.firstIndex{ "\($0.dtcDate)" == dtcDate }
+                  
+                  if currentDlc != nil{
+                      // comienza la lectura del archivo
+                      VTProCommunicate.sharedInstance().beginReadDetailFile(
+                        with: (self!.dlcList?[ currentDlc! ])!,
+                        fileType: VTProFileTypeEcgDetail
+                      )
+                      result("isSync")
+                  }else{
+                      result("no sync")
+                  }
               }
                 
           }else{
@@ -183,9 +201,6 @@ enum MyFlutterErrorCode{
     // MARK: download list VT
     func downloadList(_ idUser: Int, fileType: Int ) {
         
-        print( fileType as Any )
-        print( self.userList as Any )
-        
         self.indexUser = idUser
         
         let currentUser = self.userList?.firstIndex{ idUser == $0.userID }
@@ -195,7 +210,7 @@ enum MyFlutterErrorCode{
             return
         }
         
-        print( self.userList?[ currentUser! ] as Any )
+        print( self.userList![ currentUser! ] as Any)
         
         VTProCommunicate.sharedInstance().beginReadFileList(with: self.userList?[ currentUser! ] , fileType: dataTypeMapToFileType( datatype: fileType ) )
     }
@@ -221,7 +236,16 @@ enum MyFlutterErrorCode{
       print("commonResponse Called")
       if cmdType == VTProCmdTypeSyncTime {
         if result == VTProCommonResultSuccess {
-            self.eventSink?("SyncTime: OK")
+            
+            let res = [
+                "type":"SyncTime: OK"
+            ]
+            
+            if let jsonData = try? JSONSerialization.data(withJSONObject: res, options: [] ){
+                let jsonText = String( data: jsonData, encoding: .ascii )
+                self.eventSink?( jsonText )
+            }
+            
         }
       }
     }
@@ -230,7 +254,8 @@ enum MyFlutterErrorCode{
     // MARK: READ COMPLETE
     func readComplete(withData fileData: VTProFileToRead) {
         print("readComplete called! TYPE: \(fileData.fileType)")
-        
+        print("readComplete called! DATA: \(fileData.fileData)")
+
         if fileData.fileType == VTProFileTypeUserList {
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
                 // MARK: User List
@@ -240,7 +265,7 @@ enum MyFlutterErrorCode{
                 for user in userList ?? [] {
                     
                     let userTemp :[String:String] = [
-                        "type": "USERS",
+                        "type": "USER",
                         "userID": "\( user.userID)",
                         "gender": "\( user.gender)",
                         "birthday": "\( user.birthday)",
@@ -370,20 +395,21 @@ enum MyFlutterErrorCode{
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
                 let arr = VTProFileParser.parsePedList_(withFileData: fileData.fileData as Data)
                 
-                print( arr as Any )
                 // MARK: PED
                 for ped in arr ?? [] {
-                    let pedTemp :[String:String] = [
+                    let pedTemp :[String:Any] = [
                         "type": "PED",
-                        "totalTime": "\( ped.totalTime )",
-                        "calorie": "\( ped.calorie )",
-                        "distance": "\( ped.distance )",
-                        "speed": "\( ped.speed )",
-                        "steps": "\( ped.steps )",
-                        "fat": "\( ped.fat )",
+                        "totalTime": ped.totalTime ,
+                        "calorie": ped.calorie ,
+                        "distance": ped.distance ,
+                        "speed": ped.speed,
+                        "steps": ped.steps,
+                        "fat": ped.fat,
                         "dctDate": "\(ped.dtcDate)",
                         "userID": "\( ped.userID )",
                     ]
+                    
+                    print( ped as Any )
                    
                     if let jsonData = try? JSONSerialization.data(withJSONObject: pedTemp, options: [] ){
                         let jsonText = String( data: jsonData, encoding: .ascii )
@@ -394,36 +420,35 @@ enum MyFlutterErrorCode{
             } else {
                 print("Error %ld", fileData.enLoadResult)
             }
-        }else if (fileData.fileType) == VTProFileTypeBgList {
-            if fileData.enLoadResult == VTProFileLoadResultSuccess {
-                let arr = VTProFileParser.parsePedList_(withFileData: fileData.fileData as Data)
-                print( arr as Any )
-                // MARK: BG
-                
-            } else {
-                print("Error %ld", fileData.enLoadResult)
-            }
-        }else if (fileData.fileType) == VTProFileTypeBpList {
-            if fileData.enLoadResult == VTProFileLoadResultSuccess {
-                let arr = VTProFileParser.parsePedList_(withFileData: fileData.fileData as Data)
-                print( arr as Any )
-                // MARK: BP
-            } else {
-                print("Error %ld", fileData.enLoadResult)
-            }
-        }else if (fileData.fileType) == VTProFileTypeSpcList {
-            if fileData.enLoadResult == VTProFileLoadResultSuccess {
-                let arr = VTProFileParser.parsePedList_(withFileData: fileData.fileData as Data)
-                print( arr as Any )
-                // MARK: DLC
-            } else {
-                print("Error %ld", fileData.enLoadResult)
-            }
         }else if (fileData.fileType) == VTProFileTypeDlcList {
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
-                let arr = VTProFileParser.parsePedList_(withFileData: fileData.fileData as Data)
-                print( arr as Any )
-                // MARK: SPC
+                let arr = VTProFileParser.parseDlcList_(withFileData: fileData.fileData as Data)
+                
+                self.dlcList = arr
+                // MARK: DLC
+                
+                for dlc in arr ?? [] {
+                    
+                    let dlcTemp :[String:Any] = [
+                        "bpFlag": dlc.bpFlag,
+                        "bpValue": dlc.bpValue,
+                        "haveVoice": dlc.haveVoice,
+                        "hrResult": "\(dlc.hrResult.rawValue)",
+                        "hrValue": dlc.hrValue,
+                        "pIndex": dlc.pIndex,
+                        "spo2Result": "\(dlc.spo2Result.rawValue)",
+                        "spo2Value": dlc.spo2Value,
+                        "dtcDate": "\(dlc.dtcDate)",
+                        "userID": dlc.userID,
+                        "type": "DLC"
+                    ]
+                    
+                    if let jsonData = try? JSONSerialization.data(withJSONObject: dlcTemp, options: [] ){
+                        let jsonText = String( data: jsonData, encoding: .ascii )
+                        self.eventSink?( jsonText )
+                    }
+                }
+                
             } else {
                 print("Error %ld", fileData.enLoadResult)
             }
@@ -457,10 +482,10 @@ enum MyFlutterErrorCode{
             } else {
                 print("Detail Error %ld", fileData.enLoadResult)
             }
-        }else if (fileData.fileType) == VTProFileTypeSlmDetail {
+        }else if (fileData.fileType) == VTProFileTypeSpcList {
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
-            // MARK: SLM DETAILs
-                let detail = VTProFileParser.parseSLMData_(withFileData: fileData.fileData as Data)
+            // MARK: SPC
+                let detail = VTProFileParser.parseRecList_(withFileData: fileData.fileData as Data)
                 print( detail ?? "Nulo para SMLDETAL List" )
             } else {
                 print("Detail Error %ld", fileData.enLoadResult)
@@ -549,13 +574,27 @@ enum MyFlutterErrorCode{
         VTProCommunicate.sharedInstance().peripheral = device.rawPeripheral
         VTProCommunicate.sharedInstance().delegate = self
         self.isConnected = true
-        self.eventSink?("ONLINE: ON")
+        let res = [
+            "type":"ONLINE: ON"
+        ]
+        
+        if let jsonData = try? JSONSerialization.data(withJSONObject: res, options: [] ){
+            let jsonText = String( data: jsonData, encoding: .ascii )
+            self.eventSink?( jsonText )
+        }
     }
     func didDisconnectedDevice(_ device: VTDevice, andError error: Error) {
         print("didDisconnectedDevice - estado")
         VTBLEUtils.sharedInstance().startScan()
         self.isConnected = false
-        self.eventSink?("ONLINE: OFF")
+        let res = [
+            "type":"ONLINE: OFF"
+        ]
+        
+        if let jsonData = try? JSONSerialization.data(withJSONObject: res, options: [] ){
+            let jsonText = String( data: jsonData, encoding: .ascii )
+            self.eventSink?( jsonText )
+        }
     }
     
     func serviceDeployed(_ completed: Bool) {

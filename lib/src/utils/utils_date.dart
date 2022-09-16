@@ -1,5 +1,5 @@
 
-// 
+// getMeasurementDateTime
 DateTime getMeasurementDateTime( { required String measurementDate } ){
   final dateSplit = measurementDate.split(' ');
   final date = DateTime( 
@@ -11,4 +11,10 @@ DateTime getMeasurementDateTime( { required String measurementDate } ){
     int.parse(dateSplit[11]) // second 
   );
   return date;
+}
+
+// getMeasureFormatTime
+String getMeasureFormatTime( { required int seconds} ){
+  final time = DateTime( 0 ,0 ,0 ,0,0, seconds ).toString().split(' ')[1].split('.')[0];
+  return time;
 }

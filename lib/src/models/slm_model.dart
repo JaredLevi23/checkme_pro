@@ -1,11 +1,11 @@
 // To parse this JSON data, do
 //
-//     final smlModel = smlModelFromJson(jsonString);
+//     final slmModel = slmModelFromJson(jsonString);
 
 import 'dart:convert';
 
-class SmlModel {
-    SmlModel({
+class SlmModel {
+    SlmModel({
         required this.enPassKind,
         required this.lowOxNumber,
         required this.dtcDate,
@@ -25,11 +25,11 @@ class SmlModel {
     final String averageOx;
     final String totalTime;
 
-    factory SmlModel.fromRawJson(String str) => SmlModel.fromJson(json.decode(str));
+    factory SlmModel.fromRawJson(String str) => SlmModel.fromJson(json.decode(str));
 
     String toRawJson() => json.encode(toJson());
 
-    factory SmlModel.fromJson(Map<String, dynamic> json) => SmlModel(
+    factory SlmModel.fromJson(Map<String, dynamic> json) => SlmModel(
         enPassKind: json["enPassKind"],
         lowOxNumber: json["lowOxNumber"],
         dtcDate: json["dtcDate"],

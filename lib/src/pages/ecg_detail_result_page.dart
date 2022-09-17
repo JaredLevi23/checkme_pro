@@ -127,8 +127,8 @@ class EcgDetailResultPage extends StatelessWidget {
 
         EcgGrap(graphData: ecgDetails.arrEcgContent ) ,
 
-        Text( 'ARR_HEART_RATE:${ecgDetails.arrEcgHeartRate}'),
-        Text( 'ARR_ECG_CONTENT:${ecgDetails.arrEcgContent}'),
+        //Text( 'ARR_HEART_RATE:${ecgDetails.arrEcgHeartRate}'),
+        //Text( 'ARR_ECG_CONTENT:${ecgDetails.arrEcgContent}'),
     ]);
   }
 

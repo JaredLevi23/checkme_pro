@@ -11,14 +11,18 @@ class EcgGrap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
-      color: Colors.indigo,
+      height: 350,
+      width: MediaQuery.of(context).size.width,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
-        child: CustomPaint(
-          painter: PaintGraph( graph: graphData ),
-          size: Size(200, 200 ),
+        child: Row(
+          children: [
+            CustomPaint(
+              painter: PaintGraph( graph: graphData ),
+              size: Size( 4500 , 350 ),
+            ),
+          ],
         ),
       ),
     );
@@ -34,10 +38,9 @@ class PaintGraph extends CustomPainter{
 
   @override
   void paint(Canvas canvas, Size size) {
-    log( '${size.width}' );
     final paint = Paint();
-    paint.color = Colors.black;
-    paint.strokeWidth = 2;
+    paint.color = Colors.red;
+    paint.strokeWidth = 3;
     paint.style = PaintingStyle.stroke;
 
     final path = Path();
@@ -46,10 +49,31 @@ class PaintGraph extends CustomPainter{
     double x = 0;
 
     for (var coord in graph) {
-      path.lineTo(x, coord);
-      x++;
+      path.lineTo(x, ((coord * 90)- ( 2* (coord*90) )) + size.height/2 );
+      x = x + 0.3;
     }
 
+    final paint2 = Paint();
+    paint2.color = Colors.cyan.shade100;
+    paint2.strokeWidth = 1; 
+    paint2.style = PaintingStyle.stroke;
+
+    final path2 = Path();
+    path2.moveTo(0, 0);
+
+    for (double i = 0; i< size.height; i+=3 ) {
+       path2.lineTo( size.width , i );
+       path2.moveTo( 0, i + 3 );
+    }
+
+    path2.moveTo(0, 0);
+
+    for (double i = 0; i< size.width; i+=3 ) {
+       path2.lineTo( i , size.height );
+       path2.moveTo( i + 3 , 0 );
+    }
+
+    canvas.drawPath(path2, paint2);
     canvas.drawPath(path, paint);
 
   }

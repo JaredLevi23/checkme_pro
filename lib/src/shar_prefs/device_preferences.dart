@@ -20,4 +20,10 @@ class DevicePreferences{
   set uuid(String uuid) {
      _prefs.setString('uuid', uuid);
   }
+
+  String get deviceName => _prefs.getString('device') ?? '';
+
+  set deviceName(String device) {
+     _prefs.setString('device', device);
+  }
 }

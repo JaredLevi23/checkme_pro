@@ -51,9 +51,7 @@ class CustomDrawer extends StatelessWidget {
           _optionDrawer(
             iconData: Icons.info,
             title: 'About',
-            onPressed: (){
-              log( _dev.uuid  );
-            }
+            onPressed: (){}
           ),
           _optionDrawer(
             iconData: Icons.logout,

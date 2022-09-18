@@ -138,10 +138,15 @@ class CheckmeChannelProvider with ChangeNotifier{
       }
   }
 
-  Future<String> connectToDevice ({ required String uuid } )async{
+  Future<String> connectToDevice ({ required String uuid, String? deviceName } )async{
       try{
           final String result = await platform.invokeMethod('checkmepro/connectTo', { "uuid": uuid });
           _devicePrefs.uuid = uuid;
+
+          if( _devicePrefs.deviceName == '' ){
+            _devicePrefs.deviceName = deviceName ?? '';
+          }
+
           return result;
       }catch( err ){
         log( '$err' );
@@ -151,8 +156,8 @@ class CheckmeChannelProvider with ChangeNotifier{
 
   Future<String> cancelConnect ()async{
       try{
-          final String result = await platform.invokeMethod('checkmepro/disconnect');
-          return result;
+          final bool result = await platform.invokeMethod('checkmepro/disconnect');
+          return 'STATE: $result';
       }catch( err ){
         log( '$err' );
         return "$err";
@@ -197,7 +202,7 @@ class CheckmeChannelProvider with ChangeNotifier{
   }
   
   void _onEvent(Object? event) {
-    log( 'EVENT_FLUTTER: $event' );
+    //log( 'EVENT_FLUTTER: $event' );
 
     // event
     final headerType = TypeFileModel.fromRawJson( event.toString() );
@@ -325,7 +330,6 @@ class CheckmeChannelProvider with ChangeNotifier{
 
   // reset data 
   cleanData( { required int indexTypeFile} ){
-    log('LIMPIANDO DATOS');
     switch( indexTypeFile ){
       case 1:
         userList = [];

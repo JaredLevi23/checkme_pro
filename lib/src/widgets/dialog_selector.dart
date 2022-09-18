@@ -1,4 +1,5 @@
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/shar_prefs/device_preferences.dart';
 import 'package:checkme_pro_develop/src/widgets/sync_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ class DialogSelector extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
+    final _devicePrefs = DevicePreferences();
 
     return Material(
       color: Colors.transparent,
@@ -40,8 +42,12 @@ class DialogSelector extends StatelessWidget {
                       subtitle: Text( device.uuid),
                       leading: const CircleAvatar(child: Icon( Icons.bluetooth_searching_sharp )),
                       onTap: () async {
+                        
                         checkmeProvider.currentDevice = device;
-                        final res = await checkmeProvider.connectToDevice( uuid: device.uuid );
+                        _devicePrefs.uuid = '';
+                        _devicePrefs.deviceName = '';
+
+                        final res = await checkmeProvider.connectToDevice( uuid: device.uuid, deviceName: device.name );
 
                         if( res == 'checkmepro/connecting' ){
                           Navigator.pop(context);

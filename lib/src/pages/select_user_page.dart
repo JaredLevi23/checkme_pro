@@ -52,7 +52,6 @@ class SelectUserPage extends StatelessWidget {
             ),
             onTap: title == 'PED' 
             ? ()async{
-              log('PED');
                 final res = await checkmeProvider.beginReadFileList( 
                   indexTypeFile: 9, 
                   userId: int.parse(user.userId)
@@ -60,13 +59,10 @@ class SelectUserPage extends StatelessWidget {
                 Navigator.pushNamed(context, 'checkme/ped');
               }
             : () async{
-              log('DLC');
                 final res = await checkmeProvider.beginReadFileList( 
                   indexTypeFile: 2, 
                   userId: int.parse(user.userId)
                 );
-
-                log( res );
                 Navigator.pushNamed(context, 'checkme/dlc');
               }
           );

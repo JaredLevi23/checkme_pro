@@ -1,10 +1,20 @@
+import 'dart:developer';
+
+import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/shar_prefs/device_preferences.dart';
+import 'package:checkme_pro_develop/src/widgets/dialog_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
+    final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
+    final _dev = DevicePreferences();
+
     return Drawer(
       child: ListView(
         children: [
@@ -19,14 +29,31 @@ class CustomDrawer extends StatelessWidget {
           ),
 
           _optionDrawer(
+            iconData: Icons.bluetooth_connected,
+            title: checkmeProvider.isConnected ? 'Disconnect' : 'Connect to',
+            onPressed: checkmeProvider.isConnected 
+            ? () async {
+              await checkmeProvider.cancelConnect();
+            }
+            : () async {
+              Navigator.pop(context);
+              await checkmeProvider.startScan();
+              showDialog(context: context, builder: ( _) {
+                return const DialogSelector();
+              });
+            }
+          ),
+          _optionDrawer(
             iconData: Icons.settings,
             title: 'Settings',
-            onPressed: (){}
+            onPressed: ()=> Navigator.pushNamed(context, 'checkme/settings')
           ),
           _optionDrawer(
             iconData: Icons.info,
             title: 'About',
-            onPressed: (){}
+            onPressed: (){
+              log( _dev.uuid  );
+            }
           ),
           _optionDrawer(
             iconData: Icons.logout,

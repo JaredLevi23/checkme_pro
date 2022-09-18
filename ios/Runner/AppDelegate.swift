@@ -26,7 +26,7 @@ enum MyFlutterErrorCode{
 @objc class AppDelegate: FlutterAppDelegate,VTBLEUtilsDelegate, VTProCommunicateDelegate, FlutterStreamHandler {
     
     private var eventSink: FlutterEventSink?
-    var periArray: NSMutableArray = NSMutableArray.init( capacity: 10 )
+    var periArray: [ VTDevice ] = [];
     // var vbleUtils = VTBLEUtils()
     
     var state: VTProState?
@@ -40,6 +40,7 @@ enum MyFlutterErrorCode{
     var ecgList :[ VTProEcg ]? = nil;
     var dlcList :[ VTProDlc ]? = nil;
     var isConnected: Bool = false
+    var isBtEnabled: Bool = false
     var indexUser = 0
     var user: NSObject? = nil
     
@@ -64,7 +65,44 @@ enum MyFlutterErrorCode{
       checkmePROConnection.setMethodCallHandler({
           [weak self] (call: FlutterMethodCall, result: FlutterResult) -> Void in
           
-          if( "checkmepro/isConnected" == call.method ){
+          if( "checkmepro/btEnabled" == call.method ){
+              // MARK: bt Enabled
+              result( self?.isBtEnabled )
+              
+          } else if( "checkmepro/startScan" == call.method ){
+              // MARK: StartScan
+              self?.periArray = []
+              VTBLEUtils.sharedInstance().stopScan()
+              VTBLEUtils.sharedInstance().startScan()
+              result("checkmepro/startScan")
+              
+          }else if( "checkmepro/stopScan" == call.method ){
+              // MARK: StopScan
+              VTBLEUtils.sharedInstance().stopScan()
+              result("checkmepro/stopScan")
+              
+          }else if( "checkmepro/connectTo" == call.method ){
+              // MARK: Connect to
+              guard let args = call.arguments as? [String: Any] else { return }
+              let uuid = args["uuid"] as! String
+              
+              let currentDevice = self?.periArray.firstIndex{ uuid == "\($0.rawPeripheral.identifier)" }
+              
+              if( currentDevice == nil ){
+                  result("checkmepro/failToConnected")
+                  return
+              }
+              
+              VTBLEUtils.sharedInstance().connect(to: (self?.periArray[ currentDevice! ])!)
+              result("checkmepro/connecting")
+              
+          }else if( "checkmepro/disconnect" == call.method ){
+              // MARK: status
+              VTBLEUtils.sharedInstance().cancelConnect()
+              VTBLEUtils.sharedInstance().stopScan()
+              result( self?.isConnected )
+              
+          }else if( "checkmepro/isConnected" == call.method ){
               // MARK: status
               result( self?.isConnected )
               
@@ -86,7 +124,7 @@ enum MyFlutterErrorCode{
               guard let args = call.arguments as? [ String: Any ] else { return }
               let indexTypeFile = args["indexTypeFile"] as! Int
               
-              if indexTypeFile == 1 || indexTypeFile == 3 || indexTypeFile == 4 || indexTypeFile == 7 || indexTypeFile == 8 || indexTypeFile == 16{
+              if indexTypeFile == 1 || indexTypeFile == 3 || indexTypeFile == 4 || indexTypeFile == 7 || indexTypeFile == 8 {
                   self?.beginReadFileList( result: result, dataType: indexTypeFile )
               }else{
                   let idUser = args["idUser"] as! Int
@@ -207,6 +245,7 @@ enum MyFlutterErrorCode{
         
         if currentUser == nil {
             self.indexUser = 0
+            print( "Nil User !!!" )
             return
         }
         
@@ -282,15 +321,13 @@ enum MyFlutterErrorCode{
                     }
                 }
             }
-        }
-        if (fileData.fileType == VTProFileTypeXuserList) {
+        }else if (fileData.fileType == VTProFileTypeXuserList) {
             if (fileData.enLoadResult == VTProFileLoadResultSuccess) {
                 // MARK: X User List
                 let userList = VTProFileParser.parseUserList_(withFileData: fileData.fileData as Data)
                 print( userList as Any )
             }
-        }
-        if fileData.fileType == VTProFileTypeEcgList{
+        }else if fileData.fileType == VTProFileTypeEcgList{
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
                let arr = VTProFileParser.parseEcgList_(withFileData: fileData.fileData as Data)
                self.ecgList = arr
@@ -486,6 +523,7 @@ enum MyFlutterErrorCode{
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
             // MARK: SPC
                 let detail = VTProFileParser.parseRecList_(withFileData: fileData.fileData as Data)
+                
                 print( detail ?? "Nulo para SMLDETAL List" )
             } else {
                 print("Detail Error %ld", fileData.enLoadResult)
@@ -514,41 +552,41 @@ enum MyFlutterErrorCode{
     func dataTypeMapToFileType( datatype:Int ) -> VTProFileType {
         switch datatype {
         case 1:
-            return VTProFileTypeUserList
+            return VTProFileTypeUserList // USADA
         case 2:
-            return VTProFileTypeDlcList
+            return VTProFileTypeDlcList // USADA
         case 3:
-            return VTProFileTypeEcgList
+            return VTProFileTypeEcgList // USADA
         case 4:
-            return VTProFileTypeSpO2List
+            return VTProFileTypeSpO2List // USADA
         case 5:
-            return VTProFileTypeBpList
+            return VTProFileTypeBpList // NO SE PUEDE
         case 6:
-            return VTProFileTypeBgList
+            return VTProFileTypeBgList // NO SE PUEDE
         case 7:
-            return VTProFileTypeTmList
+            return VTProFileTypeTmList // USADA
         case 8:
-            return VTProFileTypeSlmList
+            return VTProFileTypeSlmList // USADO
         case 9:
-            return VTProFileTypePedList
+            return VTProFileTypePedList // UDADO
         case 10:
-            return VTProFileTypeXuserList
+            return VTProFileTypeXuserList//
         case 11:
-            return VTProFileTypeSpcList
+            return VTProFileTypeSpcList//
         case 12:
-            return VTProFileTypeEXHistoryList
+            return VTProFileTypeEXHistoryList//
         case 13:
-            return VTProFileTypeEXHistoryDetail
+            return VTProFileTypeEXHistoryDetail//
         case 14:
-            return VTProFileTypeEcgDetail
+            return VTProFileTypeEcgDetail // USADO
         case 15:
-            return VTProFileTypeEcgVoice
+            return VTProFileTypeEcgVoice//
         case 16:
-            return VTProFileTypeSlmDetail
+            return VTProFileTypeSlmDetail//
         case 17:
-            return VTProFileTypeLangPkg
+            return VTProFileTypeLangPkg//
         case 18:
-            return VTProFileTypeAppPkg
+            return VTProFileTypeAppPkg//
         default:
             break
         }
@@ -558,21 +596,58 @@ enum MyFlutterErrorCode{
 
     // MARK: ble states
     func update(_ state: VTBLEState) {
-        print("update- estado ")
         if state == .poweredOn {
-            VTBLEUtils.sharedInstance().startScan()
+            
+            self.isBtEnabled = true;
+            
+            let res = [
+                "type":"BluetoothState",
+                "value": "POWEREDON"
+            ]
+            
+            if let jsonData = try? JSONSerialization.data(withJSONObject: res, options: [] ){
+                let jsonText = String( data: jsonData, encoding: .ascii )
+                self.eventSink?( jsonText )
+            }
+            
+        }else{
+            self.isBtEnabled = false;
+            let res = [
+                "type":"BluetoothState",
+                "value": "POWEREDOFF"
+            ]
+            
+            if let jsonData = try? JSONSerialization.data(withJSONObject: res, options: [] ){
+                let jsonText = String( data: jsonData, encoding: .ascii )
+                self.eventSink?( jsonText )
+            }
+
         }
     }
     
     func didDiscover(_ device: VTDevice) {
-        print("didDiscover: " + (device.rawPeripheral.name ?? "Error"))
-        periArray.add(device)
+        self.periArray.append( device )
+        
+        let res:[ String: Any ] = [
+            "type":"DiscoverDevices",
+            "advName": device.advName,
+            "name": device.rawPeripheral.name ?? "No name",
+            "UUID": "\(device.rawPeripheral.identifier)",
+            "RSSI": "\(device.rssi)"
+        ]
+        
+        if let jsonData = try? JSONSerialization.data(withJSONObject: res, options: [] ){
+            let jsonText = String( data: jsonData, encoding: .ascii )
+            self.eventSink?( jsonText );
+        }
+        
     }
     
     func didConnectedDevice(_ device: VTDevice) {
-        print("didConnectedDevice - estado ")
         VTProCommunicate.sharedInstance().peripheral = device.rawPeripheral
         VTProCommunicate.sharedInstance().delegate = self
+        VTBLEUtils.sharedInstance().stopScan()
+        
         self.isConnected = true
         let res = [
             "type":"ONLINE: ON"
@@ -584,12 +659,12 @@ enum MyFlutterErrorCode{
         }
     }
     func didDisconnectedDevice(_ device: VTDevice, andError error: Error) {
-        print("didDisconnectedDevice - estado")
-        VTBLEUtils.sharedInstance().startScan()
+        // VTBLEUtils.sharedInstance().startScan()
         self.isConnected = false
         let res = [
             "type":"ONLINE: OFF"
         ]
+        
         
         if let jsonData = try? JSONSerialization.data(withJSONObject: res, options: [] ){
             let jsonText = String( data: jsonData, encoding: .ascii )

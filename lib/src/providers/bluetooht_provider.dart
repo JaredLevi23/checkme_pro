@@ -1,12 +1,12 @@
 
 
-import 'dart:async';
-import 'dart:developer';
+// import 'dart:async';
+// import 'dart:developer';
 
-import 'package:flutter/material.dart';
-//import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+// import 'package:flutter/material.dart';
+// //import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
-class BluetoothProvider with ChangeNotifier{
+// class BluetoothProvider with ChangeNotifier{
 
   // FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
   // BluetoothDevice? _bluetoothDevice;
@@ -55,4 +55,4 @@ class BluetoothProvider with ChangeNotifier{
   //   });
   // }
 
-}
+//}

@@ -116,14 +116,15 @@ static VTBLEUtils *_utils = nil;
     if (!device) {
         return;
     }
-    NSLog(@"DEVICE: %@", device.rawPeripheral.name );
-    
-    if( [device.rawPeripheral.name isEqualToString:@"Checkme 0128"]){
-        NSLog(@"Entre en device ");
-        [[ VTBLEUtils sharedInstance ] stopScan];
-        [[ VTBLEUtils sharedInstance ] connectToDevice: device ];
-        NSLog(@"Ejecute las funciones");
-    }
+//    NSLog(@"DEVICE: %@", device.rawPeripheral.name );
+//
+//    if( [device.rawPeripheral.name hasPrefix:@"Checkme"]){
+//
+//        NSLog(@"Entre en device ");
+//        [[ VTBLEUtils sharedInstance ] stopScan];
+//        [[ VTBLEUtils sharedInstance ] connectToDevice: device ];
+//        NSLog(@"Ejecute las funciones");
+//    }
     
     if (_delegate && [_delegate respondsToSelector:@selector(didDiscoverDevice:)]) {
         [_delegate didDiscoverDevice:device];

@@ -13,6 +13,11 @@
 	<key>NSLocationWhenInUseUsageDescription</key>  
 	<string>Need Location permission</string>
 
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartobservatory._tcp</string>
+	</array>
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

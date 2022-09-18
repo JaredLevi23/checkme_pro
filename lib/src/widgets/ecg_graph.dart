@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 
 class EcgGrap extends StatelessWidget {
 
-  const EcgGrap({Key? key, required this.graphData}) : super(key: key);
+  const EcgGrap({Key? key, required this.graphData, this.sizeY}) : super(key: key);
   final List<double> graphData;
+  final double? sizeY;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 350,
+    return SizedBox(
+      height: 200,
       width: MediaQuery.of(context).size.width,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -20,7 +21,7 @@ class EcgGrap extends StatelessWidget {
           children: [
             CustomPaint(
               painter: PaintGraph( graph: graphData ),
-              size: Size( 4500 , 350 ),
+              size: Size( sizeY ?? 3000 , 200 ),
             ),
           ],
         ),
@@ -54,23 +55,23 @@ class PaintGraph extends CustomPainter{
     }
 
     final paint2 = Paint();
-    paint2.color = Colors.cyan.shade100;
-    paint2.strokeWidth = 1; 
+    paint2.color = Colors.pink.shade100;
+    paint2.strokeWidth = 0.5; 
     paint2.style = PaintingStyle.stroke;
 
     final path2 = Path();
     path2.moveTo(0, 0);
 
-    for (double i = 0; i< size.height; i+=3 ) {
+    for (double i = 0; i< size.height; i+=9 ) {
        path2.lineTo( size.width , i );
-       path2.moveTo( 0, i + 3 );
+       path2.moveTo( 0, i + 9 );
     }
 
     path2.moveTo(0, 0);
 
-    for (double i = 0; i< size.width; i+=3 ) {
+    for (double i = 0; i< size.width; i+=9 ) {
        path2.lineTo( i , size.height );
-       path2.moveTo( i + 3 , 0 );
+       path2.moveTo( i + 9 , 0 );
     }
 
     canvas.drawPath(path2, paint2);

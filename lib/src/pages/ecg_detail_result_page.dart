@@ -55,6 +55,20 @@ class EcgDetailResultPage extends StatelessWidget {
   Widget listResults( EcgDetailsModel ecgDetails ){
     return ListView(
       children: [
+         Row(
+          children: [
+            Expanded(
+              child: cardResult( 
+                value: getMeasureFormatTime(seconds: ecgDetails.timeLength ), 
+                title: 'Duration', 
+                unitMeasurement: "s", 
+                icon: Icons.timer, 
+                iconColor: Colors.blue 
+              ),
+            ),
+            
+          ],
+        ),
         Row(
           children: [
             Expanded(
@@ -93,42 +107,27 @@ class EcgDetailResultPage extends StatelessWidget {
             )
           ],
         ),
-        Row(
+       
+
+        Stack(
           children: [
-            Expanded(
-              child: cardResult( 
-                value: ecgDetails.timeLength, 
-                title: 'Duration', 
-                unitMeasurement: "s", 
-                icon: Icons.timer, 
-                iconColor: Colors.blue 
+
+            EcgGrap(graphData: ecgDetails.arrEcgContent, sizeY: 4500, ),
+
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.pink,
+                shape: const CircleBorder()
               ),
+              child: const Icon(
+                Icons.play_arrow,
+                color: Colors.white,
+              ),
+              onPressed: () {},
             ),
-            Expanded(
-              child: Container(
-                height: 160,
-                padding: const EdgeInsets.all(6),
-                child: MaterialButton(
-                  color: Colors.white,
-                  onPressed: (){},
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: const [
-                      Text( 'Results', style:TextStyle( fontStyle: FontStyle.italic, fontWeight: FontWeight.w300),),
-                      Icon( Icons.monitor_heart, size: 120, color: Colors.cyan,)
-                    ],
-                  ),
-                ),
-              )
-            )
           ],
-        ),
+        ) ,
 
-        EcgGrap(graphData: ecgDetails.arrEcgContent ) ,
-
-        //Text( 'ARR_HEART_RATE:${ecgDetails.arrEcgHeartRate}'),
-        //Text( 'ARR_ECG_CONTENT:${ecgDetails.arrEcgContent}'),
     ]);
   }
 
@@ -136,7 +135,7 @@ class EcgDetailResultPage extends StatelessWidget {
     return Card(
       child: Container(
         padding: const EdgeInsets.all(10),
-        height: 150,
+        height: 120,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -144,15 +143,15 @@ class EcgDetailResultPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text( title ?? 'No title', style: const TextStyle( fontStyle: FontStyle.italic, fontWeight: FontWeight.w300),),
+                Text( title ?? 'No title', style: const TextStyle( fontStyle: FontStyle.italic, fontWeight: FontWeight.w500),),
                 const SizedBox( width: 6, ),
-                Icon( icon ?? Icons.monitor, size: 20, color: iconColor ?? Colors.red,)
+                Icon( icon ?? Icons.monitor, size: 35, color: iconColor ?? Colors.red,)
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('$value', style: const TextStyle( fontSize: 70),),
+                Text('$value', style: const TextStyle( fontSize: 45),),
                 Text( unitMeasurement ?? 'No units')
               ],
             )

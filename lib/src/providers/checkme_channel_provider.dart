@@ -1,3 +1,4 @@
+import 'package:checkme_pro_develop/src/shar_prefs/device_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:developer';
@@ -8,9 +9,14 @@ class CheckmeChannelProvider with ChangeNotifier{
 
   static const platform = MethodChannel("checkmepro.connection");
   static const EventChannel eventChannel = EventChannel('checkmepro.listener');
+  final _devicePrefs = DevicePreferences();
 
   bool _isSync = false;
   bool _isConnected = false;
+  bool _btEnabled = false;
+
+  List<DeviceModel> devices = [];
+  DeviceModel? currentDevice;
 
   // Data List
   List<TemperatureModel> temperaturesList = [];
@@ -43,11 +49,38 @@ class CheckmeChannelProvider with ChangeNotifier{
     notifyListeners();
   }
 
+  bool get btEnabled => _btEnabled;
+
+  set btEnabled(bool btEnabled) {
+    _btEnabled = btEnabled;
+    notifyListeners();
+  }
+
   Future<String> checkmeIsConnected ()async{
       try{
+
+        if( _devicePrefs.uuid != '' ){
+          await startScan();
+          await Future.delayed( const Duration( seconds: 3 ) );
+          await stopScan();
+          await connectToDevice(uuid: _devicePrefs.uuid);
+        }
+
         final bool result = await platform.invokeMethod('checkmepro/isConnected');
         isConnected = result;
+        
         return "IsConnected: $result";
+      }catch( err ){
+        log( '$err' );
+        return "$err";
+      }
+  }
+
+  Future<String> btIsEnabled ()async{
+      try{
+        final bool result = await platform.invokeMethod('checkmepro/btEnabled');
+        btEnabled = result;
+        return "IsBTEnabled: $result";
       }catch( err ){
         log( '$err' );
         return "$err";
@@ -78,6 +111,48 @@ class CheckmeChannelProvider with ChangeNotifier{
       try{
         final String result = await platform.invokeMethod('checkmepro/beginSyncTime');
         return result;
+      }catch( err ){
+        log( '$err' );
+        return "$err";
+      }
+  }
+
+  Future<String> startScan ()async{
+      try{
+        devices = [];
+        final String result = await platform.invokeMethod('checkmepro/startScan');
+        return result;
+      }catch( err ){
+        log( '$err' );
+        return "$err";
+      }
+  }
+
+  Future<String> stopScan ()async{
+      try{
+        final String result = await platform.invokeMethod('checkmepro/stopScan');
+        return result;
+      }catch( err ){
+        log( '$err' );
+        return "$err";
+      }
+  }
+
+  Future<String> connectToDevice ({ required String uuid } )async{
+      try{
+          final String result = await platform.invokeMethod('checkmepro/connectTo', { "uuid": uuid });
+          _devicePrefs.uuid = uuid;
+          return result;
+      }catch( err ){
+        log( '$err' );
+        return "$err";
+      }
+  }
+
+  Future<String> cancelConnect ()async{
+      try{
+          final String result = await platform.invokeMethod('checkmepro/disconnect');
+          return result;
       }catch( err ){
         log( '$err' );
         return "$err";
@@ -122,16 +197,36 @@ class CheckmeChannelProvider with ChangeNotifier{
   }
   
   void _onEvent(Object? event) {
-    //log( 'EVENT_FLUTTER: $event' );
+    log( 'EVENT_FLUTTER: $event' );
+
+    // event
     final headerType = TypeFileModel.fromRawJson( event.toString() );
 
-    if( headerType.type == 'DLC'){
-      final dlcTemp = DlcModel.fromRawJson( event.toString());
-      dlcList.add( dlcTemp );
+    // DISCOVER DEVICES
+    if( headerType.type == 'DiscoverDevices' ){
+      final deviceModel = DeviceModel.fromRawJson( event.toString() );
+      if( !devices.contains( deviceModel )){
+        devices.add( deviceModel );
+      }
     }
 
+    // SYNC TIME
     if( headerType.type == "SyncTime: OK" ){
       
+    }
+
+    // BT STATE
+    if( headerType.type == "BluetoothState"){
+      final btState = BtStateModel.fromRawJson( event.toString() );
+      if( btState.value == "POWEREDON" ){
+        btEnabled = true;
+      }else{
+        btEnabled = false;
+        isConnected = false;
+        isSync = false;
+        currentSyncDlc = null;
+        currentSyncEcg = null;
+      }
     }
 
     // Connected
@@ -143,6 +238,12 @@ class CheckmeChannelProvider with ChangeNotifier{
     // Disconnected
     if( headerType.type == "ONLINE: OFF" ){
       isConnected = false;
+    }
+
+    // DLC
+    if( headerType.type == 'DLC'){
+      final dlcTemp = DlcModel.fromRawJson( event.toString());
+      dlcList.add( dlcTemp );
     }
 
     // TM

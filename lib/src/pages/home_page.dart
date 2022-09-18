@@ -1,3 +1,5 @@
+import 'package:checkme_pro_develop/src/models/device_model.dart';
+import 'package:checkme_pro_develop/src/shar_prefs/device_preferences.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
 
@@ -18,7 +20,23 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     final checkProvider = Provider.of<CheckmeChannelProvider>(context, listen: false);
+    final devicePrefs = DevicePreferences();
+    final uuid = devicePrefs.uuid;
+
+    if( uuid != '' ){
+      final modelTemp = DeviceModel(
+        name: 'ACTUAL', 
+        type: 'btDevice', 
+        uuid: uuid, 
+        rssi: '', 
+        advName: ''
+      );
+
+      checkProvider.currentDevice = modelTemp;
+    }
+    
     checkProvider.startEvents();
+    checkProvider.btIsEnabled();
     checkProvider.checkmeIsConnected();
     
     super.initState();
@@ -32,22 +50,35 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Checkme PRO'),
-        actions: [
-          const ConnectionIndicator(),
-          IconButton(
-            icon: const Icon(Icons.sync),
-            onPressed: ()async{
-              final res = await checkmeProvider.beginGetInfo();
-              log( res );
-            }, 
-          ),
+        actions: const [
+          ConnectionIndicator(),
+          // IconButton(
+          //   icon: const Icon(Icons.sync),
+          //   onPressed: ()async{
+          //     final res = await checkmeProvider.beginGetInfo();
+          //     log( res );
+          //   }, 
+          // ),
         ],
       ),
       
 
       drawer: const CustomDrawer(),
 
-      body: ListView(
+      body: !checkmeProvider.btEnabled 
+      ? Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Center(
+            child: Text('Please turn on bluetooth', 
+              textAlign: TextAlign.center, 
+              style: TextStyle( fontSize: 20),
+            )
+          )
+        ],
+      )
+      : checkmeProvider.isConnected 
+      ? ListView(
         children: [
 
           CheckmeOption(
@@ -183,14 +214,33 @@ class _HomePageState extends State<HomePage> {
           // ),
 
           CheckmeOption(
-            titleOption: 'SPC',
+            titleOption: 'FALTA SPC LIST',
             iconData: Icons.developer_mode_rounded,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 16 );
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 11, userId: 1 );
               log( res );
             },
           ),
 
+          CheckmeOption(
+            titleOption: 'EX HISTORY LIST',
+            iconData: Icons.developer_mode_rounded,
+            onPressed: ()async{
+              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 18, userId: 2 );
+              log( res );
+            },
+          ),
+
+        ],
+      ): Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Center(
+            child: Text('Please connect your device', 
+              textAlign: TextAlign.center, 
+              style: TextStyle( fontSize: 20),
+            )
+          )
         ],
       )
     );

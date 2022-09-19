@@ -205,7 +205,7 @@ class CheckmeChannelProvider with ChangeNotifier{
   }
   
   void _onEvent(Object? event) {
-    log( 'EVENT_FLUTTER: $event' );
+    //log( 'EVENT_FLUTTER: $event' );
 
     // event
     final headerType = TypeFileModel.fromRawJson( event.toString() );

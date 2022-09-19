@@ -28,7 +28,13 @@ class DlcDetailsResultsPage extends StatelessWidget {
         children: [
           Card(
             child: ListTile(
-              title: Text( '${ getMeasurementDateTime( measurementDate: currentDlcModel.dtcDate )}'),
+              title: Text( 
+                getMeasurementDateTime( measurementDate: currentDlcModel.dtcDate ).toString().split('.')[0],
+                style: const TextStyle( 
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500
+                ),
+              ),
               trailing: const CircleAvatar( 
                 child: Icon(Icons.emoji_emotions,),
                 backgroundColor: Colors.white,
@@ -45,14 +51,14 @@ class DlcDetailsResultsPage extends StatelessWidget {
                     Text('Please wait')
                   ],
               )
-            : listResults( ecgDetails: ecgDetails!, dlcModel: currentDlcModel )
+            : listResults( ecgDetails: ecgDetails!, dlcModel: currentDlcModel, context: context )
           )
         ],
       )
     );
   }
 
-  Widget listResults( {required EcgDetailsModel ecgDetails, required DlcModel dlcModel } ){
+  Widget listResults( {required EcgDetailsModel ecgDetails, required DlcModel dlcModel, required BuildContext context } ){
     return ListView(
       children: [
         Row(
@@ -125,56 +131,72 @@ class DlcDetailsResultsPage extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Container(
-                height: 160,
-                padding: const EdgeInsets.all(6),
-                child: MaterialButton(
-                  color: Colors.white,
-                  onPressed: (){},
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: const [
-                      Text( 'Results', style:TextStyle( fontStyle: FontStyle.italic, fontWeight: FontWeight.w300),),
-                      Icon( Icons.monitor_heart, size: 120, color: Colors.cyan,)
-                    ],
-                  ),
-                ),
-              )
+              child: cardResult( 
+                value: 'ECG',
+                title: '', 
+                unitMeasurement: "", 
+                icon: Icons.graphic_eq, 
+                iconColor: Colors.blue,
+                onTap: (){
+                  Navigator.pushNamed(context, 'checkme/dlc/record');
+                }
+              ),
             )
           ],
         ),
 
-        EcgGrap(graphData: ecgDetails.arrEcgContent ) ,
+        //EcgGrap(graphData: ecgDetails.arrEcgContent ) ,
 
     ]);
   }
 
-  Card cardResult({ String? title, dynamic value, String? unitMeasurement, IconData? icon, Color? iconColor  }) {
-    return Card(
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        height: 150,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text( title ?? 'No title', style: const TextStyle( fontStyle: FontStyle.italic, fontWeight: FontWeight.w300),),
-                const SizedBox( width: 6, ),
-                Icon( icon ?? Icons.monitor, size: 20, color: iconColor ?? Colors.red,)
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('$value', style: const TextStyle( fontSize: 70),),
-                Text( unitMeasurement ?? 'No units')
-              ],
-            )
-          ],
+  Widget cardResult(
+    { 
+      String? title, 
+      dynamic value, 
+      String? unitMeasurement, 
+      IconData? icon, 
+      Color? iconColor, 
+      double? fontSize,
+      Function()? onTap
+    }
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          height: 145,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+    
+                  Icon( icon ?? Icons.monitor, size: 45, color: iconColor ?? Colors.red,),
+                  
+                  Text( 
+                    title ?? 'No title', 
+                    style: const TextStyle( 
+                      fontStyle: FontStyle.italic, 
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15
+                    ),
+                  ),
+    
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('$value', style: TextStyle( fontSize: fontSize ?? 45, fontWeight: FontWeight.bold),),
+                  Text( unitMeasurement ?? 'No units', style: const TextStyle( fontStyle: FontStyle.italic ),)
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

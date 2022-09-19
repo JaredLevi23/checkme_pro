@@ -21,19 +21,22 @@ class CheckmeChannelProvider with ChangeNotifier{
   // Data List
   List<TemperatureModel> temperaturesList = [];
   List<Spo2Model> spo2sList = [];
-  List<SlmModel> smlList = [];
+  List<SlmModel> slmList = [];
   List<UserModel> userList = [];
   List<PedModel> pedList = [];
   List<DlcModel> dlcList = [];
 
   late EcgModel currentEcg;
   late DlcModel currentDlc;
+  late SlmModel currentSlm;
   List<EcgModel> ecgList = [];
 
   EcgModel? currentSyncEcg;
   DlcModel? currentSyncDlc;
+  SlmModel? currentSyncSlm;
   Map<String, EcgDetailsModel> ecgDetailsList = {};
   Map<String, EcgDetailsModel> dlcDetailsList = {};
+  Map<String, SlmDetailsModel > slmDetailsList = {};
 
   bool get isSync => _isSync;
 
@@ -202,7 +205,7 @@ class CheckmeChannelProvider with ChangeNotifier{
   }
   
   void _onEvent(Object? event) {
-    //log( 'EVENT_FLUTTER: $event' );
+    log( 'EVENT_FLUTTER: $event' );
 
     // event
     final headerType = TypeFileModel.fromRawJson( event.toString() );
@@ -270,8 +273,8 @@ class CheckmeChannelProvider with ChangeNotifier{
     // SLM 
     if( headerType.type == 'SLM'){
       final smlTemp = SlmModel.fromRawJson( event.toString() );
-      if( !smlList.contains( smlTemp ) ){
-        smlList.add( smlTemp );
+      if( !slmList.contains( smlTemp ) ){
+        slmList.add( smlTemp );
       }
     }
 
@@ -319,6 +322,22 @@ class CheckmeChannelProvider with ChangeNotifier{
       }
     }
 
+    // Details Sleep Monitor
+    if( headerType.type == 'DETAILS_SLM' ){
+      try{
+        final smlDetailTemp = SlmDetailsModel.fromRawJson( event.toString() );
+        if( currentSyncSlm != null && !slmDetailsList.containsKey( currentSyncSlm!.dtcDate)){
+          slmDetailsList.addAll({ currentSyncSlm!.dtcDate : smlDetailTemp });
+        }
+
+      }catch( err ){
+        log( '$err' );
+      }finally{
+        currentSyncSlm = null;
+        isSync = false;
+      }
+    }
+
     notifyListeners();
 
   }
@@ -351,7 +370,7 @@ class CheckmeChannelProvider with ChangeNotifier{
         temperaturesList = [];
       break;
       case 8:
-        smlList = [];
+        slmList = [];
       break;
       case 9:
         pedList = [];

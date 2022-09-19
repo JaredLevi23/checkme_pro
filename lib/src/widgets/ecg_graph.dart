@@ -12,7 +12,7 @@ class EcgGrap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 200,
+      height: 250,
       width: MediaQuery.of(context).size.width,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -21,7 +21,7 @@ class EcgGrap extends StatelessWidget {
           children: [
             CustomPaint(
               painter: PaintGraph( graph: graphData ),
-              size: Size( sizeY ?? 3000 , 200 ),
+              size: Size( sizeY ?? 3000 , 250 ),
             ),
           ],
         ),

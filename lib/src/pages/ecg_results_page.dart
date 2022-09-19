@@ -15,7 +15,7 @@ class EcgResultsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Resultados de ECG'),
+        title: const Text('ECG Results'),
         actions: const [
           ConnectionIndicator()
         ],

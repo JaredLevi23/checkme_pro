@@ -28,8 +28,7 @@ class PedResultsPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric( vertical: 15),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              color: Colors.black12,
-              border: Border.all( color: Colors.cyan, width: 1.5 )
+              border: Border.all( color: Colors.cyan, width: 5 )
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -52,7 +51,7 @@ class PedResultsPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _information(units: 'km/h', value: '${ped.speed}', icondata: Icons.speed ),
-                    const Icon( Icons.directions_run_rounded,  size: 70, ),
+                    const Icon( Icons.directions_run_rounded,  size: 70, color: Colors.cyan, ),
                     _information(units: 'Km', value: '${ped.distance }', icondata: Icons.mode_of_travel_outlined ),
                   ],
                 ),
@@ -76,13 +75,13 @@ class PedResultsPage extends StatelessWidget {
     return Row(
       children: [
 
-        Icon( icondata , size: 40,),
+        Icon( icondata , size: 40, color: Colors.cyan,),
         const SizedBox( width: 8, ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text( value , style: const TextStyle( fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.normal  )),
-            Text( units , style: const TextStyle( fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic))
+            Text( units , style: const TextStyle( fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic ))
           ], 
         ) 
       ],

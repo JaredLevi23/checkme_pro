@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/widgets.dart';
 
-class SmlResultsPage extends StatelessWidget {
-  const SmlResultsPage({Key? key}) : super(key: key);
+class SlmResultsPage extends StatelessWidget {
+  const SlmResultsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class SmlResultsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SML Results'),
+        title: const Text('Sleep Monitor'),
         actions: const [
           ConnectionIndicator(),
         ],
@@ -21,17 +21,22 @@ class SmlResultsPage extends StatelessWidget {
 
       body: ListView.builder(
         padding: const EdgeInsets.all(10),
-        itemCount: checkmeProvider.smlList.length,
+        itemCount: checkmeProvider.slmList.length,
         itemBuilder: (_, index){
 
-          final sml = checkmeProvider.smlList[ index ];
-          final date = sml.dtcDate.split(' ');
+          final slm = checkmeProvider.slmList[ index ];
+          final date = slm.dtcDate.split(' ');
 
           return Card(
             child: ListTile( 
-              title: Text( 'Averange OX: ${sml.averageOx}\nLow Ox:${sml.lowOxTime}\nLowest Ox:${sml.lowestOx}\nLow Ox Number: ${sml.lowOxNumber}' ),
+              title: Text( 'Averange OX: ${slm.averageOx}\nLow Ox:${slm.lowOxTime}\nLowest Ox:${slm.lowestOx}\nLow Ox Number: ${slm.lowOxNumber}' ),
               subtitle: Text( 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}'),
-              trailing: Text( 'Duration: ${sml.totalTime}', style: TextStyle( fontSize: 17),),
+              trailing: Text( 'Duration: ${slm.totalTime}', style: TextStyle( fontSize: 17),),
+              onTap: () async {
+                checkmeProvider.currentSlm = slm;
+                await checkmeProvider.getMeasurementDetails(dtcDate: slm.dtcDate, detail: 'SLM');
+
+              },
              ),
           );
         }

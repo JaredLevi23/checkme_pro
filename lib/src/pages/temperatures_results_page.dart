@@ -23,16 +23,16 @@ class TemperaturesResultsPage extends StatelessWidget {
           final temp = checkmeProvider.temperaturesList[ index ];
           final date = temp.dtcDate.split(' ');
 
-          return  ListTile(
-            title: Text( '${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}'),
-            subtitle: const Text('Date'),
-            leading: CircleAvatar(
-              radius: 30,
-              backgroundColor: Colors.cyan,
-              foregroundColor: Colors.white,
-              child: Text( temp.tempValue, style: TextStyle( fontSize: 19 ),),
-            ),
-            trailing: Text('IDU: ${ temp.userId }'),
+          return  Column(
+            children: [
+              ListTile(
+                title: Text( '${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}'),
+                subtitle: const Text('Date'),
+                leading: const Icon( Icons.thermostat ),
+                trailing: Text( temp.tempValue + ' °C', style: const TextStyle( fontSize: 19 ),),
+              ),
+              const Divider()
+            ],
           );
 
         }

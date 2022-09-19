@@ -37,7 +37,9 @@ enum MyFlutterErrorCode{
     var info: VTProInfo? = nil
     var userList : [VTProUser]? = nil
     var xuserList: [VTProXuser]? = nil
-    var ecgList :[ VTProEcg ]? = nil;
+    var ecgList : [ VTProEcg ]? = nil;
+    var slmList : [ VTProSlm ]? = nil
+    
     var dlcList :[ VTProDlc ]? = nil;
     var isConnected: Bool = false
     var isBtEnabled: Bool = false
@@ -161,6 +163,18 @@ enum MyFlutterErrorCode{
                       VTProCommunicate.sharedInstance().beginReadDetailFile(
                         with: (self!.dlcList?[ currentDlc! ])!,
                         fileType: VTProFileTypeEcgDetail
+                      )
+                      result("isSync")
+                  }else{
+                      result("no sync")
+                  }
+              } else if typeDetail == "SLM"{
+                  let currentSLM = self?.slmList?.firstIndex{ "\($0.dtcDate)" == dtcDate }
+                  
+                  if currentSLM != nil {
+                      VTProCommunicate.sharedInstance().beginReadDetailFile(
+                        with: (self!.slmList?[ currentSLM! ])!,
+                        fileType: VTProFileTypeSlmDetail
                       )
                       result("isSync")
                   }else{
@@ -406,6 +420,8 @@ enum MyFlutterErrorCode{
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
                 let arr = VTProFileParser.parseSLMList_(withFileData: fileData.fileData as Data)
                 
+                self.slmList = arr
+                
                 // MARK: SLM
                 for slm in arr ?? [] {
                     let slmTemp :[String:String] = [
@@ -519,12 +535,31 @@ enum MyFlutterErrorCode{
             } else {
                 print("Detail Error %ld", fileData.enLoadResult)
             }
+        }else if (fileData.fileType) == VTProFileTypeSlmDetail {
+            if fileData.enLoadResult == VTProFileLoadResultSuccess {
+            // MARK: Sml detail
+                let detail = VTProFileParser.parseSLMData_(withFileData: fileData.fileData as Data)
+                
+                let smlDetailTemp:[ String: Any ] = [
+                    "type": "DETAILS_SLM",
+                    "arrOxValue": detail?.arrOxValue ?? [],
+                    "arrPrValue": detail?.arrPrValue ?? []
+                ]
+                
+                if let jsonData = try? JSONSerialization.data(withJSONObject: smlDetailTemp, options: [] ){
+                    let jsonText = String( data: jsonData, encoding: .ascii )
+                    self.eventSink?( jsonText )
+                }
+                
+            } else {
+                print("Detail Error %ld", fileData.enLoadResult)
+            }
         }else if (fileData.fileType) == VTProFileTypeSpcList {
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
             // MARK: SPC
                 let detail = VTProFileParser.parseRecList_(withFileData: fileData.fileData as Data)
                 
-                print( detail ?? "Nulo para SMLDETAL List" )
+                print( detail ?? "Nulo para SPCDETAL List" )
             } else {
                 print("Detail Error %ld", fileData.enLoadResult)
             }

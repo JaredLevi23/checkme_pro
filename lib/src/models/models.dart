@@ -10,4 +10,5 @@ export 'package:checkme_pro_develop/src/models/type_file_model.dart';
 export 'package:checkme_pro_develop/src/models/dlc_model.dart';
 export 'package:checkme_pro_develop/src/models/device_model.dart';
 export 'package:checkme_pro_develop/src/models/bt_state_model.dart';
+export 'package:checkme_pro_develop/src/models/slm_details_model.dart';
 

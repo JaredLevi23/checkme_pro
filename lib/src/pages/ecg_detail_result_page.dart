@@ -28,7 +28,10 @@ class EcgDetailResultPage extends StatelessWidget {
         children: [
           Card(
             child: ListTile(
-              title: Text( '${ getMeasurementDateTime( measurementDate: currentEcgModel.dtcDate )}'),
+              title: Text( 
+                getMeasurementDateTime( measurementDate: currentEcgModel.dtcDate ).toString().split('.')[0],
+                style: TextStyle( fontSize: 18 ),
+              ),
               trailing: const CircleAvatar( 
                 child: Icon(Icons.emoji_emotions,),
                 backgroundColor: Colors.white,
@@ -45,14 +48,14 @@ class EcgDetailResultPage extends StatelessWidget {
                     Text('Please wait')
                   ],
               )
-            : listResults( ecgDetails! )
+            : listResults( ecgDetails!, context )
           )
         ],
       )
     );
   }
 
-  Widget listResults( EcgDetailsModel ecgDetails ){
+  Widget listResults( EcgDetailsModel ecgDetails, context ){
     return ListView(
       children: [
          Row(
@@ -62,21 +65,32 @@ class EcgDetailResultPage extends StatelessWidget {
                 value: getMeasureFormatTime(seconds: ecgDetails.timeLength ), 
                 title: 'Duration', 
                 unitMeasurement: "s", 
-                icon: Icons.timer, 
-                iconColor: Colors.blue 
+                icon: Icons.timer_outlined, 
+                iconColor: Colors.blue,
+                fontSize: 30
               ),
             ),
             
-          ],
-        ),
-        Row(
-          children: [
-            Expanded(
+
+          Expanded(
               child: cardResult( 
                 value: ecgDetails.hrValue, 
                 title: 'HR', 
                 unitMeasurement: "/min",
                 icon: Icons.favorite
+              ),
+            )
+            
+          ],
+        ),
+        Row(
+          children: [
+
+            Expanded(
+              child: cardResult( 
+                value: ecgDetails.qtcValue, 
+                title: 'QTc', 
+                unitMeasurement: "ms" 
               ),
             ),
             Expanded(
@@ -100,62 +114,72 @@ class EcgDetailResultPage extends StatelessWidget {
             ),
             Expanded(
               child: cardResult( 
-                value: ecgDetails.qtcValue, 
-                title: 'QTc', 
-                unitMeasurement: "ms" 
+                value: 'ECG',
+                title: '', 
+                unitMeasurement: "", 
+                icon: Icons.graphic_eq, 
+                iconColor: Colors.blue,
+                onTap: (){
+                  Navigator.pushNamed(context, 'checkme/ecg/record');
+                }
               ),
             )
           ],
         ),
        
 
-        Stack(
-          children: [
-
-            EcgGrap(graphData: ecgDetails.arrEcgContent, sizeY: 4500, ),
-
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.pink,
-                shape: const CircleBorder()
-              ),
-              child: const Icon(
-                Icons.play_arrow,
-                color: Colors.white,
-              ),
-              onPressed: () {},
-            ),
-          ],
-        ) ,
+        //EcgGrap(graphData: ecgDetails.arrEcgContent, sizeY: 4500, ) ,
 
     ]);
   }
 
-  Card cardResult({ String? title, dynamic value, String? unitMeasurement, IconData? icon, Color? iconColor  }) {
-    return Card(
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        height: 120,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text( title ?? 'No title', style: const TextStyle( fontStyle: FontStyle.italic, fontWeight: FontWeight.w500),),
-                const SizedBox( width: 6, ),
-                Icon( icon ?? Icons.monitor, size: 35, color: iconColor ?? Colors.red,)
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('$value', style: const TextStyle( fontSize: 45),),
-                Text( unitMeasurement ?? 'No units')
-              ],
-            )
-          ],
+  Widget cardResult(
+    { 
+      String? title, 
+      dynamic value, 
+      String? unitMeasurement, 
+      IconData? icon, 
+      Color? iconColor, 
+      double? fontSize,
+      Function()? onTap
+    }
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          height: 200,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+    
+                  Icon( icon ?? Icons.monitor, size: 45, color: iconColor ?? Colors.red,),
+                  
+                  Text( 
+                    title ?? 'No title', 
+                    style: const TextStyle( 
+                      fontStyle: FontStyle.italic, 
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15
+                    ),
+                  ),
+    
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('$value', style: TextStyle( fontSize: fontSize ?? 45, fontWeight: FontWeight.bold),),
+                  Text( unitMeasurement ?? 'No units', style: const TextStyle( fontStyle: FontStyle.italic ),)
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

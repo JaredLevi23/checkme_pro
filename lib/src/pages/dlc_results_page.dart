@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import '../utils/utils_date.dart';
+import '../widgets/widgets.dart';
 
 
 class DlcResultsPage extends StatelessWidget {
@@ -55,30 +56,8 @@ class DlcResultsPage extends StatelessWidget {
                         }
 
                       }else{
-
                         showDialog(context: context, builder: (_){
-                          return AlertDialog(
-                            backgroundColor: Colors.transparent,
-                            elevation: 0,
-                            content: Container(
-                              width: 200,
-                              height: 200,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle
-                              ),
-                              child: Center(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Icon(Icons.bluetooth_audio ),
-                                    Text('Verifica la conexion del dispositivo', textAlign: TextAlign.center,),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
+                          return const CustomAlertDialog();
                         });
                         return;
                       }

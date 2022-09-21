@@ -59,36 +59,13 @@ class EcgResultsPage extends StatelessWidget {
                   if(checkmeProvider.isConnected){
 
                     if( !checkmeProvider.isSync ){
-                      //checkmeProvider.currentEcg.isSync = true;
                       checkmeProvider.currentSyncEcg ??= ecg;
                       await checkmeProvider.getMeasurementDetails( dtcDate: ecg.dtcDate, detail: 'ECG' );
                     }
 
                   }else{
-
                     showDialog(context: context, builder: (_){
-                      return AlertDialog(
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                        content: Container(
-                          width: 200,
-                          height: 200,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle
-                          ),
-                          child: Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.bluetooth_audio ),
-                                Text('Verifica la conexion del dispositivo', textAlign: TextAlign.center,),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
+                      return const CustomAlertDialog();
                     });
                     return;
                   }

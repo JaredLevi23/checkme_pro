@@ -31,11 +31,28 @@ class SlmResultsPage extends StatelessWidget {
             child: ListTile( 
               title: Text( 'Averange OX: ${slm.averageOx}\nLow Ox:${slm.lowOxTime}\nLowest Ox:${slm.lowestOx}\nLow Ox Number: ${slm.lowOxNumber}' ),
               subtitle: Text( 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}'),
-              trailing: Text( 'Duration: ${slm.totalTime}', style: TextStyle( fontSize: 17),),
+              trailing: Text( 'Duration: ${slm.totalTime}', style: const TextStyle( fontSize: 17),),
               onTap: () async {
                 checkmeProvider.currentSlm = slm;
-                await checkmeProvider.getMeasurementDetails(dtcDate: slm.dtcDate, detail: 'SLM');
 
+                if( !checkmeProvider.ecgDetailsList.containsKey( slm.dtcDate ) ){
+
+                  if(checkmeProvider.isConnected){
+
+                    if( !checkmeProvider.isSync ){
+                      checkmeProvider.currentSyncSlm ??= slm;
+                      await checkmeProvider.getMeasurementDetails(dtcDate: slm.dtcDate, detail: 'SLM');
+                    }
+
+                  }else{
+                    showDialog(context: context, builder: (_){
+                      return const CustomAlertDialog();
+                    });
+                    return;
+                  }
+                }
+                
+                Navigator.pushNamed(context, 'checkme/slm/details');
               },
              ),
           );

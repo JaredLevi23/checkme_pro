@@ -43,7 +43,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: checkmeProvider.isSync && ecgDetails == null
+            child: checkmeProvider.isSync || checkmeProvider.dlcDetailsList[ currentDlcModel.dtcDate ] == null 
             ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
@@ -144,8 +144,6 @@ class DlcDetailsResultsPage extends StatelessWidget {
             )
           ],
         ),
-
-        //EcgGrap(graphData: ecgDetails.arrEcgContent ) ,
 
     ]);
   }

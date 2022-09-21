@@ -13,6 +13,9 @@ class CheckmeChannelProvider with ChangeNotifier{
 
   bool _isSync = false;
   bool _isConnected = false;
+
+
+  
   bool _btEnabled = false;
 
   List<DeviceModel> devices = [];
@@ -205,7 +208,7 @@ class CheckmeChannelProvider with ChangeNotifier{
   }
   
   void _onEvent(Object? event) {
-    //log( 'EVENT_FLUTTER: $event' );
+    log( 'EVENT_FLUTTER: $event' );
 
     // event
     final headerType = TypeFileModel.fromRawJson( event.toString() );

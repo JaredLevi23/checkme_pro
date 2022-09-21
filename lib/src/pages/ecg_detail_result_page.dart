@@ -16,42 +16,44 @@ class EcgDetailResultPage extends StatelessWidget {
     final EcgModel currentEcgModel = checkmeProvider.currentEcg;
     EcgDetailsModel? ecgDetails = checkmeProvider.ecgDetailsList[ currentEcgModel.dtcDate ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text( 'ECG Detail' ),
-        actions: const [
-          ConnectionIndicator()
-        ],
-      ),
-
-      body: Column(
-        children: [
-          Card(
-            child: ListTile(
-              title: Text( 
-                getMeasurementDateTime( measurementDate: currentEcgModel.dtcDate ).toString().split('.')[0],
-                style: TextStyle( fontSize: 18 ),
-              ),
-              trailing: const CircleAvatar( 
-                child: Icon(Icons.emoji_emotions,),
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.cyan,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text( 'ECG Detail' ),
+          actions: const [
+            ConnectionIndicator()
+          ],
+        ),
+    
+        body: Column(
+          children: [
+            Card(
+              child: ListTile(
+                title: Text( 
+                  getMeasurementDateTime( measurementDate: currentEcgModel.dtcDate ).toString().split('.')[0],
+                  style: const TextStyle( fontSize: 18 ),
+                ),
+                trailing: const CircleAvatar( 
+                  child: Icon(Icons.emoji_emotions,),
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.cyan,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: checkmeProvider.isSync && ecgDetails == null
-            ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    CircularProgressIndicator(),
-                    Text('Please wait')
-                  ],
-              )
-            : listResults( ecgDetails!, context )
-          )
-        ],
-      )
+            Expanded(
+              child: checkmeProvider.isSync || checkmeProvider.ecgDetailsList[ currentEcgModel.dtcDate ] == null 
+              ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      CircularProgressIndicator(),
+                      Text('Please wait')
+                    ],
+                )
+              : listResults( ecgDetails!, context )
+            )
+          ],
+        )
+      ),
     );
   }
 
@@ -149,7 +151,7 @@ class EcgDetailResultPage extends StatelessWidget {
       child: Card(
         child: Container(
           padding: const EdgeInsets.all(10),
-          height: 200,
+          height: 190,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,

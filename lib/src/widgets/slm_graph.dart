@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:checkme_pro_develop/src/models/models.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,12 +18,17 @@ class SlmGraph extends StatelessWidget {
 
     return Column(
       children: [
-        const SizedBox(
+        Container(
+          margin: const EdgeInsets.symmetric( horizontal: 15 ),
           width: double.infinity,
           height: 50,
-          child: Center(
-            child: Text('SPO2'),
-          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('SPO2'),
+              Text( '${getMeasurementDateTime(measurementDate: currentSlm.dtcDate)}' )
+            ],
+          )
         ),
         Expanded(
           child: Stack(

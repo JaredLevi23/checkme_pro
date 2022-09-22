@@ -1,13 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.checkme_pro_develop">
+    package="com.example.check_developer_main">
 
-    <!-- bluetooth permissions -->
-    <uses-permission android:name="android.permission.BLUETOOTH" />  
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />  
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/> 
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
 
-   <application
-        android:label="checkme_pro_develop"
+    <application
+        android:label="check_developer_main"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

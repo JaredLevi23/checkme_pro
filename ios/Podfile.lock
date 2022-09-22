@@ -1,20 +1,36 @@
 PODS:
   - Flutter (1.0.0)
+  - flutter_blue_plus (0.0.1):
+    - Flutter
+    - flutter_blue_plus/Protos (= 0.0.1)
+  - flutter_blue_plus/Protos (0.0.1):
+    - Flutter
+    - Protobuf (~> 3.11)
+  - Protobuf (3.21.5)
   - shared_preferences_ios (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - flutter_blue_plus (from `.symlinks/plugins/flutter_blue_plus/ios`)
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Protobuf
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  flutter_blue_plus:
+    :path: ".symlinks/plugins/flutter_blue_plus/ios"
   shared_preferences_ios:
     :path: ".symlinks/plugins/shared_preferences_ios/ios"
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  flutter_blue_plus: 6787777145d615de01828f3a9fa423c3c702f0b3
+  Protobuf: 7504b04fffcf6662ad629694db8231f5e744327f
   shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
 
 PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3

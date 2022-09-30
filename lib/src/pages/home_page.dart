@@ -18,14 +18,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   @override
-  void initState() {
+  void initState(){
     final checkProvider = Provider.of<CheckmeChannelProvider>(context, listen: false);
     final devicePrefs = DevicePreferences();
     final uuid = devicePrefs.uuid;
 
     if( uuid != '' ){
+
       final modelTemp = DeviceModel(
-        name: 'ACTUAL', 
+        name: devicePrefs.deviceName, 
         type: 'btDevice', 
         uuid: uuid, 
         rssi: '', 
@@ -34,12 +35,17 @@ class _HomePageState extends State<HomePage> {
 
       checkProvider.currentDevice = modelTemp;
     }
+
+    checkPermissions();
     
+    super.initState();
+  }
+
+  void checkPermissions()async{
+    final checkProvider = Provider.of<CheckmeChannelProvider>(context, listen: false);
     checkProvider.startEvents();
     checkProvider.btIsEnabled();
     checkProvider.checkmeIsConnected();
-    
-    super.initState();
   }
 
   @override
@@ -120,8 +126,10 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'Read User List',
             iconData: Icons.group,
             onPressed: ()async {
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
-              log( res );
+              if( checkmeProvider.userList.isEmpty ){
+                final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
+                log( res );
+              }
               Navigator.pushNamed(context, 'checkme/users');
             },
           ),
@@ -130,8 +138,10 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'Daily Check',
             iconData: Icons.how_to_reg_rounded,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
-              log( res );
+              if( checkmeProvider.userList.isEmpty ){
+                final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
+                log( res );
+              }
               Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'DLC'});
             },
           ),
@@ -140,8 +150,10 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'Ecg Recorder',
             iconData: Icons.monitor_heart,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
-              log( res );
+              if( checkmeProvider.ecgList.isEmpty ){
+                final res = await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
+                log( res );
+              }
               Navigator.pushNamed(context, 'checkme/ecg');
             },
           ),
@@ -166,14 +178,6 @@ class _HomePageState extends State<HomePage> {
             },
           ),
 
-          // CheckmeOption(
-          //   titleOption: 'X User List',
-          //   iconData: Icons.group_rounded,
-          //   onPressed: ()async{
-          //     final res = await checkmeProvider.beginReadFileList( indexTypeFile: 10 );
-          //     log( res );
-          //   },
-          // ),
 
            CheckmeOption(
             titleOption: 'Sleep Monitor',
@@ -189,11 +193,22 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'Pedometer',
             iconData: Icons.directions_walk_outlined,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
+              if( checkmeProvider.userList.isEmpty ){
+                final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
+                log( res );
+              }
               Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'PED'});
-              log( res );
             },
           ),
+
+          // CheckmeOption(
+          //   titleOption: 'X User List',
+          //   iconData: Icons.group_rounded,
+          //   onPressed: ()async{
+          //     final res = await checkmeProvider.beginReadFileList( indexTypeFile: 10 );
+          //     log( res );
+          //   },
+          // ),
 
           // CheckmeOption(
           //   titleOption: 'Blood Preassure',
@@ -212,24 +227,6 @@ class _HomePageState extends State<HomePage> {
           //     log( res );
           //   },
           // ),
-
-          CheckmeOption(
-            titleOption: 'FALTA SPC LIST',
-            iconData: Icons.developer_mode_rounded,
-            onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 11, userId: 1 );
-              log( res );
-            },
-          ),
-
-          CheckmeOption(
-            titleOption: 'EX HISTORY LIST',
-            iconData: Icons.developer_mode_rounded,
-            onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 18, userId: 2 );
-              log( res );
-            },
-          ),
 
         ],
       ): Column(

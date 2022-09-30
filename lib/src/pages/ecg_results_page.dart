@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:checkme_pro_develop/src/models/ecg_details_model.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/utils/utils_date.dart';
@@ -43,7 +45,7 @@ class EcgResultsPage extends StatelessWidget {
                   ),
                 ],
               ),
-              subtitle: Text( '${getMeasurementDateTime( measurementDate: ecg.dtcDate )}' ),
+              subtitle: Text( Platform.isIOS ? '${getMeasurementDateTime( measurementDate: ecg.dtcDate )}' :ecg.dtcDate ),
               leading: CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.cyan,
@@ -61,6 +63,7 @@ class EcgResultsPage extends StatelessWidget {
                     if( !checkmeProvider.isSync ){
                       checkmeProvider.currentSyncEcg ??= ecg;
                       await checkmeProvider.getMeasurementDetails( dtcDate: ecg.dtcDate, detail: 'ECG' );
+                      //await checkmeProvider.getMeasurementDetails( dtcDate: ecg.timeString ?? ecg.dtcDate, detail: 'ECG' );
                     }
 
                   }else{
@@ -71,7 +74,7 @@ class EcgResultsPage extends StatelessWidget {
                   }
                 }
 
-                Navigator.pushNamed(context, 'checkme/ecg/details');
+                //Navigator.pushNamed(context, 'checkme/ecg/details');
               },
             ),
           );

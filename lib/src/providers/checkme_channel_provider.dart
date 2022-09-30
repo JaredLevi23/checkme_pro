@@ -65,12 +65,13 @@ class CheckmeChannelProvider with ChangeNotifier{
   Future<String> checkmeIsConnected ()async{
       try{
 
-        if( _devicePrefs.uuid != '' ){
-          await startScan();
-          await Future.delayed( const Duration( seconds: 3 ) );
-          await stopScan();
-          await connectToDevice(uuid: _devicePrefs.uuid);
-        }
+        // if( _devicePrefs.uuid != '' ){
+        //   log("YA TENGO UN UUID!!!");
+        //   await startScan();
+        //   await Future.delayed( const Duration( seconds: 6 ) );
+        //   await stopScan();
+        //   await connectToDevice(uuid: _devicePrefs.uuid);
+        // }
 
         final bool result = await platform.invokeMethod('checkmepro/isConnected');
         isConnected = result;
@@ -170,12 +171,14 @@ class CheckmeChannelProvider with ChangeNotifier{
       }
   }
 
-  Future<String> beginReadFileList ({ required int indexTypeFile, int? userId = 0 } )async{
+  Future<String> beginReadFileList ({ required int indexTypeFile, int? userId } )async{
       try{
         
         final String result = await platform.invokeMethod(
-          'checkmepro/beginReadFileList', 
-          { 'indexTypeFile': indexTypeFile, 'idUser': userId }
+          'checkmepro/beginReadFileList',
+          userId != null 
+          ? { 'indexTypeFile': indexTypeFile, 'idUser': userId }
+          : { 'indexTypeFile': indexTypeFile }
         );
 
         return result;
@@ -190,7 +193,8 @@ class CheckmeChannelProvider with ChangeNotifier{
   // get measurement details
   Future<void> getMeasurementDetails( { required String dtcDate, required String detail } )async{
     try{
-      final res = await platform.invokeMethod('checkmepro/beginReadFileListDetailsECG', { 'id': dtcDate, 'detail': detail});
+      final res = await platform.invokeMethod('checkmepro/beginReadFileListDetailsECG', 
+      { 'id': dtcDate, 'detail': detail});
       
       if( res == "isSync"){
         isSync = true;
@@ -341,6 +345,21 @@ class CheckmeChannelProvider with ChangeNotifier{
       }
     }
 
+    // Details Sleep Monitor
+    if( headerType.type == 'DETAILS_EKG_ANDROID' ){
+      try{
+        
+        final model = EcgDetailsAndroidModel.fromRawJson( event.toString());
+        log( model.type );
+
+      }catch( err ){
+        log( '$err' );
+      }finally{
+        currentSyncSlm = null;
+        isSync = false;
+      }
+    }
+
     notifyListeners();
 
   }
@@ -360,7 +379,7 @@ class CheckmeChannelProvider with ChangeNotifier{
         dlcList = [];
       break;
       case 3:
-        ecgList = [];
+        //ecgList = [];
       break;
       case 4:
         spo2sList = [];

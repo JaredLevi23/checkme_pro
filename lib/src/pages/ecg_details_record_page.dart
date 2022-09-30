@@ -1,3 +1,6 @@
+
+import 'dart:io';
+
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:checkme_pro_develop/src/widgets/widgets.dart';
@@ -59,7 +62,7 @@ class _EcgRecordDetailsState extends State<EcgDetailsRecordPage> {
                         children: [
                           const Text( 'Record ECG', style: TextStyle( fontSize: 18, color: Colors.white),),
                           Text( 
-                            getMeasurementDateTime(measurementDate: currentModel.dtcDate).toString().split('.')[0],
+                            Platform.isIOS ? getMeasurementDateTime(measurementDate: currentModel.dtcDate).toString().split('.')[0] : currentModel.dtcDate,
                             style: const TextStyle( fontSize: 18, color: Colors.white)
                           )
                         ],

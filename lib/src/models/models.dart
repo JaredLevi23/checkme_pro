@@ -11,4 +11,5 @@ export 'package:checkme_pro_develop/src/models/spo2_model.dart';
 export 'package:checkme_pro_develop/src/models/temperature_model.dart';
 export 'package:checkme_pro_develop/src/models/type_file_model.dart';
 export 'package:checkme_pro_develop/src/models/user_model.dart';
+export 'package:checkme_pro_develop/src/models/ecg_details_android_model.dart';
 

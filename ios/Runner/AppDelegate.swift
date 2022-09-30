@@ -27,8 +27,6 @@ enum MyFlutterErrorCode{
     
     private var eventSink: FlutterEventSink?
     var periArray: [ VTDevice ] = [];
-    // var vbleUtils = VTBLEUtils()
-    
     var state: VTProState?
     var currNEModel: NameEventModel?
     var isInitialRequest = false
@@ -693,6 +691,7 @@ enum MyFlutterErrorCode{
             self.eventSink?( jsonText )
         }
     }
+    
     func didDisconnectedDevice(_ device: VTDevice, andError error: Error) {
         // VTBLEUtils.sharedInstance().startScan()
         self.isConnected = false

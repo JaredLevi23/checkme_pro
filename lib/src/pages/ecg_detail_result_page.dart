@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,7 +33,9 @@ class EcgDetailResultPage extends StatelessWidget {
             Card(
               child: ListTile(
                 title: Text( 
-                  getMeasurementDateTime( measurementDate: currentEcgModel.dtcDate ).toString().split('.')[0],
+                  Platform.isIOS 
+                  ? getMeasurementDateTime( measurementDate: currentEcgModel.dtcDate ).toString().split('.')[0]
+                  : currentEcgModel.dtcDate,
                   style: const TextStyle( fontSize: 18 ),
                 ),
                 trailing: const CircleAvatar( 
@@ -122,7 +127,10 @@ class EcgDetailResultPage extends StatelessWidget {
                 icon: Icons.graphic_eq, 
                 iconColor: Colors.blue,
                 onTap: (){
-                  Navigator.pushNamed(context, 'checkme/ecg/record');
+                  log('WAVE INT SIZE: ${ecgDetails.arrEcgContent!.length}' );
+                  log('WAVE INT SIZE: ${ecgDetails.arrEcgHeartRate}' );
+                  log('WAVE INT SIZE: ${ecgDetails.qtValue}' );
+                  //Navigator.pushNamed(context, 'checkme/ecg/record');
                 }
               ),
             )

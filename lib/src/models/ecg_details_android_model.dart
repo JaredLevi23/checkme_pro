@@ -1,10 +1,8 @@
 // To parse this JSON data, do
 //
-//     final EcgDetailsAndroidModel = EcgDetailsAndroidModelFromJson(jsonString);
+//     final ecgDetailsAndroidModel = ecgDetailsAndroidModelFromJson(jsonString);
 
 import 'dart:convert';
-
-import 'dart:typed_data';
 
 class EcgDetailsAndroidModel {
     EcgDetailsAndroidModel({
@@ -37,7 +35,7 @@ class EcgDetailsAndroidModel {
     int total;
     String waveList;
     int waveSize;
-    List<Int32List> waveViewList;
+    List waveViewList;
 
     factory EcgDetailsAndroidModel.fromRawJson(String str) => EcgDetailsAndroidModel.fromJson(json.decode(str));
 
@@ -57,7 +55,7 @@ class EcgDetailsAndroidModel {
         total: json["total"],
         waveList: json["waveList"],
         waveSize: json["waveSize"],
-        waveViewList: json["waveViewList"],
+        waveViewList: jsonDecode(json["waveViewList"]),
     );
 
     Map<String, dynamic> toJson() => {

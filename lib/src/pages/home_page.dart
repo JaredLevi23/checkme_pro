@@ -1,8 +1,7 @@
 import 'package:checkme_pro_develop/src/models/device_model.dart';
+import 'package:checkme_pro_develop/src/providers/bluetooht_provider.dart';
 import 'package:checkme_pro_develop/src/shar_prefs/device_preferences.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer';
-
 import 'package:provider/provider.dart'
 ;
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
@@ -24,7 +23,6 @@ class _HomePageState extends State<HomePage> {
     final uuid = devicePrefs.uuid;
 
     if( uuid != '' ){
-
       final modelTemp = DeviceModel(
         name: devicePrefs.deviceName, 
         type: 'btDevice', 
@@ -32,68 +30,68 @@ class _HomePageState extends State<HomePage> {
         rssi: '', 
         advName: ''
       );
-
       checkProvider.currentDevice = modelTemp;
     }
-
-    checkPermissions();
-    
+    initBtServices();
     super.initState();
   }
 
-  void checkPermissions()async{
+  void initBtServices()async{
     final checkProvider = Provider.of<CheckmeChannelProvider>(context, listen: false);
     checkProvider.startEvents();
-    checkProvider.btIsEnabled();
-    checkProvider.checkmeIsConnected();
   }
 
   @override
   Widget build(BuildContext context) {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
+    final btProvider = Provider.of<BluetoothProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Checkme PRO'),
-        actions: const [
-          ConnectionIndicator(),
-          // IconButton(
-          //   icon: const Icon(Icons.sync),
-          //   onPressed: ()async{
-          //     final res = await checkmeProvider.beginGetInfo();
-          //     log( res );
-          //   }, 
-          // ),
+        actions:[
+          const ConnectionIndicator(),
+          
         ],
       ),
       
 
       drawer: const CustomDrawer(),
 
-      body: !checkmeProvider.btEnabled 
+      body: !btProvider.isEnabled
       ? Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Center(
+        children: [
+          const Center(
             child: Text('Please turn on bluetooth', 
               textAlign: TextAlign.center, 
               style: TextStyle( fontSize: 20),
             )
+          ),
+          SizedBox(
+            width: 300,
+            child: SyncButton(
+              title: 'Continue Offline',
+              onPressed: (){
+                checkmeProvider.offlineMode = true;
+              }, 
+              backgroundColor: Colors.red.shade300,
+            ),
           )
         ],
       )
-      : checkmeProvider.isConnected 
+      : checkmeProvider.offlineMode || checkmeProvider.isConnected
       ? ListView(
         children: [
-
           CheckmeOption(
             titleOption: 'Get Info',
             iconData: Icons.info,
             onPressed: ()async{
-              final res = await checkmeProvider.getInfoCheckmePRO();
-              log( res );
-              Navigator.pushNamed(context, 'checkme/info', arguments: { 'info': res } );
+              if( checkmeProvider.informationModel == null ){
+                await checkmeProvider.getInfoCheckmePRO();
+              }
+              Navigator.pushNamed(context, 'checkme/info');
             },
           ),
 
@@ -101,7 +99,8 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'Sync Time',
             iconData: Icons.sync_alt,
             onPressed: () async {
-              final res = await checkmeProvider.beginSyncTime();
+
+              await checkmeProvider.beginSyncTime();
 
               showDialog(context: context, builder: ( _){
                 return AlertDialog(
@@ -115,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(15),
                       color: Colors.white
                     ),
-                    child: Center(child: Text( res )),
+                    child: const Center(child: Text( 'Sync Time' )),
                   ),
                 );
               });
@@ -127,8 +126,7 @@ class _HomePageState extends State<HomePage> {
             iconData: Icons.group,
             onPressed: ()async {
               if( checkmeProvider.userList.isEmpty ){
-                final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
-                log( res );
+                await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
               }
               Navigator.pushNamed(context, 'checkme/users');
             },
@@ -139,8 +137,7 @@ class _HomePageState extends State<HomePage> {
             iconData: Icons.how_to_reg_rounded,
             onPressed: ()async{
               if( checkmeProvider.userList.isEmpty ){
-                final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
-                log( res );
+                await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
               }
               Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'DLC'});
             },
@@ -151,8 +148,8 @@ class _HomePageState extends State<HomePage> {
             iconData: Icons.monitor_heart,
             onPressed: ()async{
               if( checkmeProvider.ecgList.isEmpty ){
-                final res = await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
-                log( res );
+                await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
+                
               }
               Navigator.pushNamed(context, 'checkme/ecg');
             },
@@ -162,8 +159,9 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'Pulse Oxymeter',
             iconData: Icons.invert_colors_on_sharp,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 4 );
-              log( res );
+              if( checkmeProvider.spo2sList.isEmpty ){
+                await checkmeProvider.beginReadFileList( indexTypeFile: 4 );
+              }
               Navigator.pushNamed(context, 'checkme/spo2');
             },
           ),
@@ -172,9 +170,10 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'Thermometer',
             iconData: Icons.thermostat,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 7 );
+              if( checkmeProvider.temperaturesList.isEmpty ){
+                await checkmeProvider.beginReadFileList( indexTypeFile: 7 );
+              }
               Navigator.pushNamed(context, 'checkme/temp');
-              log( res );
             },
           ),
 
@@ -183,8 +182,9 @@ class _HomePageState extends State<HomePage> {
             titleOption: 'Sleep Monitor',
             iconData: Icons.bed,
             onPressed: ()async{
-              final res = await checkmeProvider.beginReadFileList( indexTypeFile: 8 );
-              log( res );
+              if( checkmeProvider.slmList.isEmpty ){
+                await checkmeProvider.beginReadFileList( indexTypeFile: 8 );
+              }
               Navigator.pushNamed(context, 'checkme/sml');
             },
           ),
@@ -194,8 +194,7 @@ class _HomePageState extends State<HomePage> {
             iconData: Icons.directions_walk_outlined,
             onPressed: ()async{
               if( checkmeProvider.userList.isEmpty ){
-                final res = await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
-                log( res );
+                await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
               }
               Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'PED'});
             },
@@ -231,12 +230,35 @@ class _HomePageState extends State<HomePage> {
         ],
       ): Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Center(
+        children:[
+          const Center(
             child: Text('Please connect your device', 
               textAlign: TextAlign.center, 
               style: TextStyle( fontSize: 20),
             )
+          ),
+          SizedBox(
+            width: 300,
+            child: SyncButton(
+              title: 'Search Device',
+              onPressed: ()async{
+                await checkmeProvider.startScan();
+                showDialog(context: context, builder: ( _) {
+                  return const DialogSelector();
+                });
+              }, 
+              backgroundColor: Colors.blue,
+            ),
+          ),
+          SizedBox(
+            width: 300,
+            child: SyncButton(
+              title: 'Continue Offline',
+              onPressed: (){
+                checkmeProvider.offlineMode = true;
+              }, 
+              backgroundColor: Colors.red.shade300,
+            ),
           )
         ],
       )

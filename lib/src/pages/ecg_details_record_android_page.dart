@@ -1,46 +1,46 @@
+
 import 'dart:io';
 
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../models/models.dart';
 
-class DlcDetailsRecordPage extends StatefulWidget {
-  const DlcDetailsRecordPage({Key? key}) : super(key: key);
+class EcgDetailsRecordAndroidPage extends StatefulWidget {
+  const EcgDetailsRecordAndroidPage({Key? key}) : super(key: key);
 
   @override
-  State<DlcDetailsRecordPage> createState() => _EcgRecordDetailsState();
+  State<EcgDetailsRecordAndroidPage> createState() => _EcgRecordDetailsState();
 }
 
-class _EcgRecordDetailsState extends State<DlcDetailsRecordPage> {
+class _EcgRecordDetailsState extends State<EcgDetailsRecordAndroidPage> {
 
-  @override
-  void initState() {
-    super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   SystemChrome.setPreferredOrientations([
+  //     DeviceOrientation.landscapeLeft,
+  //     DeviceOrientation.landscapeRight,
+  //   ]);
+  // }
 
-  @override
-  void dispose() {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   SystemChrome.setPreferredOrientations([
+  //     DeviceOrientation.portraitUp,
+  //   ]);
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) { 
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
-    final currentModel = checkmeProvider.currentDlc;
-    EcgDetailsModel? dlcDetails = checkmeProvider.dlcDetailsList[ currentModel.dtcDate ];
+    final currentModel = checkmeProvider.currentEcg;
+    EcgDetailsAndroidModel? ecgDetails = checkmeProvider.ecgDetailsAndroidList[ currentModel.dtcDate ];
 
     return SafeArea(
       child: Scaffold(
@@ -59,11 +59,9 @@ class _EcgRecordDetailsState extends State<DlcDetailsRecordPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Text( 'Daily Check', style: TextStyle( fontSize: 18, color: Colors.white),),
+                          const Text( 'Record ECG', style: TextStyle( fontSize: 18, color: Colors.white),),
                           Text( 
-                            Platform.isIOS
-                            ? getMeasurementDateTime(measurementDate: currentModel.dtcDate).toString().split('.')[0]
-                            : currentModel.dtcDate,
+                            Platform.isIOS ? getMeasurementDateTime(measurementDate: currentModel.dtcDate).toString().split('.')[0] : currentModel.dtcDate,
                             style: const TextStyle( fontSize: 18, color: Colors.white)
                           )
                         ],
@@ -88,42 +86,31 @@ class _EcgRecordDetailsState extends State<DlcDetailsRecordPage> {
                       Column(
                         children: [
                           const Icon( Icons.favorite, color: Colors.pink, ),
-                          Text( 'HR: ${dlcDetails?.hrValue}', style: const TextStyle( fontSize: 18, fontWeight: FontWeight.bold ), )
+                          Text( 'HR: ${ecgDetails?.hr}', style: const TextStyle( fontSize: 18, fontWeight: FontWeight.bold ), )
                         ],
                       ),
                       Column(
                         children: [
                           const Icon( Icons.monitor, color: Colors.pink, ),
-                          Text( 'QT: ${dlcDetails?.qtValue}', style: const TextStyle( fontSize: 18, fontWeight: FontWeight.bold ), )
+                          Text( 'QT: ${ecgDetails?.qt}', style: const TextStyle( fontSize: 18, fontWeight: FontWeight.bold ), )
                         ],
                       ),
                       Column(
                         children: [
                           const Icon( Icons.monitor, color: Colors.pink, ),
-                          Text( 'QTc: ${dlcDetails?.qtcValue}', style: const TextStyle( fontSize: 18, fontWeight: FontWeight.bold ), )
+                          Text( 'QTc: ${ecgDetails?.qtc}', style: const TextStyle( fontSize: 18, fontWeight: FontWeight.bold ), )
                         ],
                       ),
                       Column(
                         children: [
                           const Icon( Icons.monitor_rounded, color: Colors.pink, ),
-                          Text( 'QRS: ${dlcDetails?.qrsValue}', style: const TextStyle( fontSize: 18, fontWeight: FontWeight.bold ), )
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          const Icon( Icons.monitor, color: Colors.pink, ),
-                          Text( 'SPO: ${currentModel.spo2Value}%', style: const TextStyle( fontSize: 18, fontWeight: FontWeight.bold ), )
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          const Icon( Icons.monitor_rounded, color: Colors.pink, ),
-                          Text( 'PI: ${currentModel.pIndex}', style: const TextStyle( fontSize: 18, fontWeight: FontWeight.bold ), )
+                          Text( 'QRS: ${ecgDetails?.qrs}', style: const TextStyle( fontSize: 18, fontWeight: FontWeight.bold ), )
                         ],
                       ),
                     ],
                   ),
-                  EcgGrap(graphData: dlcDetails?.arrEcgContent ?? [] )
+
+                  EcgGrapAndroid(graphData: ecgDetails?.waveViewList ?? [] )
                 ],
               )
             )

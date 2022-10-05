@@ -101,6 +101,7 @@ class PermissionActivity : AppCompatActivity() {
         val lm = getSystemService(LOCATION_SERVICE) as LocationManager
         var gps_enabled = false
         var network_enabled = false
+        var bluetooth = false
 
         try {
             gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)

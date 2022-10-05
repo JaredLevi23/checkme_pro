@@ -38,8 +38,8 @@ class CustomDrawer extends StatelessWidget {
             }
             : () async {
               Navigator.pop(context);
-              final res = await checkmeProvider.startScan();
-              log( res );
+              checkmeProvider.offlineMode = false;
+              await checkmeProvider.startScan();
               showDialog(context: context, builder: ( _) {
                 return const DialogSelector();
               });

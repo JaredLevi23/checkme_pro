@@ -7,13 +7,15 @@ class TemperatureModel {
         required this.tempValue,
         required this.measureMode,
         required this.enPassKind,
+        required this.type
     });
 
+    String type;
     String userId;
     String dtcDate;
-    String tempValue;
-    String measureMode;
-    String enPassKind;
+    double tempValue;
+    int measureMode;
+    int enPassKind;
 
     factory TemperatureModel.fromRawJson(String str) => TemperatureModel.fromJson(json.decode(str));
 
@@ -22,9 +24,10 @@ class TemperatureModel {
     factory TemperatureModel.fromJson(Map<String, dynamic> json) => TemperatureModel(
         userId: json["userID"],
         dtcDate: json["dtcDate"],
-        tempValue: json["tempValue"],
+        tempValue: double.parse( json["tempValue"].toString() ) ,
         measureMode: json["measureMode"],
         enPassKind: json["enPassKind"],
+        type: json["type"]
     );
 
     Map<String, dynamic> toJson() => {
@@ -33,5 +36,6 @@ class TemperatureModel {
         "tempValue": tempValue,
         "measureMode": measureMode,
         "enPassKind": enPassKind,
+        "type": type
     };
 }

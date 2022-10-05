@@ -2,9 +2,10 @@
 // Date: 12-SEP
 // Function: Show device information
 
+import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:checkme_pro_develop/src/models/models.dart';
+import 'package:provider/provider.dart';
 
 class DeviceInfoPage extends StatelessWidget {
   const DeviceInfoPage({Key? key}) : super(key: key);
@@ -12,9 +13,7 @@ class DeviceInfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-  // data 
-  final jsonInfo = (ModalRoute.of(context)?.settings.arguments as Map<String, String>)['info'];
-  final DeviceInformationModel device = DeviceInformationModel.fromRawJson( jsonInfo! );
+  final device = Provider.of<CheckmeChannelProvider>(context).informationModel;
 
     return Scaffold(
       appBar: AppBar( title: const Text('Device information'), actions: const [ ConnectionIndicator() ],),
@@ -23,15 +22,15 @@ class DeviceInfoPage extends StatelessWidget {
         children: [
 
           // descriptions
-          deviceDescription(title: device.application, subtitle: 'Application'),
-          deviceDescription(title: device.branchCode, subtitle: 'Brach Code'),
-          deviceDescription(title: device.model, subtitle: 'Model'),
-          deviceDescription(title: device.hardware, subtitle: 'Hardware'),
-          deviceDescription(title: device.software, subtitle: 'Sofware'),
-          deviceDescription(title: device.theCurLanguage, subtitle: 'CUR LNG'),
-          deviceDescription(title: device.language, subtitle: 'Language'),
-          deviceDescription(title: device.sn, subtitle: 'SN'),
-          deviceDescription(title: device.spcPVer, subtitle: 'SPCPVER'),
+          deviceDescription(title: device?.application ?? 'unknown', subtitle: 'Application'),
+          deviceDescription(title: device?.branchCode ?? 'unknown', subtitle: 'Brach Code'),
+          deviceDescription(title: device?.model ?? 'unknown', subtitle: 'Model'),
+          deviceDescription(title: device?.hardware ?? 'unknown', subtitle: 'Hardware'),
+          deviceDescription(title: device?.software ?? 'unknown', subtitle: 'Sofware'),
+          deviceDescription(title: device?.theCurLanguage ?? 'unknown', subtitle: 'CUR LNG'),
+          deviceDescription(title: device?.language ?? 'unknown', subtitle: 'Language'),
+          deviceDescription(title: device?.sn ?? 'unknown', subtitle: 'SN'),
+          deviceDescription(title: device?.spcPVer ?? 'unknown', subtitle: 'SPCPVER'),
 
         ],
       )

@@ -16,11 +16,11 @@ class EcgModel {
     });
 
     final String type;
-    final String enLeadKind;
-    final String enPassKind;
+    final int enLeadKind;
+    final int enPassKind;
     final String dtcDate;
     final String userId;
-    final String haveVoice;
+    final bool haveVoice;
     bool? isSync;
 
     factory EcgModel.fromRawJson(String str) => EcgModel.fromJson(json.decode(str));

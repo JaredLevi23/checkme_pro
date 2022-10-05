@@ -65,11 +65,7 @@ enum MyFlutterErrorCode{
       checkmePROConnection.setMethodCallHandler({
           [weak self] (call: FlutterMethodCall, result: FlutterResult) -> Void in
           
-          if( "checkmepro/btEnabled" == call.method ){
-              // MARK: bt Enabled
-              result( self?.isBtEnabled )
-              
-          } else if( "checkmepro/startScan" == call.method ){
+        if( "checkmepro/startScan" == call.method ){
               // MARK: StartScan
               self?.periArray = []
               VTBLEUtils.sharedInstance().stopScan()
@@ -89,12 +85,12 @@ enum MyFlutterErrorCode{
               let currentDevice = self?.periArray.firstIndex{ uuid == "\($0.rawPeripheral.identifier)" }
               
               if( currentDevice == nil ){
-                  result("checkmepro/failToConnected")
+                  result(false)
                   return
               }
               
               VTBLEUtils.sharedInstance().connect(to: (self?.periArray[ currentDevice! ])!)
-              result("checkmepro/connecting")
+              result(true)
               
           }else if( "checkmepro/disconnect" == call.method ){
               // MARK: status
@@ -106,11 +102,7 @@ enum MyFlutterErrorCode{
               // MARK: status
               result( self?.isConnected )
               
-          }else if( "checkmepro/beginGetInfo" == call.method ){
-              // MARK: begin get info device
-            self?.beginGetInfo(result: result )
-              
-          } else if( "checkmepro/getInfoCheckmePRO" == call.method ){
+          }else if( "checkmepro/getInfoCheckmePRO" == call.method ){
               // MARK: set info
             self?.getInfoCheckmePRO( result: result )
               
@@ -129,7 +121,7 @@ enum MyFlutterErrorCode{
               }else{
                   let idUser = args["idUser"] as! Int
                   self?.downloadList( idUser , fileType: indexTypeFile )
-                  result("DOWNLOADLIST")
+                  result(true)
               }
                 
           }else if( "checkmepro/beginReadFileListDetailsECG" == call.method ){
@@ -198,11 +190,6 @@ enum MyFlutterErrorCode{
 
 // MARK: FUNCTIONS VT
     
-    // MARK: get info from checkme pro VT
-    func beginGetInfo( result: FlutterResult ){
-        VTProCommunicate.sharedInstance().beginGetInfo()
-        result("beginGetInfo: OK")
-    }
     
     // MARK: set basic info
     func getInfoCheckmePRO( result:FlutterResult ) {
@@ -266,9 +253,7 @@ enum MyFlutterErrorCode{
         VTProCommunicate.sharedInstance().beginReadFileList(with: self.userList?[ currentUser! ] , fileType: dataTypeMapToFileType( datatype: fileType ) )
     }
     
-    // MARK: ???
     func getInfoWithResultData(_ infoData: Data?) {
-        print("getInfoWithResultData called!!!")
         if isInitialRequest && (infoData != nil) {
             isInitialRequest = false
             self.info = VTProFileParser.parseProInfo(with: infoData)
@@ -346,12 +331,12 @@ enum MyFlutterErrorCode{
                 // MARK: ECG
                for ecg in arr ?? [] {
                     
-                    let ecgTemp :[String:String] = [
+                    let ecgTemp :[String:Any] = [
                         "type": "ECG",
-                        "enPassKind": "\( ecg.enPassKind )",
+                        "enPassKind": ecg.enPassKind.rawValue,
                         "dtcDate": "\( ecg.dtcDate )",
-                        "haveVoice": "\( ecg.haveVoice )",
-                        "enLeadKind": "\( ecg.enLeadKind )",
+                        "haveVoice": ecg.haveVoice,
+                        "enLeadKind": ecg.enLeadKind.rawValue,
                         "userID": "\(ecg.userID )",
                     ]
                    
@@ -371,13 +356,13 @@ enum MyFlutterErrorCode{
                 
                 // MARK: SPO2
                 for spo in arr ?? [] {
-                    let spoTemp :[String:String] = [
+                    let spoTemp :[String:Any] = [
                         "type": "SPO2",
-                        "enPassKind": "\( spo.enPassKind )",
-                        "pIndex": "\( spo.pIndex )",
-                        "prValue": "\( spo.prValue )",
-                        "spo2Value": "\( spo.spo2Value )",
-                        "dctDate": "\(spo.dtcDate)",
+                        "enPassKind": spo.enPassKind.rawValue,
+                        "pIndex": spo.pIndex,
+                        "prValue": spo.prValue,
+                        "spo2Value": spo.spo2Value,
+                        "dtcDate": "\(spo.dtcDate)",
                         "userID": "\( spo.userID )",
                     ]
                    
@@ -396,13 +381,13 @@ enum MyFlutterErrorCode{
                 
                 // MARK: Temperature
                 for tm in arr ?? [] {
-                    let tmTemp :[String:String] = [
+                    let tmTemp :[String:Any] = [
                         "type":"TM",
                         "userID": "\( tm.userID )",
                         "dtcDate": "\(tm.dtcDate)",
-                        "tempValue": "\(tm.tempValue)",
-                        "measureMode": "\(tm.measureMode)",
-                        "enPassKind": "\(tm.enPassKind.rawValue)"
+                        "tempValue": tm.tempValue,
+                        "measureMode": tm.measureMode,
+                        "enPassKind": tm.enPassKind.rawValue
                     ]
                    
                     if let jsonData = try? JSONSerialization.data(withJSONObject: tmTemp, options: [] ){
@@ -422,16 +407,16 @@ enum MyFlutterErrorCode{
                 
                 // MARK: SLM
                 for slm in arr ?? [] {
-                    let slmTemp :[String:String] = [
+                    let slmTemp :[String:Any] = [
                         "type":"SLM",
                         "userID": "\( slm.userID )",
                         "dtcDate": "\(slm.dtcDate)",
-                        "averageOx": "\(slm.averageOx)",
-                        "lowOxNumber": "\(slm.lowOxNumber)",
-                        "lowOxTime": "\(slm.lowOxTime)",
-                        "lowestOx": "\(slm.lowestOx)",
-                        "totalTime":"\(slm.totalTime)",
-                        "enPassKind": "\(slm.enPassKind.rawValue)"
+                        "averageOx": slm.averageOx,
+                        "lowOxNumber": slm.lowOxNumber,
+                        "lowOxTime": slm.lowOxTime,
+                        "lowestOx": slm.lowestOx,
+                        "totalTime":slm.totalTime,
+                        "enPassKind": slm.enPassKind.rawValue
                     ]
                    
                     if let jsonData = try? JSONSerialization.data(withJSONObject: slmTemp, options: [] ){
@@ -456,11 +441,9 @@ enum MyFlutterErrorCode{
                         "speed": ped.speed,
                         "steps": ped.steps,
                         "fat": ped.fat,
-                        "dctDate": "\(ped.dtcDate)",
+                        "dtcDate": "\(ped.dtcDate)",
                         "userID": "\( ped.userID )",
                     ]
-                    
-                    print( ped as Any )
                    
                     if let jsonData = try? JSONSerialization.data(withJSONObject: pedTemp, options: [] ){
                         let jsonText = String( data: jsonData, encoding: .ascii )
@@ -484,13 +467,13 @@ enum MyFlutterErrorCode{
                         "bpFlag": dlc.bpFlag,
                         "bpValue": dlc.bpValue,
                         "haveVoice": dlc.haveVoice,
-                        "hrResult": "\(dlc.hrResult.rawValue)",
+                        "hrResult": dlc.hrResult.rawValue,
                         "hrValue": dlc.hrValue,
                         "pIndex": dlc.pIndex,
-                        "spo2Result": "\(dlc.spo2Result.rawValue)",
+                        "spo2Result": dlc.spo2Result.rawValue,
                         "spo2Value": dlc.spo2Value,
                         "dtcDate": "\(dlc.dtcDate)",
-                        "userID": dlc.userID,
+                        "userID": "\(dlc.userID)",
                         "type": "DLC"
                     ]
                     
@@ -683,7 +666,7 @@ enum MyFlutterErrorCode{
         
         self.isConnected = true
         let res = [
-            "type":"ONLINE: ON"
+            "type":"DEVICE-ONLINE"
         ]
         
         if let jsonData = try? JSONSerialization.data(withJSONObject: res, options: [] ){
@@ -696,7 +679,7 @@ enum MyFlutterErrorCode{
         // VTBLEUtils.sharedInstance().startScan()
         self.isConnected = false
         let res = [
-            "type":"ONLINE: OFF"
+            "type":"DEVICE-OFFLINE"
         ]
         
         

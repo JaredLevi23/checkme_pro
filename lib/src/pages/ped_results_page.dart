@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -35,7 +37,9 @@ class PedResultsPage extends StatelessWidget {
               children: [
 
                 Text(
-                  getMeasurementDateTime( measurementDate : ped.dctDate ).toString().split('.')[0],
+                  Platform.isIOS
+                  ? getMeasurementDateTime( measurementDate : ped.dctDate ).toString().split('.')[0]
+                  : ped.dctDate,
                   style: const TextStyle( fontSize: 22, fontStyle: FontStyle.italic ),
                   ),
 

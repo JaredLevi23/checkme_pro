@@ -16,14 +16,14 @@ class SlmModel {
         required this.totalTime,
     });
 
-    final String enPassKind;
-    final String lowOxNumber;
+    final int enPassKind;
+    final int lowOxNumber;
     final String dtcDate;
     final String userId;
-    final String lowOxTime;
-    final String lowestOx;
-    final String averageOx;
-    final String totalTime;
+    final int lowOxTime;
+    final int lowestOx;
+    final int averageOx;
+    final int totalTime;
 
     factory SlmModel.fromRawJson(String str) => SlmModel.fromJson(json.decode(str));
 

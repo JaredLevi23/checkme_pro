@@ -34,7 +34,7 @@ class SelectUserPage extends StatelessWidget {
         itemBuilder: (_, index){
 
           final user = checkmeProvider.userList[ index ];
-
+          final userName = user.userName.replaceAll( RegExp('[^A-Za-z0-9 ]'), '' );
           return GestureDetector(
             child: Card(
               child: Column(
@@ -42,7 +42,7 @@ class SelectUserPage extends StatelessWidget {
                 children: [
                   const Icon( Icons.person, size: 80, color: Colors.black54,),
                   Text( 
-                    user.userName, 
+                    userName, 
                     style: const TextStyle( fontSize:  18 ), 
                     textAlign: TextAlign.center
                   ),
@@ -52,17 +52,19 @@ class SelectUserPage extends StatelessWidget {
             ),
             onTap: title == 'PED' 
             ? ()async{
-                final res = await checkmeProvider.beginReadFileList( 
+                await checkmeProvider.beginReadFileList( 
                   indexTypeFile: 9, 
                   userId: int.parse(user.userId)
                 );
+                
                 Navigator.pushNamed(context, 'checkme/ped');
               }
             : () async{
-                final res = await checkmeProvider.beginReadFileList( 
+                await checkmeProvider.beginReadFileList( 
                   indexTypeFile: 2, 
                   userId: int.parse(user.userId)
                 );
+
                 Navigator.pushNamed(context, 'checkme/dlc');
               }
           );

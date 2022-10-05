@@ -1,7 +1,13 @@
 package com.example.check_developer_main
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.util.Log
 import com.example.check_developer_main.bean.BleBean
 import com.example.check_developer_main.ble.format.*
 import com.example.check_developer_main.ble.manager.BleScanManager
@@ -20,21 +26,32 @@ import java.io.File
 class MainActivity: FlutterActivity(), BleScanManager.Scan{
 
     companion object {
-        var isOffline = false
         var loading = true
-        var currentId = ""
         val bleWorker = BleDataWorker()
         val scan = BleScanManager()
         val dataScope = CoroutineScope(Dispatchers.IO)
         val uiScope = CoroutineScope(Dispatchers.Main)
+        var eventSink: EventChannel.EventSink? = null
     }
 
     private val userChannel = Channel<Int>(Channel.CONFLATED)
-    private var eventSink: EventChannel.EventSink? = null
     private val listenerCheckmePro = "checkmepro.listener";
     private val connectioncheckmePro  = "checkmepro.connection";
     lateinit var userInfo: UserInfo
     private val bleList: MutableList<BleBean> = ArrayList()
+
+    private val receiver = object: BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when(intent?.getIntExtra( BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR )){
+                BluetoothAdapter.STATE_ON ->{
+                    println("CONECTADO")
+                }
+                BluetoothAdapter.STATE_OFF ->{
+                    println("DESCONECTADO")
+                }
+            }
+        }
+    }
 
     private var userFileName = arrayOf(
         "dlc.dat",
@@ -56,15 +73,12 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
             call, result ->
 
             when (call.method) {
-                "checkmepro/btEnabled" -> {
-                    // MARK: bt Enabled
-                    result.success( true );
-                }
+
                 "checkmepro/startScan" -> {
                     // MARK: StartScan
+                    bleList.clear()
                     initScan();
                     result.success("SCAN START!");
-
                 }
                 "checkmepro/stopScan" -> {
                     // MARK: StopScan
@@ -76,31 +90,52 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                     // MARK: Connect to
                     scan.stop();
                     var args = call.arguments as HashMap<String, String>
-                    println( "ARGUMENTOS: ${ args["uuid"] }" );
-
                     var filter: BleBean = bleList.single { d -> d.bluetoothDevice.address == args["uuid"] }
                     onScanItemClick( filter.bluetoothDevice );
-                    result.success("checkmepro/connecting");
+                    result.success(true );
                 }
                 "checkmepro/disconnect" -> {
-                    // MARK: status
-
+                    // MARK: status<
+                    bleWorker.disconnect();
+                    var json = JSONObject()
+                    json.put("type", "DEVICE-OFFLINE")
+                    eventSink?.success( json.toString() )
+                    result.success("DISCONNECTED");
                 }
                 "checkmepro/isConnected" -> {
-                    // MARK: status
-                    result.success( false );
+
                 }
                 "checkmepro/beginGetInfo" -> {
                     // MARK: begin get info device
-
                 }
                 "checkmepro/getInfoCheckmePRO" -> {
                     // MARK: set info
+                    dataScope.launch {
+                        var info = bleWorker.getDeviceInfo()
+                        var json = info.json
+                        var deviceInfo = JSONObject()
+                        try {
+                            deviceInfo.put("model", json["Model"])
+                            deviceInfo.put("spcPVer", json["SPCPVer"])
+                            deviceInfo.put("software", json["SoftwareVer"])
+                            deviceInfo.put("application", json["Application"])
+                            deviceInfo.put("theCurLanguage", json["CurLanguage"])
+                            deviceInfo.put("sn", json["SN"])
+                            deviceInfo.put("region", json["Region"])
+                            deviceInfo.put("hardware", json["HardwareVer"])
+                            deviceInfo.put("fileVer", json["FileVer"])
+                            deviceInfo.put("branchCode", json["BranchCode"])
+                            deviceInfo.put("language", json["LanguageVer"])
+                            result.success( deviceInfo.toString() )
 
+                        }catch ( e: JSONException){
+                            println("ERROR INFO: $e")
+                            result.success("NO-INFO")
+                        }
+                    }
                 }
                 "checkmepro/beginSyncTime" -> {
                     // MARK: sync Time
-
                 }
                 "checkmepro/beginReadFileList" -> {
                     // MARK: begin read File
@@ -113,18 +148,18 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                             // LEER SIN USUARIO
                             if( fileName != null){
                                 readFile( fileName, "" );
-                                result.success("ARCHIVO SIN USUARIO");
+                                result.success("isSync");
                             }else{
-                                result.success("ARCHIVO NO ENCONTRADO   ");
+                                result.success(true );
                             }
                         }else{
                             // LEER CON USUARIO
                             val idUser = args["idUser"]
                             if( fileName != null){
                                 readFile( fileName, "$idUser" );
-                                result.success("ARCHIVO CON USUARIO");
+                                result.success("isSync");
                             }else{
-                                result.success("ARCHIVO NO ENCONTRADO   ");
+                                result.success(true);
                             }
                         }
                     }else{
@@ -139,12 +174,14 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                     val type = args["detail"]
 
                     if( timeString != null && type != null ){
-                        GlobalScope.launch ( Dispatchers.Main ){
+                        //GlobalScope.launch ( Dispatchers.Main ){
+                        GlobalScope.launch( Dispatchers.Main ) {
                             getFileDetails( timeString,type )
                         }
+                        //}
                     }
 
-                    result.success("Metodo llamado!! ");
+                    result.success("isSync");
                 }
                 else -> {
                     // not implemented
@@ -157,7 +194,6 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
             override fun onListen(args: Any?, events: EventChannel.EventSink?) {
                 eventSink = events;
             }
-
             override fun onCancel(args: Any?) {
                 eventSink = null;
             }
@@ -258,7 +294,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         var json = JSONObject()
                         try {
                             //json.put("date"         , dlcArray.date);
-                            json.put("type"         ,"DLC-ADROID");
+                            json.put("type"         ,"DLC");
                             json.put("bpFlag"       , dlcArray.bpiFace);
                             json.put("hrResult"     , dlcArray.eface);
                             json.put("hrValue"      , dlcArray.hr);
@@ -269,7 +305,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                             json.put("prFlag"       , dlcArray.prFlag)
                             json.put("dtcDate"      , dlcArray.timeString);
                             json.put("userID"       , userId);
-                            json.put("haveVoice"    , "${ if(dlcArray.voice == 0) "false" else "true" }");
+                            json.put("haveVoice"    , dlcArray.voice != 0 );
 
                             eventSink?.success( json.toString() );
                         }catch (e: JSONException){
@@ -291,11 +327,11 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                     try {
                         //json.put("date"     ,"${ecgArray.date}");
                         json.put("type"         , "ECG");
-                        json.put("enPassKind"   , "${ecgArray.face}");
+                        json.put("enPassKind"   , ecgArray.face);
                         json.put("dtcDate"      , ecgArray.timeString)
                         json.put("userID"       , userId );
-                        json.put("haveVoice"    , "${ if(ecgArray.voice == 0) "false" else "true" }");
-                        json.put("enLeadKind"   , "${ecgArray.way}");
+                        json.put("haveVoice"    , ecgArray.voice != 0 );
+                        json.put("enLeadKind"   , ecgArray.way);
 
                         eventSink?.success( json.toString() );
                     }catch (e: JSONException){
@@ -311,11 +347,11 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                     try {
                         //json.put("date"         , oxyArray.date)
                         json.put("type"         , "SPO2")
+                        json.put("dtcDate"      , oxyArray.timeString)
                         json.put("enPassKind"   , oxyArray.face)
-                        json.put("spo2Value"    , oxyArray.oxy)
                         json.put("pIndex"       , oxyArray.pi)
                         json.put("prValue"      , oxyArray.pr)
-                        json.put("dctDate"      , oxyArray.timeString)
+                        json.put("spo2Value"    , oxyArray.oxy)
                         json.put("way"          , oxyArray.way)
                         json.put("userID"       , userId )
 
@@ -376,7 +412,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         json.put("enPassKind"   , smlArray.face)
                         json.put("lowOxNumber"  , smlArray.lowCount)
                         json.put("lowOxTime"    , smlArray.lowTime)
-                        json.put("averangeOx"   , smlArray.meanO2)
+                        json.put("averageOx"   , smlArray.meanO2)
                         json.put("lowestOx"     , smlArray.minO2)
                         json.put("totalTime"    , smlArray.time)
                         json.put("dtcDate"      , smlArray.timeString)
@@ -402,6 +438,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         json.put("speed"    , pedArray.speed)
                         json.put("steps"    , pedArray.step)
                         json.put("totalTime", pedArray.time)
+                        json.put("userID", userId )
                         //json.put("date"         , pedArray.date)
 
                         eventSink?.success( json.toString() );
@@ -431,7 +468,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
             return;
         }
 
-        if( type == "ECG" ){
+        if( type == "ECG" || type == "DLC"){
             val info = EcgWaveInfo( fileValue )
             val json = JSONObject()
             try {
@@ -451,14 +488,13 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                 json.put("waveSize" , info.waveSize )
 
                 val waveSize: Int = (info.waveIntSize/1000) - 1
-                var waveViewList: MutableList< IntArray > = mutableListOf()
+                var waveViewList: MutableList< Int > = mutableListOf()
 
                 for ( k in 0 until waveSize ){
                     var value = info.getWave( k )
-                    waveViewList.add( value )
-
                     for ( k in value ){
-                        println( "VALUE: $k" )
+                        //println( "VALUE: $k" )
+                        waveViewList.add( k )
                     }
                 }
 
@@ -485,21 +521,16 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
         scan.stop()
         bleWorker.initWorker(this, bluetoothDevice)
 
-        var json = JSONObject();
-        try {
-            json.put("type", "ONLINE: ON");
-        }catch (e: JSONException){
-            println("ERROR JSON: $e");
-        }
-        eventSink?.success( json.toString() );
-
         dataScope.launch {
             val a = withTimeoutOrNull(10000) {
                 bleWorker.waitConnect()
+                println("WAIT CONNECT!!!")
             }
+
             a?.let {
                 val b = withTimeoutOrNull(10000) {
                     bleWorker.getFile("usr.dat")
+                    println("GET FILE USER.DAT EN ONSCANITEMCLICK")
                 }
                 b?.let {
                     userChannel.send(1)
@@ -507,42 +538,23 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
             }
         }
         uiScope.launch {
+            println("LAUNCH UISCOPE")
             readUser()
         }
     }
 
     private fun getFileType( type:Int ): String {
-
         when( type ){
-            1 ->{
-                return "usr.dat";
-            }
-            2 ->{
-                return "dlc.dat";
-            }
-            3 ->{
-                return "ecg.dat";
-            }
-            4 ->{
-                return "oxi.dat";
-            }
-            5 ->{
-
-            }
-            6 ->{
-
-            }
-            7 ->{
-                return "tmp.dat";
-            }
-            8 ->{
-                return "slm.dat";
-            }
-            9 ->{
-                return "ped.dat";
-            }
+            1 ->{ return "usr.dat"; }
+            2 ->{ return "dlc.dat"; }
+            3 ->{ return "ecg.dat"; }
+            4 ->{ return "oxi.dat"; }
+            5 ->{}
+            6 ->{}
+            7 ->{ return "tmp.dat"; }
+            8 ->{ return "slm.dat"; }
+            9 ->{ return "ped.dat"; }
         }
-
         return "";
     }
 

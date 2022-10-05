@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +20,11 @@ class DlcResultsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('DLC Results'),
+        actions: [ 
+          TextButton(onPressed: (){
+            log( '${checkmeProvider.dlcList.length}' );
+          }, child: const Text('AQUI'))
+         ],
       ),
 
       body: ListView.builder(
@@ -41,7 +49,7 @@ class DlcResultsPage extends StatelessWidget {
                     Text('SPO2: ${ dlc.spo2Value }%', textAlign: TextAlign.center,),
                   ],
                 ),
-                subtitle: Text( '${ getMeasurementDateTime( measurementDate: dlc.dtcDate ) }' ),
+                subtitle: Text( Platform.isIOS ? '${ getMeasurementDateTime( measurementDate: dlc.dtcDate ) }' : dlc.dtcDate ),
                 onTap: ()async {
                   checkmeProvider.currentDlc = dlc;
 
@@ -62,8 +70,9 @@ class DlcResultsPage extends StatelessWidget {
                         return;
                       }
                     }
-
-                    Navigator.pushNamed(context, 'checkme/dlc/details');
+                    Platform.isIOS 
+                    ? Navigator.pushNamed(context, 'checkme/dlc/details')
+                    : Navigator.pushNamed(context, 'checkme/dlc-android/details');
                 },
               ),
               const Divider()
@@ -71,23 +80,6 @@ class DlcResultsPage extends StatelessWidget {
           );
         }
       ),
-    );
-  }
-
-   Widget _information({ required String units, required String value, required IconData icondata, Color? iconColor }){
-    return Row(
-      children: [
-
-        Icon( icondata , size: 40, color: iconColor ?? Colors.black ,),
-        const SizedBox( width: 8, ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text( value , style: const TextStyle( fontSize: 20, fontWeight: FontWeight.bold, fontStyle: FontStyle.normal  )),
-            Text( units , style: const TextStyle( fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic))
-          ], 
-        ) 
-      ],
     );
   }
 }

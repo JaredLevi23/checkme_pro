@@ -63,7 +63,6 @@ class EcgResultsPage extends StatelessWidget {
                     if( !checkmeProvider.isSync ){
                       checkmeProvider.currentSyncEcg ??= ecg;
                       await checkmeProvider.getMeasurementDetails( dtcDate: ecg.dtcDate, detail: 'ECG' );
-                      //await checkmeProvider.getMeasurementDetails( dtcDate: ecg.timeString ?? ecg.dtcDate, detail: 'ECG' );
                     }
 
                   }else{
@@ -74,7 +73,9 @@ class EcgResultsPage extends StatelessWidget {
                   }
                 }
 
-                //Navigator.pushNamed(context, 'checkme/ecg/details');
+                Platform.isIOS 
+                ? Navigator.pushNamed(context, 'checkme/ecg/details')
+                : Navigator.pushNamed(context, 'checkme/ecg-android/details');
               },
             ),
           );

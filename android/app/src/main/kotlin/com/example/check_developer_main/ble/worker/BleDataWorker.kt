@@ -3,6 +3,7 @@ package com.example.check_developer_main.ble.worker
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
+import com.example.check_developer_main.MainActivity
 import com.example.check_developer_main.ble.format.CheckMeResponse
 import com.example.check_developer_main.ble.format.DeviceInfo
 import com.example.check_developer_main.ble.manager.BleDataManager
@@ -21,10 +22,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import no.nordicsemi.android.ble.data.Data
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.File
 import kotlin.experimental.inv
 
-class BleDataWorker {
+class BleDataWorker{
     private var pool: ByteArray? = null
     private val deviceChannel = Channel<DeviceInfo>(Channel.CONFLATED)
     private val fileChannel = Channel<Int>(Channel.CONFLATED)
@@ -187,7 +190,11 @@ class BleDataWorker {
                 .timeout(10000)
                 .retry(15, 100)
                 .done {
-                    Log.i("BLE", "连接成功了.>>.....>>>>")
+
+                    var json = JSONObject()
+                    json.put("type", "DEVICE-ONLINE")
+                    MainActivity.eventSink?.success( json.toString() )
+
                     dataScope.launch {
                         connectChannel.send("yes")
                     }
@@ -221,6 +228,9 @@ class BleDataWorker {
     }
 
     fun disconnect(){
+        var json = JSONObject()
+        json.put("type", "DEVICE-OFFLINE")
+        MainActivity.eventSink?.success( json.toString() )
         myBleDataManager?.disconnect()?.enqueue();
     }
 

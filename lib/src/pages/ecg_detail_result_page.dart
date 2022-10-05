@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -127,10 +126,7 @@ class EcgDetailResultPage extends StatelessWidget {
                 icon: Icons.graphic_eq, 
                 iconColor: Colors.blue,
                 onTap: (){
-                  log('WAVE INT SIZE: ${ecgDetails.arrEcgContent!.length}' );
-                  log('WAVE INT SIZE: ${ecgDetails.arrEcgHeartRate}' );
-                  log('WAVE INT SIZE: ${ecgDetails.qtValue}' );
-                  //Navigator.pushNamed(context, 'checkme/ecg/record');
+                  Navigator.pushNamed(context, 'checkme/ecg/record');
                 }
               ),
             )

@@ -11,6 +11,7 @@ class DialogSelector extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
+
     final _devicePrefs = DevicePreferences();
 
     return Material(
@@ -49,7 +50,7 @@ class DialogSelector extends StatelessWidget {
 
                         final res = await checkmeProvider.connectToDevice( uuid: device.uuid, deviceName: device.name );
 
-                        if( res == 'checkmepro/connecting' ){
+                        if( res ){
                           Navigator.pop(context);
                         }
                       },
@@ -61,10 +62,7 @@ class DialogSelector extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SyncButton(title: 'Detener', onPressed: (){
-                  checkmeProvider.stopScan();
-                }),
-                SyncButton(title: 'Close', onPressed: (){
+                SyncButton(title: 'Cancel', onPressed: (){
                   checkmeProvider.stopScan();
                   Navigator.pop(context);
                 }),

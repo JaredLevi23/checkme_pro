@@ -1,56 +1,41 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
+class BluetoothProvider with ChangeNotifier{
 
-// import 'dart:async';
-// import 'dart:developer';
-// import 'package:flutter/material.dart';
+  FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
+  StreamSubscription<BluetoothState>? btStateSuscription;
+  bool _isEnabled = false;
 
-// class BluetoothProvider with ChangeNotifier{
+  bool get isEnabled => _isEnabled;
 
-//   FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
-//   BluetoothDevice? _bluetoothDevice;
+  set isEnabled(bool isEnabled) {
+    _isEnabled = isEnabled;
+    notifyListeners();
+  }
 
-//   BluetoothDevice? get bluetoothDevice => _bluetoothDevice;
+  BluetoothProvider(){
+    _isEnabled = false;
+    initSubscription();
+  }
 
-//   StreamSubscription<ScanResult>? scanSubscription;
-//   StreamSubscription<BluetoothDeviceState>? deviceStateSubscription;
-  
-//   List<BluetoothDevice> devices = [];
+  checkBtState()async{
+    isEnabled = await flutterBlue.isOn;
+  }
 
-//   set bluetoothDevice(BluetoothDevice? bluetoothDevice) {
-//     _bluetoothDevice = bluetoothDevice;
-//     connectToDevice();
-//     notifyListeners();
-//   }
+  initSubscription()async{
+    btStateSuscription = flutterBlue.state.listen((event) { 
+       if( event == BluetoothState.on ){
+        isEnabled = true;
+       } else if( event == BluetoothState.off ){
+        isEnabled = false;
+       }
+    });
+  }
 
-//   startScan()async{
-//     devices = [];
+  finishSuscription(){
+    btStateSuscription?.cancel();
+  }
 
-//     scanSubscription = flutterBlue.scan().listen((event) { 
-//       if( event.device.name.contains("Checkme") && !devices.contains( event.device )){
-//         devices.add( event.device );
-//         log( 'NAME: ${event.device.name}' );
-//         log( 'RSSI: ${event.rssi}' );
-//         notifyListeners();      
-//       }
-//     });
-//   }
-
-//   terminateConnection(){
-//     flutterBlue.stopScan();
-//     scanSubscription?.cancel();
-//     deviceStateSubscription?.cancel();
-//     bluetoothDevice?.disconnect();
-//   }
-
-//   connectToDevice()async{
-//     await bluetoothDevice?.connect( autoConnect: true );
-//     deviceStateSubscription = bluetoothDevice?.state.listen((event) { 
-//       log('Device State: $event');
-
-//       if( event == BluetoothDeviceState.disconnected ){
-//         deviceStateSubscription?.cancel();
-//       }
-//     });
-//   }
-
-// }
+}

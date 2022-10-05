@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +26,7 @@ class Spo2ResultsPage extends StatelessWidget {
         itemBuilder: (context, index){
 
           final spo2 = checkmeProvider.spo2sList[index];
-          final date = spo2.dctDate.split(' ');
+          final date = spo2.dtcDate.split(' ');
 
           return Card(
             child: ListTile(
@@ -35,7 +37,7 @@ class Spo2ResultsPage extends StatelessWidget {
                   Text( 'PR: ${spo2.prValue}' ),
                 ],
               ),
-              subtitle: Text( 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}'),
+              subtitle: Text( Platform.isIOS ? 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}' : 'Date: ${spo2.dtcDate}'),
               leading: const CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.cyan,

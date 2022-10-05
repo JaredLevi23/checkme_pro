@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 class SyncButton extends StatelessWidget {
   final Function()? onPressed;
   final String title;
+  final Color? backgroundColor;
+  final Color? fontColor;
 
   const SyncButton({
     Key? key,
     required this.title,
-    required this.onPressed
+    required this.onPressed,
+    this.backgroundColor,
+    this.fontColor
   }) : super(key: key);
 
   @override
@@ -20,11 +24,11 @@ class SyncButton extends StatelessWidget {
       child: MaterialButton(
         height: 60,
         elevation: 0,
-        color: const Color.fromRGBO(31, 202, 181, 100),
+        color: backgroundColor ?? const Color.fromRGBO(31, 202, 181, 100),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15)
         ),
-        child: Text( title, style: TextStyle( fontSize: 18, color: Colors.white),),
+        child: Text( title, style: TextStyle( fontSize: 18, color: fontColor ?? Colors.white),),
         onPressed: onPressed
       ),
     );

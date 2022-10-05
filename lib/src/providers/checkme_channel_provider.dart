@@ -13,15 +13,13 @@ class CheckmeChannelProvider with ChangeNotifier{
 
   bool _isSync = false;
   bool _isConnected = false;
-
-
-  
-  bool _btEnabled = false;
+  bool _offlineMode = false;
 
   List<DeviceModel> devices = [];
   DeviceModel? currentDevice;
 
   // Data List
+  DeviceInformationModel? informationModel;
   List<TemperatureModel> temperaturesList = [];
   List<Spo2Model> spo2sList = [];
   List<SlmModel> slmList = [];
@@ -37,8 +35,11 @@ class CheckmeChannelProvider with ChangeNotifier{
   EcgModel? currentSyncEcg;
   DlcModel? currentSyncDlc;
   SlmModel? currentSyncSlm;
+
   Map<String, EcgDetailsModel> ecgDetailsList = {};
   Map<String, EcgDetailsModel> dlcDetailsList = {};
+  Map<String, EcgDetailsAndroidModel> ecgDetailsAndroidList = {};
+  Map<String, EcgDetailsAndroidModel> dlcDetailsAndroidList = {};
   Map<String, SlmDetailsModel > slmDetailsList = {};
 
   bool get isSync => _isSync;
@@ -55,83 +56,54 @@ class CheckmeChannelProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  bool get btEnabled => _btEnabled;
+  bool get offlineMode => _offlineMode;
 
-  set btEnabled(bool btEnabled) {
-    _btEnabled = btEnabled;
+  set offlineMode(bool offlineMode) {
+    _offlineMode = offlineMode;
     notifyListeners();
   }
 
-  Future<String> checkmeIsConnected ()async{
+  Future<bool> stablishConnection ()async{
+    
       try{
-
-        // if( _devicePrefs.uuid != '' ){
-        //   log("YA TENGO UN UUID!!!");
-        //   await startScan();
-        //   await Future.delayed( const Duration( seconds: 6 ) );
-        //   await stopScan();
-        //   await connectToDevice(uuid: _devicePrefs.uuid);
-        // }
-
+        if( _devicePrefs.uuid != '' ){
+          await startScan();
+          await Future.delayed( const Duration( seconds: 6 ) );
+          await stopScan();
+          await connectToDevice(uuid: _devicePrefs.uuid);
+        }
         final bool result = await platform.invokeMethod('checkmepro/isConnected');
-        isConnected = result;
-        
-        return "IsConnected: $result";
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<String> btIsEnabled ()async{
-      try{
-        final bool result = await platform.invokeMethod('checkmepro/btEnabled');
-        btEnabled = result;
-        return "IsBTEnabled: $result";
-      }catch( err ){
-        log( '$err' );
-        return "$err";
-      }
-  }
-
-  Future<String> beginGetInfo ()async{
-      try{
-        final String result = await platform.invokeMethod('checkmepro/beginGetInfo');
         return result;
       }catch( err ){
         log( '$err' );
-        return "$err";
+        return false;
       }
   }
 
-  Future<String> getInfoCheckmePRO ()async{
+  Future<void> getInfoCheckmePRO ()async{
       try{
         final String result = await platform.invokeMethod('checkmepro/getInfoCheckmePRO');
-        return result;
+        informationModel = DeviceInformationModel.fromRawJson( result );
+        notifyListeners();
       }catch( err ){
         log( '$err' );
-        return "$err";
       }
   }
 
-  Future<String> beginSyncTime ()async{
+  Future<void> beginSyncTime ()async{
       try{
-        final String result = await platform.invokeMethod('checkmepro/beginSyncTime');
-        return result;
+        await platform.invokeMethod('checkmepro/beginSyncTime');
       }catch( err ){
         log( '$err' );
-        return "$err";
       }
   }
 
-  Future<String> startScan ()async{
+  Future<void> startScan ()async{
       try{
         devices = [];
-        final String result = await platform.invokeMethod('checkmepro/startScan');
-        return result;
+        await platform.invokeMethod('checkmepro/startScan');
       }catch( err ){
         log( '$err' );
-        return "$err";
       }
   }
 
@@ -142,62 +114,67 @@ class CheckmeChannelProvider with ChangeNotifier{
       }catch( err ){
         log( '$err' );
         return "$err";
+      
       }
   }
 
-  Future<String> connectToDevice ({ required String uuid, String? deviceName } )async{
+  Future<bool> connectToDevice ({ required String uuid, String? deviceName } )async{
+    bool result = false;
       try{
-          final String result = await platform.invokeMethod('checkmepro/connectTo', { "uuid": uuid });
+          result = await platform.invokeMethod('checkmepro/connectTo', { "uuid": uuid });
+          // bluetooth device info saved 
           _devicePrefs.uuid = uuid;
+          _devicePrefs.deviceName = deviceName ?? '';
 
-          if( _devicePrefs.deviceName == '' ){
-            _devicePrefs.deviceName = deviceName ?? '';
+          if( result ){
+            isSync = true;
+            beginReadFileList( indexTypeFile: 1 );
+            beginReadFileList( indexTypeFile: 3 );
+            beginReadFileList( indexTypeFile: 4 );
+            beginReadFileList( indexTypeFile: 7 );
+            beginReadFileList( indexTypeFile: 8 );
+            isSync = false;
           }
-
           return result;
       }catch( err ){
-        log( '$err' );
-        return "$err";
+        //log( '$err' );
+        return result;
       }
   }
 
-  Future<String> cancelConnect ()async{
+  Future<void> cancelConnect ()async{
       try{
-          final bool result = await platform.invokeMethod('checkmepro/disconnect');
-          return 'STATE: $result';
+          await platform.invokeMethod('checkmepro/disconnect');
       }catch( err ){
-        log( '$err' );
-        return "$err";
+        //log( '$err' );
       }
   }
 
-  Future<String> beginReadFileList ({ required int indexTypeFile, int? userId } )async{
+  Future<void> beginReadFileList ({ required int indexTypeFile, int? userId } )async{
       try{
-        
-        final String result = await platform.invokeMethod(
+        cleanData(indexTypeFile: indexTypeFile);
+        await platform.invokeMethod(
           'checkmepro/beginReadFileList',
           userId != null 
           ? { 'indexTypeFile': indexTypeFile, 'idUser': userId }
           : { 'indexTypeFile': indexTypeFile }
         );
-
-        return result;
       }catch( err ){
         log( '$err' );
-        return "$err";
-      }finally{
-        cleanData(indexTypeFile: indexTypeFile);
       }
   }
 
   // get measurement details
   Future<void> getMeasurementDetails( { required String dtcDate, required String detail } )async{
     try{
+      log('LLAMANDO A LOS DETALLES 1');
       final res = await platform.invokeMethod('checkmepro/beginReadFileListDetailsECG', 
       { 'id': dtcDate, 'detail': detail});
       
       if( res == "isSync"){
+        log('LLAMANDO A LOS DETALLES: ISSYNC TRUE 2');
         isSync = true;
+        //isSync = true;
       }
 
     }catch( err ){
@@ -211,8 +188,8 @@ class CheckmeChannelProvider with ChangeNotifier{
     eventChannel.receiveBroadcastStream().listen(_onEvent, onError: _onError);
   }
   
-  void _onEvent(Object? event) {
-    log( 'EVENT_FLUTTER: $event' );
+  void _onEvent(Object? event) async{
+    //log( 'EVENT_FLUTTER: $event' );
 
     // event
     final headerType = TypeFileModel.fromRawJson( event.toString() );
@@ -230,28 +207,14 @@ class CheckmeChannelProvider with ChangeNotifier{
       
     }
 
-    // BT STATE
-    if( headerType.type == "BluetoothState"){
-      final btState = BtStateModel.fromRawJson( event.toString() );
-      if( btState.value == "POWEREDON" ){
-        btEnabled = true;
-      }else{
-        btEnabled = false;
-        isConnected = false;
-        isSync = false;
-        currentSyncDlc = null;
-        currentSyncEcg = null;
-      }
-    }
-
     // Connected
-    if( headerType.type == "ONLINE: ON" ){
+    if( headerType.type == "DEVICE-ONLINE" ){
       isConnected = true;
       
     }
 
     // Disconnected
-    if( headerType.type == "ONLINE: OFF" ){
+    if( headerType.type == "DEVICE-OFFLINE" ){
       isConnected = false;
     }
 
@@ -312,6 +275,7 @@ class CheckmeChannelProvider with ChangeNotifier{
     // DETAILS_EKG (ECG/DLC)
     if( headerType.type == 'DETAILS_EKG'){
       try{
+        
         final detailECGTemp = EcgDetailsModel.fromRawJson( event.toString() );
 
         if( currentSyncEcg != null && !ecgDetailsList.containsKey( currentSyncEcg!.dtcDate ) && currentSyncDlc == null){
@@ -345,17 +309,24 @@ class CheckmeChannelProvider with ChangeNotifier{
       }
     }
 
-    // Details Sleep Monitor
-    if( headerType.type == 'DETAILS_EKG_ANDROID' ){
+    // DETAILS_EKG (ECG/DLC)
+    if( headerType.type == 'DETAILS_EKG_ANDROID'){
       try{
-        
-        final model = EcgDetailsAndroidModel.fromRawJson( event.toString());
-        log( model.type );
+        log('LLAMANDO A LOS DETALLES: DETALLES RECIBIDOS 3');
+        final detailECGTemp = EcgDetailsAndroidModel.fromRawJson( event.toString() );
+        await Future.delayed( const Duration( seconds: 3 ));
+        if( currentSyncEcg != null && !ecgDetailsAndroidList.containsKey( currentSyncEcg!.dtcDate ) && currentSyncDlc == null){
+          ecgDetailsAndroidList.addAll( {currentSyncEcg!.dtcDate : detailECGTemp} );
+        }else if(currentSyncDlc != null && !dlcDetailsAndroidList.containsKey( currentSyncDlc!.dtcDate ) && currentSyncEcg == null ){
+          dlcDetailsAndroidList.addAll( {currentSyncDlc!.dtcDate : detailECGTemp } );
+        }
 
       }catch( err ){
-        log( '$err' );
-      }finally{
-        currentSyncSlm = null;
+        log('$err');
+      } finally{
+        log('LLAMANDO A LOS DETALLES: ISSYNC FALSE 4');
+        currentSyncEcg = null;
+        currentSyncDlc = null;
         isSync = false;
       }
     }
@@ -379,7 +350,7 @@ class CheckmeChannelProvider with ChangeNotifier{
         dlcList = [];
       break;
       case 3:
-        //ecgList = [];
+        ecgList = [];
       break;
       case 4:
         spo2sList = [];

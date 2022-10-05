@@ -8,15 +8,15 @@ import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import '../models/models.dart';
 import '../utils/utils_date.dart';
 
-class DlcDetailsResultsPage extends StatelessWidget {
-  const DlcDetailsResultsPage({Key? key}) : super(key: key);
+class DlcDetailsResultAndroidPage extends StatelessWidget {
+  const DlcDetailsResultAndroidPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
     final DlcModel currentDlcModel = checkmeProvider.currentDlc;
-    EcgDetailsModel? ecgDetails = checkmeProvider.dlcDetailsList[ currentDlcModel.dtcDate ];
+    EcgDetailsAndroidModel? ecgDetails = checkmeProvider.dlcDetailsAndroidList[ currentDlcModel.dtcDate ];
 
     return Scaffold(
       appBar: AppBar(
@@ -47,7 +47,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: checkmeProvider.isSync || checkmeProvider.dlcDetailsList[ currentDlcModel.dtcDate ] == null 
+            child: checkmeProvider.isSync || checkmeProvider.dlcDetailsAndroidList[ currentDlcModel.dtcDate ] == null 
             ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
@@ -62,7 +62,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
     );
   }
 
-  Widget listResults( {required EcgDetailsModel ecgDetails, required DlcModel dlcModel, required BuildContext context } ){
+  Widget listResults( {required EcgDetailsAndroidModel ecgDetails, required DlcModel dlcModel, required BuildContext context } ){
     return ListView(
       children: [
         Row(
@@ -89,7 +89,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
           children: [
             Expanded(
               child: cardResult( 
-                value: ecgDetails.hrValue, 
+                value: ecgDetails.hr, 
                 title: 'HR', 
                 unitMeasurement: "/min",
                 icon: Icons.favorite
@@ -97,7 +97,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
             ),
             Expanded(
               child: cardResult( 
-                value: ecgDetails.qrsValue, 
+                value: ecgDetails.qrs, 
                 title: 'QRS', 
                 unitMeasurement: "ms",
                 icon: Icons.monitor
@@ -109,14 +109,14 @@ class DlcDetailsResultsPage extends StatelessWidget {
           children: [
             Expanded(
               child: cardResult( 
-                value: ecgDetails.qtValue, 
+                value: ecgDetails.qt, 
                 title: 'QT', 
                 unitMeasurement: "ms" 
               ),
             ),
             Expanded(
               child: cardResult( 
-                value: ecgDetails.qtcValue, 
+                value: ecgDetails.qtc, 
                 title: 'QTc', 
                 unitMeasurement: "ms" 
               ),
@@ -127,7 +127,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
           children: [
             Expanded(
               child: cardResult( 
-                value: ecgDetails.timeLength, 
+                value: ecgDetails.total, 
                 title: 'Duration', 
                 unitMeasurement: "s", 
                 icon: Icons.timer, 
@@ -142,7 +142,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
                 icon: Icons.graphic_eq, 
                 iconColor: Colors.blue,
                 onTap: (){
-                  Navigator.pushNamed(context, 'checkme/dlc/record');
+                  Navigator.pushNamed(context, 'checkme/dlc-android/record' );
                 }
               ),
             )

@@ -13,15 +13,15 @@ class PedModel {
         required this.fat,
     });
 
-    double speed;
-    String dctDate;
     String type;
-    String userId;
-    int totalTime;
     double calorie;
     double distance;
-    int steps;
+    String dctDate;
     double fat;
+    double speed;
+    int steps;
+    int totalTime;
+    String userId;
 
     factory PedModel.fromRawJson(String str) => PedModel.fromJson(json.decode(str));
 
@@ -29,7 +29,7 @@ class PedModel {
 
     factory PedModel.fromJson(Map<String, dynamic> json) => PedModel(
         speed: json["speed"].toDouble(),
-        dctDate: json["dctDate"],
+        dctDate: json["dtcDate"],
         type: json["type"],
         userId: json["userID"],
         totalTime: json["totalTime"],

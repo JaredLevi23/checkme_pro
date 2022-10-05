@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +32,7 @@ class SlmResultsPage extends StatelessWidget {
           return Card(
             child: ListTile( 
               title: Text( 'Averange OX: ${slm.averageOx}\nLow Ox:${slm.lowOxTime}\nLowest Ox:${slm.lowestOx}\nLow Ox Number: ${slm.lowOxNumber}' ),
-              subtitle: Text( 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}'),
+              subtitle: Text( Platform.isIOS ? 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}' : 'Date: ${ slm.dtcDate }' ),
               trailing: Text( 'Duration: ${slm.totalTime}', style: const TextStyle( fontSize: 17),),
               onTap: () async {
                 checkmeProvider.currentSlm = slm;

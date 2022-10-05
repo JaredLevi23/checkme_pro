@@ -19,16 +19,16 @@ class DlcModel {
         required this.type,
     });
 
-    String hrResult;
-    int userId;
-    bool haveVoice;
-    String dtcDate;
+    int hrResult;
+    String userId;
+    int spo2Result;
     int spo2Value;
     int bpValue;
     int hrValue;
-    double pIndex;
-    String spo2Result;
     int bpFlag;
+    bool haveVoice;
+    double pIndex;
+    String dtcDate;
     String type;
 
     factory DlcModel.fromRawJson(String str) => DlcModel.fromJson(json.decode(str));

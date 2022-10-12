@@ -13,7 +13,7 @@ class UserResultPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User List'),
+        title: const Text('User List', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1)),),
         actions: const [ ConnectionIndicator() ],
       ),
 
@@ -23,12 +23,12 @@ class UserResultPage extends StatelessWidget {
         itemBuilder: (_, index){
 
           final user = checkmeProvider.userList[index];
-          final birthDay = user.birthday.split(' ');
+          final birthDay = user.birthDay.split(' ');
 
           return Card(
             child: ListTile(
               leading: CircleAvatar( 
-                child: Text( user.userId ),
+                child: Text( '${user.userId}' ),
                 radius: 30,
                 backgroundColor: Colors.cyan,
                 foregroundColor: Colors.white,

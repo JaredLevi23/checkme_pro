@@ -16,7 +16,7 @@ class PedResultsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PED Results'),
+        title: const Text('PED Results', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
       ),
 
       body: ListView.builder(
@@ -38,8 +38,8 @@ class PedResultsPage extends StatelessWidget {
 
                 Text(
                   Platform.isIOS
-                  ? getMeasurementDateTime( measurementDate : ped.dctDate ).toString().split('.')[0]
-                  : ped.dctDate,
+                  ? getMeasurementDateTime( measurementDate : ped.dtcDate ).toString().split('.')[0]
+                  : ped.dtcDate,
                   style: const TextStyle( fontSize: 22, fontStyle: FontStyle.italic ),
                   ),
 

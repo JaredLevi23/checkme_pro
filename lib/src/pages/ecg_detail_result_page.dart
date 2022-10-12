@@ -21,7 +21,7 @@ class EcgDetailResultPage extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text( 'ECG Detail' ),
+          title: const Text( 'ECG Detail', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1)) ),
           actions: const [
             ConnectionIndicator()
           ],

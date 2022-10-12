@@ -14,16 +14,20 @@ class SlmModel {
         required this.lowestOx,
         required this.averageOx,
         required this.totalTime,
+        this.id,
+        this.inServer
     });
 
+    final int? id;
     final int enPassKind;
     final int lowOxNumber;
     final String dtcDate;
-    final String userId;
+    final int userId;
     final int lowOxTime;
     final int lowestOx;
     final int averageOx;
     final int totalTime;
+    final int? inServer;
 
     factory SlmModel.fromRawJson(String str) => SlmModel.fromJson(json.decode(str));
 
@@ -33,11 +37,13 @@ class SlmModel {
         enPassKind: json["enPassKind"],
         lowOxNumber: json["lowOxNumber"],
         dtcDate: json["dtcDate"],
-        userId: json["userID"],
+        userId: json["userId"],
         lowOxTime: json["lowOxTime"],
         lowestOx: json["lowestOx"],
         averageOx: json["averageOx"],
         totalTime: json["totalTime"],
+        id: json["id"],
+        inServer: json["inServer"]
     );
 
     Map<String, dynamic> toJson() => {
@@ -49,5 +55,7 @@ class SlmModel {
         "lowestOx": lowestOx,
         "averageOx": averageOx,
         "totalTime": totalTime,
+        "id": id,
+        "inServer": inServer ?? 0
     };
 }

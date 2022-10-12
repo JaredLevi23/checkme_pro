@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +11,13 @@ class SelectUserPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
+
     final typeFile = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final title = typeFile['title'] ?? 'None';
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select User $title'),
+        title: Text('Select User $title', style: const TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
         actions: const[
           ConnectionIndicator()
         ],
@@ -52,19 +52,26 @@ class SelectUserPage extends StatelessWidget {
             ),
             onTap: title == 'PED' 
             ? ()async{
-                await checkmeProvider.beginReadFileList( 
-                  indexTypeFile: 9, 
-                  userId: int.parse(user.userId)
-                );
-                
+                if( checkmeProvider.isConnected ){
+                  await checkmeProvider.beginReadFileList( 
+                    indexTypeFile: 9, 
+                    userId: user.userId
+                  );
+                }
+
+                await checkmeProvider.loadDataById(tableName: 'Ped', userId: user.userId );
                 Navigator.pushNamed(context, 'checkme/ped');
               }
             : () async{
-                await checkmeProvider.beginReadFileList( 
-                  indexTypeFile: 2, 
-                  userId: int.parse(user.userId)
-                );
 
+                if( checkmeProvider.isConnected ){
+                  await checkmeProvider.beginReadFileList( 
+                    indexTypeFile: 2, 
+                    userId: user.userId
+                  );
+                }
+
+                await checkmeProvider.loadDataById(tableName: 'Dlc', userId: user.userId );
                 Navigator.pushNamed(context, 'checkme/dlc');
               }
           );

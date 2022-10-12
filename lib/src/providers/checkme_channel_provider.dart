@@ -1,3 +1,4 @@
+import 'package:checkme_pro_develop/src/db/db_provider.dart';
 import 'package:checkme_pro_develop/src/shar_prefs/device_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,8 +8,9 @@ import 'package:checkme_pro_develop/src/models/models.dart';
 
 class CheckmeChannelProvider with ChangeNotifier{
 
-  static const platform = MethodChannel("checkmepro.connection");
-  static const EventChannel eventChannel = EventChannel('checkmepro.listener');
+  static const MethodChannel platform     = MethodChannel("checkmepro.connection");
+  static const EventChannel  eventChannel = EventChannel('checkmepro.listener');
+
   final _devicePrefs = DevicePreferences();
 
   bool _isSync = false;
@@ -20,17 +22,17 @@ class CheckmeChannelProvider with ChangeNotifier{
 
   // Data List
   DeviceInformationModel? informationModel;
-  List<TemperatureModel> temperaturesList = [];
+  List<TemperatureModel> tmpList = [];
   List<Spo2Model> spo2sList = [];
   List<SlmModel> slmList = [];
   List<UserModel> userList = [];
   List<PedModel> pedList = [];
   List<DlcModel> dlcList = [];
+  List<EcgModel> ecgList = [];
 
   late EcgModel currentEcg;
   late DlcModel currentDlc;
   late SlmModel currentSlm;
-  List<EcgModel> ecgList = [];
 
   EcgModel? currentSyncEcg;
   DlcModel? currentSyncDlc;
@@ -38,33 +40,30 @@ class CheckmeChannelProvider with ChangeNotifier{
 
   Map<String, EcgDetailsModel> ecgDetailsList = {};
   Map<String, EcgDetailsModel> dlcDetailsList = {};
-  Map<String, EcgDetailsAndroidModel> ecgDetailsAndroidList = {};
-  Map<String, EcgDetailsAndroidModel> dlcDetailsAndroidList = {};
   Map<String, SlmDetailsModel > slmDetailsList = {};
 
-  bool get isSync => _isSync;
+  Map<String, EcgDetailsAndroidModel> ecgDetailsAndroidList = {};
+  Map<String, EcgDetailsAndroidModel> dlcDetailsAndroidList = {};
 
+  // SET/GET
+  bool get isSync => _isSync;
   set isSync(bool isSync) {
     _isSync = isSync;
     notifyListeners();
   }
-
   bool get isConnected => _isConnected;
-
   set isConnected(bool isConnected) {
     _isConnected = isConnected;
     notifyListeners();
   }
-
   bool get offlineMode => _offlineMode;
-
   set offlineMode(bool offlineMode) {
     _offlineMode = offlineMode;
     notifyListeners();
   }
-
-  Future<bool> stablishConnection ()async{
-    
+  
+  // CONNECTIONS
+  Future< bool >   autoConnection ()async{
       try{
         if( _devicePrefs.uuid != '' ){
           await startScan();
@@ -79,26 +78,7 @@ class CheckmeChannelProvider with ChangeNotifier{
         return false;
       }
   }
-
-  Future<void> getInfoCheckmePRO ()async{
-      try{
-        final String result = await platform.invokeMethod('checkmepro/getInfoCheckmePRO');
-        informationModel = DeviceInformationModel.fromRawJson( result );
-        notifyListeners();
-      }catch( err ){
-        log( '$err' );
-      }
-  }
-
-  Future<void> beginSyncTime ()async{
-      try{
-        await platform.invokeMethod('checkmepro/beginSyncTime');
-      }catch( err ){
-        log( '$err' );
-      }
-  }
-
-  Future<void> startScan ()async{
+  Future< void >   startScan ()async{
       try{
         devices = [];
         await platform.invokeMethod('checkmepro/startScan');
@@ -106,8 +86,7 @@ class CheckmeChannelProvider with ChangeNotifier{
         log( '$err' );
       }
   }
-
-  Future<String> stopScan ()async{
+  Future< String > stopScan ()async{
       try{
         final String result = await platform.invokeMethod('checkmepro/stopScan');
         return result;
@@ -117,32 +96,20 @@ class CheckmeChannelProvider with ChangeNotifier{
       
       }
   }
-
-  Future<bool> connectToDevice ({ required String uuid, String? deviceName } )async{
+  Future< bool >   connectToDevice ({ required String uuid, String? deviceName } )async{
     bool result = false;
       try{
           result = await platform.invokeMethod('checkmepro/connectTo', { "uuid": uuid });
           // bluetooth device info saved 
           _devicePrefs.uuid = uuid;
           _devicePrefs.deviceName = deviceName ?? '';
-
-          if( result ){
-            isSync = true;
-            beginReadFileList( indexTypeFile: 1 );
-            beginReadFileList( indexTypeFile: 3 );
-            beginReadFileList( indexTypeFile: 4 );
-            beginReadFileList( indexTypeFile: 7 );
-            beginReadFileList( indexTypeFile: 8 );
-            isSync = false;
-          }
           return result;
       }catch( err ){
         //log( '$err' );
         return result;
       }
   }
-
-  Future<void> cancelConnect ()async{
+  Future< void >   cancelConnect ()async{
       try{
           await platform.invokeMethod('checkmepro/disconnect');
       }catch( err ){
@@ -150,44 +117,58 @@ class CheckmeChannelProvider with ChangeNotifier{
       }
   }
 
-  Future<void> beginReadFileList ({ required int indexTypeFile, int? userId } )async{
+// INFORMATION MANAGE 
+  Future<void> getInfoCheckmePRO ()async{
       try{
-        cleanData(indexTypeFile: indexTypeFile);
-        await platform.invokeMethod(
+        final String result = await platform.invokeMethod('checkmepro/getInfoCheckmePRO');
+        informationModel = DeviceInformationModel.fromRawJson( result );
+        notifyListeners();
+      }catch( err ){
+        log( '$err' );
+      }
+  }
+  Future<void> beginSyncTime ()async{
+      try{
+        await platform.invokeMethod('checkmepro/beginSyncTime');
+      }catch( err ){
+        log( '$err' );
+      }
+  }
+  Future<bool> beginReadFileList ({ required int indexTypeFile, int? userId } )async{
+      try{
+        // cleanData(indexTypeFile: indexTypeFile);
+        final res = await platform.invokeMethod(
           'checkmepro/beginReadFileList',
           userId != null 
           ? { 'indexTypeFile': indexTypeFile, 'idUser': userId }
           : { 'indexTypeFile': indexTypeFile }
         );
+
+        return res;
       }catch( err ){
         log( '$err' );
+        return false;
       }
   }
-
-  // get measurement details
-  Future<void> getMeasurementDetails( { required String dtcDate, required String detail } )async{
+  Future<bool> getMeasurementDetails( { required String dtcDate, required String detail } )async{
     try{
-      log('LLAMANDO A LOS DETALLES 1');
-      final res = await platform.invokeMethod('checkmepro/beginReadFileListDetailsECG', 
+      final bool res = await platform.invokeMethod('checkmepro/beginReadFileListDetailsECG', 
       { 'id': dtcDate, 'detail': detail});
       
-      if( res == "isSync"){
-        log('LLAMANDO A LOS DETALLES: ISSYNC TRUE 2');
+      if( res ){
         isSync = true;
-        //isSync = true;
       }
-
+      return res;
     }catch( err ){
       log( '$err' );
+      return false;
     }
   }
 
   // events 
-
   void startEvents(){
     eventChannel.receiveBroadcastStream().listen(_onEvent, onError: _onError);
   }
-  
   void _onEvent(Object? event) async{
     //log( 'EVENT_FLUTTER: $event' );
 
@@ -210,7 +191,6 @@ class CheckmeChannelProvider with ChangeNotifier{
     // Connected
     if( headerType.type == "DEVICE-ONLINE" ){
       isConnected = true;
-      
     }
 
     // Disconnected
@@ -218,57 +198,101 @@ class CheckmeChannelProvider with ChangeNotifier{
       isConnected = false;
     }
 
-    // DLC
-    if( headerType.type == 'DLC'){
-      final dlcTemp = DlcModel.fromRawJson( event.toString());
-      dlcList.add( dlcTemp );
+    if( headerType.type == "GETALL" ){
+      isSync = true;
+      await Future.delayed( const Duration( milliseconds: 2000 ));
+      beginReadFileList(indexTypeFile: 1);
+      await Future.delayed( const Duration( milliseconds: 2000 ));
+      beginReadFileList(indexTypeFile: 3);
+      await Future.delayed( const Duration( milliseconds: 2000 ));
+      beginReadFileList(indexTypeFile: 4);
+      await Future.delayed( const Duration( milliseconds: 2000 ));
+      beginReadFileList(indexTypeFile: 7);
+      await Future.delayed( const Duration( milliseconds: 2000 ));
+      beginReadFileList(indexTypeFile: 8);
+      isSync = false;
     }
 
-    // TM
-    if( headerType.type == 'TM') {
-      final tempTm = TemperatureModel.fromRawJson( event.toString());
-      if(!temperaturesList.contains( tempTm )){
-        temperaturesList.add(tempTm);
+    // DLCLIST
+    if( headerType.type == 'DLCLIST'){
+      final dlcTemp = DlcListModel.fromRawJson( event.toString());
+      for (DlcModel dlc in dlcTemp.dlcList) {
+        final search = await DBProvider.db.getValue( tableName: 'Dlc', dtcDate: dlc.dtcDate );
+        if( search.isEmpty ){
+          await DBProvider.db.newValue('Dlc', dlc );
+        }
       }
+
+    }
+
+    // TMLIST
+    if( headerType.type == 'TMPLISTS') {
+      final tempTm = TmpListModel.fromRawJson( event.toString());
+      for (TemperatureModel tmp in tempTm.tmpList ) {
+        final search = await DBProvider.db.getValue( tableName: 'Tmp', dtcDate: tmp.dtcDate );
+        if( search.isEmpty ){
+          await DBProvider.db.newValue('Tmp', tmp);
+          tmpList.insert(0, tmp );
+        }
+      }
+
     }
 
     //SPO2 
     if( headerType.type == 'SPO2'){
       final spo2Temp = Spo2Model.fromRawJson( event.toString() );
-      if( !spo2sList.contains( spo2Temp ) ){
-        spo2sList.add(spo2Temp);
+      final search = await DBProvider.db.getValue( tableName: 'Spo', dtcDate: spo2Temp.dtcDate );
+      if( search.isEmpty ){
+        await DBProvider.db.newValue('Spo', spo2Temp );
+        spo2sList.insert(0, spo2Temp );
       }
     }
 
-    // SLM 
-    if( headerType.type == 'SLM'){
-      final smlTemp = SlmModel.fromRawJson( event.toString() );
-      if( !slmList.contains( smlTemp ) ){
-        slmList.add( smlTemp );
+    // SLMLIST
+    if( headerType.type == 'SLMLIST'){
+      final slmTemp = SlmListModel.fromRawJson( event.toString() );
+      for (SlmModel slm in slmTemp.slmList) {  
+        final search = await DBProvider.db.getValue( tableName: 'Slm', dtcDate: slm.dtcDate );
+        if( search.isEmpty ){
+          await DBProvider.db.newValue('Slm', slm );
+          slmList.insert(0, slm);
+        }
       }
     }
 
     // PED
     if( headerType.type == 'PED'){
       final pedTemp = PedModel.fromRawJson( event.toString() );
-      if( !pedList.contains( pedTemp ) ){
-        pedList.add( pedTemp );
+      final search = await DBProvider.db.getValue( tableName: 'Ped', dtcDate: pedTemp.dtcDate );
+      if( search.isEmpty ){
+        await DBProvider.db.newValue('Ped', pedTemp );
+        pedList.insert(0, pedTemp) ;
       }
     }
 
-    // ECG 
-    if( headerType.type == 'ECG' ){
-      final ecgTemp = EcgModel.fromRawJson( event.toString() );
-      if( !ecgList.contains( ecgTemp ) ){
-        ecgList.add( ecgTemp );
+    // ECGLIST
+    if( headerType.type == 'ECGLIST' ){
+      final ecgTemp = EcgListModel.fromRawJson( event.toString() );
+
+      for ( EcgModel ecg in ecgTemp.ecgList ) {
+        final search = await DBProvider.db.getValue( tableName: 'Ecg', dtcDate: ecg.dtcDate );
+        if( search.isEmpty ){
+          await DBProvider.db.newValue('Ecg', ecg );
+          ecgList.insert(0, ecg );
+        }
       }
     }
 
-    // USERS
-    if( headerType.type == 'USER' ){
-      final userTemp = UserModel.fromRawJson( event.toString() );
-      if( !userList.contains( userTemp )){
-        userList.add( userTemp );
+    // USERLIST
+    if( headerType.type == 'USERLIST' ){
+      final userListTemp = UserListModel.fromRawJson( event.toString() );
+
+      for (UserModel user in userListTemp.userList) {
+        final search = await DBProvider.db.getValue( tableName: 'Users', dtcDate: user.userName );
+        if( search.isEmpty ){
+          await DBProvider.db.newValue('Users', user );
+          userList.add( user );
+        }
       }
     }
 
@@ -312,9 +336,9 @@ class CheckmeChannelProvider with ChangeNotifier{
     // DETAILS_EKG (ECG/DLC)
     if( headerType.type == 'DETAILS_EKG_ANDROID'){
       try{
-        log('LLAMANDO A LOS DETALLES: DETALLES RECIBIDOS 3');
         final detailECGTemp = EcgDetailsAndroidModel.fromRawJson( event.toString() );
         await Future.delayed( const Duration( seconds: 3 ));
+        
         if( currentSyncEcg != null && !ecgDetailsAndroidList.containsKey( currentSyncEcg!.dtcDate ) && currentSyncDlc == null){
           ecgDetailsAndroidList.addAll( {currentSyncEcg!.dtcDate : detailECGTemp} );
         }else if(currentSyncDlc != null && !dlcDetailsAndroidList.containsKey( currentSyncDlc!.dtcDate ) && currentSyncEcg == null ){
@@ -324,7 +348,6 @@ class CheckmeChannelProvider with ChangeNotifier{
       }catch( err ){
         log('$err');
       } finally{
-        log('LLAMANDO A LOS DETALLES: ISSYNC FALSE 4');
         currentSyncEcg = null;
         currentSyncDlc = null;
         isSync = false;
@@ -334,47 +357,72 @@ class CheckmeChannelProvider with ChangeNotifier{
     notifyListeners();
 
   }
-
   void _onError(Object error) {
     log('$error');
    notifyListeners();
   }
 
-  // reset data 
-  cleanData( { required int indexTypeFile} ){
-    switch( indexTypeFile ){
-      case 1:
-        userList = [];
-      break;
-      case 2:
-        dlcList = [];
-      break;
-      case 3:
-        ecgList = [];
-      break;
-      case 4:
-        spo2sList = [];
-      break;
-      case 5:
-      break;
-      case 6:
-      break;
-      case 7:
-        temperaturesList = [];
-      break;
-      case 8:
-        slmList = [];
-      break;
-      case 9:
-        pedList = [];
-      break;
-      case 10:
-      break;
-      case 11:
-      break;
-      case 12:
-      break;
+  Future<void> loadData( { required String tableName } )async{
+    final data = await DBProvider.db.getAllDb( tableName );
+
+    if( data.isNotEmpty ){
+
+      if( tableName == 'Users' ){  
+        final res = data as List<UserModel>;
+        userList = [ ...res ];
+      }
+
+      if( tableName == 'Ecg' ){
+        final res = data as List<EcgModel>;
+        ecgList = [ ...res ];
+      }
+
+      if( tableName == 'Dlc' ){
+        final res = data as List<DlcModel>;
+        dlcList = [ ...res ];
+      }
+
+      if( tableName == 'Tmp' ){
+        final res = data as List<TemperatureModel>;
+        tmpList = [ ...res ];
+      }
+
+      if( tableName == 'Spo' ){
+        final res = data as List<Spo2Model>;
+        spo2sList = [ ...res ];
+      }
+
+      if( tableName == 'Ped' ){
+        final res = data as List<PedModel>;
+        pedList = [ ...res ];
+      }
+
+      if( tableName == 'Slm' ){
+        final res = data as List<SlmModel>;
+        slmList = [ ...res ];
+      }
+
+      notifyListeners();
     }
-    notifyListeners();
   }
+
+  Future<void> loadDataById( { required String tableName, required int userId } )async{
+    dlcList = [];
+    pedList = [];
+    final data = await DBProvider.db.getValueByUserId( tableName: tableName, userId: userId );
+
+    if( data.isNotEmpty ){
+      if( tableName == 'Dlc' ){
+        final res = data as List<DlcModel>;
+        dlcList = [ ...res ];
+      }
+
+      if( tableName == 'Ped' ){
+        final res = data as List<PedModel>;
+        pedList = [ ...res ];
+      }
+      notifyListeners();
+    }
+  }
+  
 }

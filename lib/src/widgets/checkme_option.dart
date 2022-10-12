@@ -10,10 +10,11 @@ class CheckmeOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only( left: 15, right: 15, top: 10, bottom: 5),
+      margin: const EdgeInsets.only( left: 15, right: 15, top: 7, bottom: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        border: Border.all( color: Colors.cyan, width: 2 )
+        //border: Border.all( color: Colors.blue, width: 2 ),
+        color: Colors.white
       ),
       child: MaterialButton(
         shape: RoundedRectangleBorder(
@@ -22,21 +23,19 @@ class CheckmeOption extends StatelessWidget {
         onPressed: onPressed,
         child: SizedBox(
           width: double.infinity,
-          height: 120,
+          height: 85,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Container(
-                width: 90,
-                height: 90,
-                child: Icon( iconData , size: 70, color: Colors.cyan ,),
-                decoration: BoxDecoration(
-                  border: Border.all( color: Colors.cyan ),
-                  borderRadius: BorderRadius.circular(15)
-                ),
-              ),
-              const SizedBox( width: 10, ),
-              Text( titleOption , style: const TextStyle( fontSize: 20, color: Colors.blueGrey ),)
+              Icon( iconData, size: 50, color: const Color.fromRGBO(10, 72, 113, 1),),
+              const SizedBox(width: 10,),
+              Text( titleOption , style: const TextStyle( fontSize: 21, color: Colors.black, fontWeight: FontWeight.bold ),),
+              const Spacer(),
+              const Icon(
+                Icons.add_box_rounded,
+                color: Colors.green,
+                size: 40,
+              )
             ],
           ),
         ),

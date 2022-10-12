@@ -12,16 +12,18 @@ class Spo2Model {
         required this.pIndex,
         required this.dtcDate,
         required this.userId,
-        required this.type
+        this.id,
+        this.inServer
     });
 
+    final int? id;
     final String dtcDate;
-    final String userId;
-    final String type;
+    final int userId;
     final int spo2Value;
-    final int enPassKind;
     final int prValue;
+    final int enPassKind;
     final dynamic pIndex;
+    final int? inServer;
 
     factory Spo2Model.fromRawJson(String str) => Spo2Model.fromJson(json.decode(str));
 
@@ -33,8 +35,9 @@ class Spo2Model {
         enPassKind: json["enPassKind"],
         pIndex: json["pIndex"],
         dtcDate: json["dtcDate"],
-        userId: json["userID"],
-        type: json["type"]
+        userId: json["userId"],
+        id: json["id"],
+        inServer: json["inServer"]
     );
 
     Map<String, dynamic> toJson() => {
@@ -44,6 +47,7 @@ class Spo2Model {
         "pIndex": pIndex,
         "dtcDate": dtcDate,
         "userID": userId,
-        "type": type
+        "id": id,
+        "inServer": inServer ?? 0
     };
 }

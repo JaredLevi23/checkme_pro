@@ -15,7 +15,7 @@ class SlmResultsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sleep Monitor'),
+        title: const Text('Sleep Monitor', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
         actions: const [
           ConnectionIndicator(),
         ],
@@ -30,30 +30,65 @@ class SlmResultsPage extends StatelessWidget {
           final date = slm.dtcDate.split(' ');
 
           return Card(
-            child: ListTile( 
-              title: Text( 'Averange OX: ${slm.averageOx}\nLow Ox:${slm.lowOxTime}\nLowest Ox:${slm.lowestOx}\nLow Ox Number: ${slm.lowOxNumber}' ),
-              subtitle: Text( Platform.isIOS ? 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}' : 'Date: ${ slm.dtcDate }' ),
-              trailing: Text( 'Duration: ${slm.totalTime}', style: const TextStyle( fontSize: 17),),
+            child: GestureDetector( 
+              child: Row(
+                children: [
+                  Container(
+                    width: 90,
+                    height: 120,
+                    decoration: const BoxDecoration(
+                      color: const Color.fromRGBO(50, 97, 148, 1),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon( Icons.night_shelter_outlined, size: 70, color: Colors.white,),
+                        Text('Duration ${ slm.totalTime }', style: const TextStyle( color: Colors.white), textAlign: TextAlign.center,)
+                      ],
+                    )
+                  ),
+                  const SizedBox( width: 15,),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text( Platform.isIOS ? 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}' : 'Date: ${ slm.dtcDate }', style: const TextStyle(  fontWeight: FontWeight.bold ), ),
+                      Text( 'Averange OX: ${slm.averageOx}\nLow Ox:${slm.lowOxTime}\nLowest Ox:${slm.lowestOx}\nLow Ox Number: ${slm.lowOxNumber}' ),
+                      //Text( 'Duration: ${slm.totalTime}', style: const TextStyle( fontSize: 17),),
+                    ],
+                  )
+                ],
+              ),
               onTap: () async {
                 checkmeProvider.currentSlm = slm;
 
-                if( !checkmeProvider.ecgDetailsList.containsKey( slm.dtcDate ) ){
-
+                if( !checkmeProvider.slmDetailsList.containsKey( slm.dtcDate ) ){
                   if(checkmeProvider.isConnected){
-
                     if( !checkmeProvider.isSync ){
                       checkmeProvider.currentSyncSlm ??= slm;
-                      await checkmeProvider.getMeasurementDetails(dtcDate: slm.dtcDate, detail: 'SLM');
-                    }
+                      final res = await checkmeProvider.getMeasurementDetails(dtcDate: slm.dtcDate, detail: 'SLM');
 
+                      if( !res ){
+                        showDialog(
+                            context: context, 
+                            builder: (_){ 
+                              return const CustomAlertDialog(
+                                message: 'Please try again or check the connection with the device', 
+                                iconData: Icons.info
+                              );
+                            }
+                          );
+                      }
+                    }
                   }else{
                     showDialog(context: context, builder: (_){
-                      return const CustomAlertDialog();
+                      return const CustomAlertDialog(
+                        message: 'Check the connection with the device.',
+                        iconData: Icons.bluetooth_disabled,
+                      );
                     });
                     return;
                   }
                 }
-                
                 Navigator.pushNamed(context, 'checkme/slm/details');
               },
              ),

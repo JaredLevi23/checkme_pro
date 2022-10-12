@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,14 +14,14 @@ class TemperaturesResultsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar( 
-        title: const Text( 'Temperatures' ),
+        title: const Text( 'Temperatures', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1)) ),
         actions: const[ ConnectionIndicator(), ],
       ),
       body: ListView.builder(
-        itemCount: checkmeProvider.temperaturesList.length,
+        itemCount: checkmeProvider.tmpList.length,
         itemBuilder: (context, index){
 
-          final temp = checkmeProvider.temperaturesList[ index ];
+          final temp = checkmeProvider.tmpList[ index ];
           final date = temp.dtcDate.split(' ');
 
           return  Column(

@@ -20,7 +20,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text( 'DLC Detail' ),
+        title: const Text( 'DLC Detail', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1)) ),
         actions: const [
           ConnectionIndicator()
         ],

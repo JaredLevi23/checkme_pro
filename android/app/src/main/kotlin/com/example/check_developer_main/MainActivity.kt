@@ -40,19 +40,6 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
     lateinit var userInfo: UserInfo
     private val bleList: MutableList<BleBean> = ArrayList()
 
-    private val receiver = object: BroadcastReceiver(){
-        override fun onReceive(context: Context?, intent: Intent?) {
-            when(intent?.getIntExtra( BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR )){
-                BluetoothAdapter.STATE_ON ->{
-                    println("CONECTADO")
-                }
-                BluetoothAdapter.STATE_OFF ->{
-                    println("DESCONECTADO")
-                }
-            }
-        }
-    }
-
     private var userFileName = arrayOf(
         "dlc.dat",
         "spc.dat",
@@ -147,19 +134,17 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         if( indexTypeFile == 1 || indexTypeFile == 3 || indexTypeFile == 4 || indexTypeFile == 7 || indexTypeFile == 8){
                             // LEER SIN USUARIO
                             if( fileName != null){
-                                readFile( fileName, "" );
-                                result.success("isSync");
+                                readFile( fileName, "", result );
                             }else{
-                                result.success(true );
+                                result.success(false );
                             }
                         }else{
                             // LEER CON USUARIO
                             val idUser = args["idUser"]
                             if( fileName != null){
-                                readFile( fileName, "$idUser" );
-                                result.success("isSync");
+                                readFile( fileName, "$idUser", result );
                             }else{
-                                result.success(true);
+                                result.success(false );
                             }
                         }
                     }else{
@@ -174,14 +159,13 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                     val type = args["detail"]
 
                     if( timeString != null && type != null ){
-                        //GlobalScope.launch ( Dispatchers.Main ){
                         GlobalScope.launch( Dispatchers.Main ) {
                             getFileDetails( timeString,type )
                         }
-                        //}
+                        result.success(true );
+                    }else{
+                        result.success(false  );
                     }
-
-                    result.success("isSync");
                 }
                 else -> {
                     // not implemented
@@ -241,35 +225,39 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
         userChannel.receive()
         val userTemp = File(Constant.getPathX("usr.dat")).readBytes()
         userTemp.apply {
-            userInfo = UserInfo(this)
-            var tIndex = 1
-            for (user in userInfo.user) {
+            try {
+                userInfo = UserInfo(this)
+                var tIndex = 1
+                for (user in userInfo.user) {
+                    for (f in userFileName) {
+                        bleWorker.getFile(user.id + f)
+                        tIndex++
+                    }
+                    //userAdapter.addUser(user)
+                    var json = JSONObject()
+                    try {
+                        //json.put("type", "USER");
+                        json.put("userId", user.id.toInt() );
+                        json.put("gender", "${user.sex}");
+                        json.put("birthDay", "${user.birthday}");
+                        json.put("height", "${user.height}");
+                        json.put("iconID", "${user.ico}");
+                        json.put("userName", "${user.name}");
+                        json.put("weight", "${user.weight}");
+                        json.put("age", "${user.pacemakeflag}");
+
+                        eventSink?.success( json.toString() );
+                    }catch ( e: JSONException){
+                        println("ERROR USER JSON: $e")
+                    }
+                }
+
                 for (f in userFileName) {
-                    bleWorker.getFile(user.id + f)
+                    bleWorker.getFile( f )
                     tIndex++
                 }
-                //userAdapter.addUser(user)
-                var json = JSONObject()
-                try {
-                    json.put("type", "USER");
-                    json.put("userID", "${user.id}");
-                    json.put("gender", "${user.sex}");
-                    json.put("birthday", "${user.birthday}");
-                    json.put("height", "${user.height}");
-                    json.put("iconID", "${user.ico}");
-                    json.put("userName", "${user.name}");
-                    json.put("weight", "${user.weight}");
-                    json.put("age", "${user.pacemakeflag}");
-
-                    eventSink?.success( json.toString() );
-                }catch ( e: JSONException){
-                    println("ERROR USER JSON: $e")
-                }
-            }
-
-            for (f in userFileName) {
-                bleWorker.getFile( f )
-                tIndex++
+            }catch (e: Exception){
+                println("ERROR: $e")
             }
 
             delay(300)
@@ -277,7 +265,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
         }
     }
 
-    private fun readFile( fileName: String, userId: String = "" ){
+    private fun readFile( fileName: String, userId: String = "", result: MethodChannel.Result ){
         val fileTemp = File(Constant.getPathX( userId + fileName ));
 
         if( !fileTemp.exists() ){
@@ -304,14 +292,17 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                             json.put("bpValue"      , dlcArray.pr)
                             json.put("prFlag"       , dlcArray.prFlag)
                             json.put("dtcDate"      , dlcArray.timeString);
-                            json.put("userID"       , userId);
-                            json.put("haveVoice"    , dlcArray.voice != 0 );
+                            json.put("userId"       , userId);
+                            json.put("haveVoice"    , dlcArray.voice );
 
                             eventSink?.success( json.toString() );
                         }catch (e: JSONException){
                             println("ERROR JSON DLC: $e");
+                            result.success( false );
                         }
                     }
+
+                result.success( true );
 
             }
             "spc.dat"->{
@@ -329,15 +320,18 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         json.put("type"         , "ECG");
                         json.put("enPassKind"   , ecgArray.face);
                         json.put("dtcDate"      , ecgArray.timeString)
-                        json.put("userID"       , userId );
-                        json.put("haveVoice"    , ecgArray.voice != 0 );
-                        json.put("enLeadKind"   , ecgArray.way);
+                        json.put("userId"       , userId.toInt() );
+                        json.put("haveVoice"    , ecgArray.voice );
+                        json.put("enLeadKind"   , ecgArray.way );
 
                         eventSink?.success( json.toString() );
                     }catch (e: JSONException){
                         println("ERROR JSON DLC: $e");
+                        result.success( false )
                     }
                 }
+
+                result.success( true )
             }
             "oxi.dat"->{
 
@@ -353,13 +347,16 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         json.put("prValue"      , oxyArray.pr)
                         json.put("spo2Value"    , oxyArray.oxy)
                         json.put("way"          , oxyArray.way)
-                        json.put("userID"       , userId )
+                        json.put("userId"       , userId.toInt() )
 
                         eventSink?.success( json.toString() );
                     }catch (e: JSONException){
                         println("ERROR JSON DLC: $e");
+                        result.success( false )
                     }
                 }
+
+                result.success( true )
 
             }
             "tmp.dat"->{
@@ -373,13 +370,16 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         json.put("dtcDate"     , tmpArray.timeString )
                         json.put("tempValue"   , tmpArray.tmp)
                         json.put("measureMode" , tmpArray.way )
-                        json.put("userID"      , userId )
+                        json.put("userId"      , userId.toInt() )
 
                         eventSink?.success( json.toString() );
                     }catch (e: JSONException){
+                        result.success( false )
                         println("ERROR JSON DLC: $e");
                     }
                 }
+
+                result.success( true )
 
             }
             "bpi.dat"->{
@@ -398,8 +398,11 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         eventSink?.success( json.toString() );
                     }catch (e: JSONException){
                         println("ERROR JSON DLC: $e");
+                        result.success( false )
                     }
                 }
+
+                result.success( true )
             }
             "slm.dat"->{
                 var slmInfo = SlpInfo( fileValue )
@@ -416,14 +419,17 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         json.put("lowestOx"     , smlArray.minO2)
                         json.put("totalTime"    , smlArray.time)
                         json.put("dtcDate"      , smlArray.timeString)
-                        json.put("userID"       , userId )
+                        json.put("userId"       , userId.toInt() )
 
                         eventSink?.success( json.toString() )
 
                     }catch (e: JSONException){
                         println("ERROR SLM: $e")
+                        result.success( false )
                     }
                 }
+
+                result.success( true )
             }
             "ped.dat"->{
                 var pedInfo = PedInfo( fileValue )
@@ -438,14 +444,16 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         json.put("speed"    , pedArray.speed)
                         json.put("steps"    , pedArray.step)
                         json.put("totalTime", pedArray.time)
-                        json.put("userID", userId )
+                        json.put("userId"   , userId.toInt() )
                         //json.put("date"         , pedArray.date)
 
                         eventSink?.success( json.toString() );
                     }catch (e: JSONException){
                         println("ERROR JSON DLC: $e");
+                        result.success( false )
                     }
                 }
+                result.success( true )
             }
             "nibp.dat"->{
 
@@ -524,13 +532,11 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
         dataScope.launch {
             val a = withTimeoutOrNull(10000) {
                 bleWorker.waitConnect()
-                println("WAIT CONNECT!!!")
             }
 
             a?.let {
                 val b = withTimeoutOrNull(10000) {
                     bleWorker.getFile("usr.dat")
-                    println("GET FILE USER.DAT EN ONSCANITEMCLICK")
                 }
                 b?.let {
                     userChannel.send(1)
@@ -538,7 +544,6 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
             }
         }
         uiScope.launch {
-            println("LAUNCH UISCOPE")
             readUser()
         }
     }

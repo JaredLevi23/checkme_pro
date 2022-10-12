@@ -1,6 +1,3 @@
-
-import 'dart:developer';
-
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/shar_prefs/device_preferences.dart';
 import 'package:checkme_pro_develop/src/widgets/widgets.dart';
@@ -17,15 +14,34 @@ class CustomDrawer extends StatelessWidget {
     final _dev = DevicePreferences();
 
     return Drawer(
+      backgroundColor: const Color.fromRGBO(10, 72, 113, 1),
       child: ListView(
         children: [
 
           //TODO: add hoyhealth icon
 
-          const DrawerHeader(
-            child: CircleAvatar(
-              backgroundColor: Colors.cyan,
-              child: Icon( Icons.person, size: 90, color: Colors.white,),
+          DrawerHeader(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+
+                const CircleAvatar(
+                  child: Icon(Icons.person),
+                ),
+
+                const SizedBox(
+                  width: 10,
+                ),
+
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text('User', style: TextStyle( fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),),
+                    Text('Account', style: TextStyle( fontSize: 15, color: Colors.white ),)
+                  ],
+                )
+              ],
             )
           ),
 
@@ -53,8 +69,20 @@ class CustomDrawer extends StatelessWidget {
           _optionDrawer(
             iconData: Icons.info,
             title: 'About',
+            onPressed: ()async {
+              if( checkmeProvider.informationModel == null ){
+                await checkmeProvider.getInfoCheckmePRO();
+              }
+              Navigator.pushNamed(context, 'checkme/info');
+            }
+          ),
+
+          _optionDrawer(
+            iconData: Icons.school, 
+            title: 'HoyLearning', 
             onPressed: (){}
           ),
+
           _optionDrawer(
             iconData: Icons.logout,
             title: 'Logout',
@@ -70,8 +98,8 @@ class CustomDrawer extends StatelessWidget {
   // Option Drawer 
   Widget _optionDrawer( { required IconData iconData, required String title, required Function()? onPressed } ){
     return ListTile(
-      leading: Icon( iconData , size: 30, color: Colors.cyan,),
-      title: Text( title , style: const TextStyle( fontSize: 17, color: Colors.blueGrey),),
+      leading: Icon( iconData , size: 30, color: Colors.white,),
+      title: Text( title , style: const TextStyle( fontSize: 17, color: Colors.white),),
       onTap: onPressed
     ); 
   }

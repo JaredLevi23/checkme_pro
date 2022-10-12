@@ -41,8 +41,8 @@ enum MyFlutterErrorCode{
     var dlcList :[ VTProDlc ]? = nil;
     var isConnected: Bool = false
     var isBtEnabled: Bool = false
-    var indexUser = 0
-    var user: NSObject? = nil
+    var idUser: Int = 0
+    var currentDtcDate: String = ""
     
     
   override func application(
@@ -76,6 +76,11 @@ enum MyFlutterErrorCode{
               // MARK: StopScan
               VTBLEUtils.sharedInstance().stopScan()
               result("checkmepro/stopScan")
+              
+          }else if( "checkmepro/getAllInfo" == call.method ){
+              // MARK: StopScan
+              self?.loadAllInfo()
+              result( true )
               
           }else if( "checkmepro/connectTo" == call.method ){
               // MARK: Connect to
@@ -117,9 +122,10 @@ enum MyFlutterErrorCode{
               let indexTypeFile = args["indexTypeFile"] as! Int
               
               if indexTypeFile == 1 || indexTypeFile == 3 || indexTypeFile == 4 || indexTypeFile == 7 || indexTypeFile == 8 {
-                  self?.beginReadFileList( result: result, dataType: indexTypeFile )
+                  self?.beginReadFileList( result: result, fileType: indexTypeFile )
               }else{
                   let idUser = args["idUser"] as! Int
+                  
                   self?.downloadList( idUser , fileType: indexTypeFile )
                   result(true)
               }
@@ -130,6 +136,7 @@ enum MyFlutterErrorCode{
               guard let args = call.arguments as? [String:Any] else {return}
               let dtcDate = args["id"] as! String
               let typeDetail = args["detail"] as! String
+              self?.currentDtcDate = dtcDate
               
               if typeDetail == "ECG"{
                   let currentEcg = self?.ecgList?.firstIndex{ "\($0.dtcDate)" == dtcDate }
@@ -140,9 +147,9 @@ enum MyFlutterErrorCode{
                         with: (self!.ecgList?[ currentEcg! ])!,
                         fileType: VTProFileTypeEcgDetail
                       )
-                      result("isSync")
+                      result(true)
                   }else{
-                      result("no sync")
+                      result(false)
                   }
               } else if typeDetail == "DLC"{
                   
@@ -154,9 +161,9 @@ enum MyFlutterErrorCode{
                         with: (self!.dlcList?[ currentDlc! ])!,
                         fileType: VTProFileTypeEcgDetail
                       )
-                      result("isSync")
+                      result(true)
                   }else{
-                      result("no sync")
+                      result( false )
                   }
               } else if typeDetail == "SLM"{
                   let currentSLM = self?.slmList?.firstIndex{ "\($0.dtcDate)" == dtcDate }
@@ -166,9 +173,9 @@ enum MyFlutterErrorCode{
                         with: (self!.slmList?[ currentSLM! ])!,
                         fileType: VTProFileTypeSlmDetail
                       )
-                      result("isSync")
+                      result(true)
                   }else{
-                      result("no sync")
+                      result(false)
                   }
               }
                 
@@ -189,6 +196,15 @@ enum MyFlutterErrorCode{
   }
 
 // MARK: FUNCTIONS VT
+    func loadAllInfo(){
+        let fileList = [ 1,3,4,7,8 ]
+        for f in fileList {
+            VTProCommunicate.sharedInstance().beginReadFileList(
+                with: nil,
+                fileType: dataTypeMapToFileType( datatype: f  )
+            )
+        }
+    }
     
     
     // MARK: set basic info
@@ -225,32 +241,32 @@ enum MyFlutterErrorCode{
     }
     
     // MARK: beginReadFileList VT
-    func beginReadFileList( result:FlutterResult, dataType: Int ) {
+    func beginReadFileList( result:FlutterResult, fileType: Int ) {
         
         VTProCommunicate.sharedInstance().beginReadFileList(
             with: nil,
-            fileType: dataTypeMapToFileType( datatype: dataType  )
+            fileType: dataTypeMapToFileType( datatype: fileType  )
         )
         
-        result(" DateTypeRead ")
+        result(true)
     }
     
     // MARK: download list VT
     func downloadList(_ idUser: Int, fileType: Int ) {
         
-        self.indexUser = idUser
-        
+        self.idUser = idUser
         let currentUser = self.userList?.firstIndex{ idUser == $0.userID }
         
         if currentUser == nil {
-            self.indexUser = 0
-            print( "Nil User !!!" )
+            self.idUser = 0
             return
         }
         
-        print( self.userList![ currentUser! ] as Any)
+        VTProCommunicate.sharedInstance().beginReadFileList(
+            with: self.userList?[ currentUser! ] ,
+            fileType: dataTypeMapToFileType( datatype: fileType )
+        )
         
-        VTProCommunicate.sharedInstance().beginReadFileList(with: self.userList?[ currentUser! ] , fileType: dataTypeMapToFileType( datatype: fileType ) )
     }
     
     func getInfoWithResultData(_ infoData: Data?) {
@@ -298,25 +314,34 @@ enum MyFlutterErrorCode{
                 let userList = VTProFileParser.parseUserList_(withFileData: fileData.fileData as Data)
                 self.userList = userList
                 
+                var jsonUserList: [ [ String:Any ] ] = []
+                
                 for user in userList ?? [] {
                     
-                    let userTemp :[String:String] = [
-                        "type": "USER",
-                        "userID": "\( user.userID)",
-                        "gender": "\( user.gender)",
-                        "birthday": "\( user.birthday)",
-                        "height": "\( user.height)",
-                        "iconID": "\( user.iconID)",
-                        "userName": "\(user.userName)" ,
-                        "weight":  "\(user.weight)",
-                        "age": "\(user.age)",
+                    let userTemp :[String:Any] = [
+                        "userId"    : user.userID,
+                        "gender"    : "\( user.gender)",
+                        "birthDay"  : "\( user.birthday)",
+                        "height"    : "\( user.height)",
+                        "iconID"    : "\( user.iconID)",
+                        "userName"  : "\(user.userName)" ,
+                        "weight"    :  "\(user.weight)",
+                        "age"       : "\(user.age)",
                     ]
                    
-                    if let jsonData = try? JSONSerialization.data(withJSONObject: userTemp, options: [] ){
-                        let jsonText = String( data: jsonData, encoding: .ascii )
-                        self.eventSink?( jsonText )
-                    }
+                    jsonUserList.append( userTemp )
                 }
+                
+                let userResList: [ String: Any ] = [
+                    "type":"USERLIST",
+                    "userList": jsonUserList
+                ]
+                
+                if let jsonData = try? JSONSerialization.data(withJSONObject: userResList, options: [] ){
+                    let jsonText = String( data: jsonData, encoding: .ascii )
+                    self.eventSink?( jsonText )
+                }
+                
             }
         }else if (fileData.fileType == VTProFileTypeXuserList) {
             if (fileData.enLoadResult == VTProFileLoadResultSuccess) {
@@ -329,21 +354,35 @@ enum MyFlutterErrorCode{
                let arr = VTProFileParser.parseEcgList_(withFileData: fileData.fileData as Data)
                self.ecgList = arr
                 // MARK: ECG
+                
+                var jsonEcgList: [[String: Any]] = []
+                
                for ecg in arr ?? [] {
                     
                     let ecgTemp :[String:Any] = [
-                        "type": "ECG",
+                        "type"      : "ECG",
                         "enPassKind": ecg.enPassKind.rawValue,
-                        "dtcDate": "\( ecg.dtcDate )",
-                        "haveVoice": ecg.haveVoice,
+                        "dtcDate"   : "\( ecg.dtcDate )",
+                        "haveVoice" : ecg.haveVoice ? 1 : 0,
                         "enLeadKind": ecg.enLeadKind.rawValue,
-                        "userID": "\(ecg.userID )",
+                        "userId"    : self.idUser,
                     ]
                    
-                    if let jsonData = try? JSONSerialization.data(withJSONObject: ecgTemp, options: [] ){
-                        let jsonText = String( data: jsonData, encoding: .ascii )
-                        self.eventSink?( jsonText )
-                    }
+                    //if let jsonData = try? JSONSerialization.data(withJSONObject: ecgTemp, options: [] ){
+                      //  let jsonText = String( data: jsonData, encoding: .ascii )
+                        //self.eventSink?( jsonText )
+                    //}
+                   jsonEcgList.append( ecgTemp )
+                }
+                
+                let ecgResList: [ String: Any ] = [
+                    "type":"ECGLIST",
+                    "ecgList": jsonEcgList
+                ]
+                
+                if let jsonData = try? JSONSerialization.data(withJSONObject: ecgResList, options: [] ){
+                    let jsonText = String( data: jsonData, encoding: .ascii )
+                    self.eventSink?( jsonText )
                 }
                 
                 
@@ -357,13 +396,13 @@ enum MyFlutterErrorCode{
                 // MARK: SPO2
                 for spo in arr ?? [] {
                     let spoTemp :[String:Any] = [
-                        "type": "SPO2",
+                        "type"      : "SPO2",
                         "enPassKind": spo.enPassKind.rawValue,
-                        "pIndex": spo.pIndex,
-                        "prValue": spo.prValue,
-                        "spo2Value": spo.spo2Value,
-                        "dtcDate": "\(spo.dtcDate)",
-                        "userID": "\( spo.userID )",
+                        "pIndex"    : spo.pIndex,
+                        "prValue"   : spo.prValue,
+                        "spo2Value" : spo.spo2Value,
+                        "dtcDate"   : "\(spo.dtcDate)",
+                        "userId"    : self.idUser,
                     ]
                    
                     if let jsonData = try? JSONSerialization.data(withJSONObject: spoTemp, options: [] ){
@@ -379,21 +418,29 @@ enum MyFlutterErrorCode{
             if fileData.enLoadResult == VTProFileLoadResultSuccess {
                 let arr = VTProFileParser.parseTempList_(withFileData: fileData.fileData as Data)
                 
+                var tmList :[ [ String: Any ] ] = [];
                 // MARK: Temperature
                 for tm in arr ?? [] {
                     let tmTemp :[String:Any] = [
-                        "type":"TM",
-                        "userID": "\( tm.userID )",
-                        "dtcDate": "\(tm.dtcDate)",
-                        "tempValue": tm.tempValue,
-                        "measureMode": tm.measureMode,
-                        "enPassKind": tm.enPassKind.rawValue
+                        "type"          :"TM",
+                        "userId"        : self.idUser ,
+                        "dtcDate"       : "\(tm.dtcDate)",
+                        "tempValue"     : tm.tempValue,
+                        "measureMode"   : tm.measureMode,
+                        "enPassKind"    : tm.enPassKind.rawValue
                     ]
-                   
-                    if let jsonData = try? JSONSerialization.data(withJSONObject: tmTemp, options: [] ){
-                        let jsonText = String( data: jsonData, encoding: .ascii )
-                        self.eventSink?( jsonText )
-                    }
+                    
+                    tmList.append( tmTemp )
+                }
+                
+                let jsonDataTm: [ String: Any ] = [
+                    "type": "TMPLISTS",
+                    "tmpList": tmList
+                ]
+                
+                if let jsonData = try? JSONSerialization.data(withJSONObject: jsonDataTm, options: [] ){
+                    let jsonText = String( data: jsonData, encoding: .ascii )
+                    self.eventSink?( jsonText )
                 }
                 
             } else {
@@ -405,11 +452,13 @@ enum MyFlutterErrorCode{
                 
                 self.slmList = arr
                 
+                var slmListTemp:[[ String: Any ]] = []
+                
                 // MARK: SLM
                 for slm in arr ?? [] {
                     let slmTemp :[String:Any] = [
                         "type":"SLM",
-                        "userID": "\( slm.userID )",
+                        "userId": self.idUser,
                         "dtcDate": "\(slm.dtcDate)",
                         "averageOx": slm.averageOx,
                         "lowOxNumber": slm.lowOxNumber,
@@ -419,11 +468,19 @@ enum MyFlutterErrorCode{
                         "enPassKind": slm.enPassKind.rawValue
                     ]
                    
-                    if let jsonData = try? JSONSerialization.data(withJSONObject: slmTemp, options: [] ){
-                        let jsonText = String( data: jsonData, encoding: .ascii )
-                        self.eventSink?( jsonText )
-                    }
+                    slmListTemp.append( slmTemp )
                 }
+                
+                let json:[ String:Any ] = [
+                    "type": "SLMLIST",
+                    "slmList": slmListTemp
+                ]
+                
+                if let jsonData = try? JSONSerialization.data(withJSONObject: json, options: [] ){
+                    let jsonText = String( data: jsonData, encoding: .ascii )
+                    self.eventSink?( jsonText )
+                }
+                
             } else {
                 print("Error %ld", fileData.enLoadResult)
             }
@@ -442,7 +499,7 @@ enum MyFlutterErrorCode{
                         "steps": ped.steps,
                         "fat": ped.fat,
                         "dtcDate": "\(ped.dtcDate)",
-                        "userID": "\( ped.userID )",
+                        "userId":  self.idUser,
                     ]
                    
                     if let jsonData = try? JSONSerialization.data(withJSONObject: pedTemp, options: [] ){
@@ -461,26 +518,35 @@ enum MyFlutterErrorCode{
                 self.dlcList = arr
                 // MARK: DLC
                 
+                var dlcListJson: [[ String: Any ]] = []
+                
                 for dlc in arr ?? [] {
                     
                     let dlcTemp :[String:Any] = [
                         "bpFlag": dlc.bpFlag,
                         "bpValue": dlc.bpValue,
-                        "haveVoice": dlc.haveVoice,
+                        "haveVoice": dlc.haveVoice ? 1 : 0,
                         "hrResult": dlc.hrResult.rawValue,
                         "hrValue": dlc.hrValue,
                         "pIndex": dlc.pIndex,
                         "spo2Result": dlc.spo2Result.rawValue,
                         "spo2Value": dlc.spo2Value,
                         "dtcDate": "\(dlc.dtcDate)",
-                        "userID": "\(dlc.userID)",
+                        "userId": self.idUser,
                         "type": "DLC"
                     ]
                     
-                    if let jsonData = try? JSONSerialization.data(withJSONObject: dlcTemp, options: [] ){
-                        let jsonText = String( data: jsonData, encoding: .ascii )
-                        self.eventSink?( jsonText )
-                    }
+                    dlcListJson.append( dlcTemp )
+                }
+                
+                let jsonDlcList : [ String: Any ] = [
+                    "type": "DLCLIST",
+                    "dlcList": dlcListJson
+                ]
+                
+                if let jsonData = try? JSONSerialization.data(withJSONObject: jsonDlcList, options: [] ){
+                    let jsonText = String( data: jsonData, encoding: .ascii )
+                    self.eventSink?( jsonText )
                 }
                 
             } else {
@@ -493,6 +559,7 @@ enum MyFlutterErrorCode{
                 
                 let ecgDetailTemp :[String: Any] = [
                     "type": "DETAILS_EKG",
+                    "userId": self.idUser,
                     "arrEcgContent": detail?.arrEcgContent ?? [],
                     "arrEcgHeartRate": detail?.arrEcgHeartRate ?? [],
                     "hrValue": detail?.hrValue ?? 0,
@@ -505,13 +572,16 @@ enum MyFlutterErrorCode{
                     "enFilterKind": detail?.enFilterKind.rawValue ?? 0,
                     "enLeadKind": detail?.enLeadKind.rawValue ?? 0,
                     "qtValue": detail?.qtValue ?? 0,
-                    "isQT": detail?.isQT ?? false
+                    "isQT": detail!.isQT ? 1 : 0,
+                    "dtcDate": self.currentDtcDate
                 ]
                
                 if let jsonData = try? JSONSerialization.data(withJSONObject: ecgDetailTemp, options: [] ){
                     let jsonText = String( data: jsonData, encoding: .ascii )
                     self.eventSink?( jsonText )
                 }
+                
+                self.currentDtcDate = ""
                 
             } else {
                 print("Detail Error %ld", fileData.enLoadResult)
@@ -524,13 +594,16 @@ enum MyFlutterErrorCode{
                 let smlDetailTemp:[ String: Any ] = [
                     "type": "DETAILS_SLM",
                     "arrOxValue": detail?.arrOxValue ?? [],
-                    "arrPrValue": detail?.arrPrValue ?? []
+                    "arrPrValue": detail?.arrPrValue ?? [],
+                    "dtcDate": self.currentDtcDate
                 ]
                 
                 if let jsonData = try? JSONSerialization.data(withJSONObject: smlDetailTemp, options: [] ){
                     let jsonText = String( data: jsonData, encoding: .ascii )
                     self.eventSink?( jsonText )
                 }
+                
+                self.currentDtcDate = ""
                 
             } else {
                 print("Detail Error %ld", fileData.enLoadResult)
@@ -545,6 +618,8 @@ enum MyFlutterErrorCode{
                 print("Detail Error %ld", fileData.enLoadResult)
             }
         }
+        
+        self.idUser = 0
     }
     
     func realTimeCallBack(with object: VTProMiniObject) {
@@ -693,14 +768,24 @@ enum MyFlutterErrorCode{
         print("Good - serviceDeployed")
         state = VTProStateSyncData
         
-//        if !VTProCommunicate.sharedInstance().peripheral.name!.hasPrefix("Checkme") {
-//            initFuncArray()
-//        }
         VTProCommunicate.sharedInstance().delegate = self
         VTProCommunicate.sharedInstance().beginPing()
         isInitialRequest = true
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(0.5 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: {
             VTProCommunicate.sharedInstance().beginGetInfo()
+            
+        })
+        
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(Int64(0.5 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: {
+            
+            let res = [
+                "type": "GETALL"
+            ]
+            
+            if let jsonData = try? JSONSerialization.data(withJSONObject: res, options: [] ){
+                let jsonText = String( data: jsonData, encoding: .ascii )
+                self.eventSink?( jsonText )
+            }
         })
         
     }

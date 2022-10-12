@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class CustomAlertDialog extends StatelessWidget {
-  const CustomAlertDialog({Key? key}) : super(key: key);
+  const CustomAlertDialog({Key? key, required this.message, required this.iconData}) : super(key: key);
+
+  final String message;
+  final IconData iconData;
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +22,9 @@ class CustomAlertDialog extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.bluetooth_audio ),
-              Text('Check the connection with the device.', textAlign: TextAlign.center,),
+            children: [
+              Icon( iconData ),
+              Text( message , textAlign: TextAlign.center,),
             ],
           ),
         ),

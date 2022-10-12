@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'dart:typed_data';
-
 class EcgDetailsModel {
     EcgDetailsModel({
         required this.pvcsValue,
@@ -18,8 +16,7 @@ class EcgDetailsModel {
         required this.type,
         required this.ecgResult,
         required this.hrValue,
-        this.arrEcgContentUint,
-        this.arrEcgHearRateUint
+        required this.dtcDate
     });
 
     int enFilterKind;
@@ -33,11 +30,11 @@ class EcgDetailsModel {
     int timeLength;
     String ecgResult;
     String type;
-    bool isQt;
+    String dtcDate;
+    int isQt;
     List<int>? arrEcgHeartRate;
     List<double>? arrEcgContent;
-    Uint8List? arrEcgHearRateUint;
-    Uint8List? arrEcgContentUint;
+    
 
     factory EcgDetailsModel.fromRawJson(String str) => EcgDetailsModel.fromJson(json.decode(str));
 
@@ -58,8 +55,7 @@ class EcgDetailsModel {
         type: json["type"],
         ecgResult: json["ecgResult"],
         hrValue: json["hrValue"],
-        arrEcgContentUint: json["arrEcgContentUint"],
-        arrEcgHearRateUint: json["arrEcgHearRateUint"],
+        dtcDate: json["dtcDate"]
     );
 
     Map<String, dynamic> toJson() => {
@@ -77,7 +73,6 @@ class EcgDetailsModel {
         "type": type,
         "ecgResult": ecgResult,
         "hrValue": hrValue,
-        "arrEcgContentUint": arrEcgContentUint ?? [],
-        "arrEcgHearRateUint": arrEcgHearRateUint ?? [],
+        "dtcDate": dtcDate
     };
 }

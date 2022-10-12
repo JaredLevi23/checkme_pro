@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:checkme_pro_develop/src/models/ecg_details_model.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/utils/utils_date.dart';
@@ -17,7 +16,7 @@ class EcgResultsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ECG Results'),
+        title: const Text('ECG Results', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
         actions: const [
           ConnectionIndicator()
         ],
@@ -36,13 +35,6 @@ class EcgResultsPage extends StatelessWidget {
                   const Icon( Icons.favorite, color: Colors.red ),
                   const SizedBox( width:  5,),
                   Text( 'HR: ${checkmeDetails?.hrValue ?? 'Unknown'}' ),
-                  if( ecg.isSync == true )
-                    //const Spacer(),
-                    const SizedBox(
-                    child: LinearProgressIndicator(),
-                    width: 30,
-                    height: 5,
-                  ),
                 ],
               ),
               subtitle: Text( Platform.isIOS ? '${getMeasurementDateTime( measurementDate: ecg.dtcDate )}' :ecg.dtcDate ),
@@ -67,7 +59,10 @@ class EcgResultsPage extends StatelessWidget {
 
                   }else{
                     showDialog(context: context, builder: (_){
-                      return const CustomAlertDialog();
+                      return const CustomAlertDialog(
+                        message: 'Check the connection with the device.',
+                        iconData: Icons.bluetooth_disabled,
+                      );
                     });
                     return;
                   }

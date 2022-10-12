@@ -1,13 +1,11 @@
-import 'package:checkme_pro_develop/src/shar_prefs/device_preferences.dart';
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
-
+import 'src/providers/bluetooht_provider.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/routes/routes.dart';
+import 'package:checkme_pro_develop/src/shar_prefs/device_preferences.dart';
 import 'package:checkme_pro_develop/src/theme/theme.dart';
 
-import 'src/providers/bluetooht_provider.dart';
 
 void main() async {
   
@@ -33,7 +31,6 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Material App',
-        //home: CircularProgressPage(),
         initialRoute: 'home',
         routes: routes(),
         theme: themeData()

@@ -69,6 +69,7 @@ class BleDataWorker{
 
 
     private fun handleDataPool(bytes: ByteArray?): ByteArray? {
+        Log.d("CMDSTATE", "$cmdState")
         val bytesLeft: ByteArray? = bytes
 
         if (bytes == null || bytes.size < 8) {
@@ -113,6 +114,8 @@ class BleDataWorker{
                             fileData = add(fileData, this)
                             fileData?.let {
                                 dataScope.launch {
+                                    Log.d("FILENAME", "$currentFileName")
+                                    Log.d("FILESIZE", "$currentFileSize")
                                     fileProgressChannel.send(
                                         FileProgress(
                                             currentFileName,
@@ -126,9 +129,13 @@ class BleDataWorker{
 
                         if (currentPkg > pkgTotal) {
                             fileData?.apply {
-                                result = 0
-                                Log.i("file", "receive  $currentFileName")
-                                File(Constant.getPathX(currentFileName)).writeBytes(this)
+                                try{
+                                    result = 0
+                                    Log.i("file", "receive  $currentFileName")
+                                    File(Constant.getPathX(currentFileName)).writeBytes(this)
+                                }catch (e:Exception){
+                                    Log.i("ERROR", "error read file")
+                                }
                             }
                             val pkg = EndReadPkg()
                             sendCmd(pkg.buf)
@@ -210,6 +217,7 @@ class BleDataWorker{
 
     suspend fun getFile(name: String): Int {
         mutex.withLock {
+
             this.currentFileName = name
             cmdState = 1
             val pkg = StartReadPkg(name)

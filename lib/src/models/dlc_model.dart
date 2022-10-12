@@ -16,20 +16,22 @@ class DlcModel {
         required this.pIndex,
         required this.spo2Result,
         required this.bpFlag,
-        required this.type,
+        this.id,
+        this.inServer
     });
 
-    int hrResult;
-    String userId;
-    int spo2Result;
-    int spo2Value;
-    int bpValue;
-    int hrValue;
-    int bpFlag;
-    bool haveVoice;
-    double pIndex;
-    String dtcDate;
-    String type;
+    final int? id;
+    final String dtcDate;
+    final double pIndex;
+    final int haveVoice;
+    final int bpFlag;
+    final int bpValue;
+    final int hrValue;
+    final int hrResult;
+    final int spo2Result;
+    final int spo2Value;
+    final int userId;
+    final int? inServer;
 
     factory DlcModel.fromRawJson(String str) => DlcModel.fromJson(json.decode(str));
 
@@ -37,7 +39,7 @@ class DlcModel {
 
     factory DlcModel.fromJson(Map<String, dynamic> json) => DlcModel(
         hrResult: json["hrResult"],
-        userId: json["userID"],
+        userId: json["userId"],
         haveVoice: json["haveVoice"],
         dtcDate: json["dtcDate"],
         spo2Value: json["spo2Value"],
@@ -46,7 +48,8 @@ class DlcModel {
         pIndex: json["pIndex"].toDouble(),
         spo2Result: json["spo2Result"],
         bpFlag: json["bpFlag"],
-        type: json["type"],
+        id: json["id"],
+        inServer: json["inServer"] ?? 0
     );
 
     Map<String, dynamic> toJson() => {
@@ -60,6 +63,7 @@ class DlcModel {
         "pIndex": pIndex,
         "spo2Result": spo2Result,
         "bpFlag": bpFlag,
-        "type": type,
+        "id": id,
+        "inServer": inServer ?? 0 
     };
 }

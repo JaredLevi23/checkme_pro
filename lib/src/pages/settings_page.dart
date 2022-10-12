@@ -19,7 +19,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text('Settings', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
       ),
 
       body: ListView(

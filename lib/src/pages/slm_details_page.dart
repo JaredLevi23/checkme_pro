@@ -19,11 +19,9 @@ class SlmDetailsPage extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Sleep Monitor Details'),
+          title: const Text('Sleep Monitor Details', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
         ),
-        body: Container(
-          child: SlmGraph(),
-        ),
+        body: const SlmGraph(),
       ),
     );
   }

@@ -19,15 +19,14 @@ class DlcResultsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('DLC Results'),
-        actions: [ 
-          TextButton(onPressed: (){
-            log( '${checkmeProvider.dlcList.length}' );
-          }, child: const Text('AQUI'))
+        title: const Text('DLC Results', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
+        actions: const [ 
+          ConnectionIndicator()
          ],
       ),
 
       body: ListView.builder(
+        //itemCount: checkmeProvider.dlcList.length,
         itemCount: checkmeProvider.dlcList.length,
         itemBuilder: (_, index){
 
@@ -60,19 +59,37 @@ class DlcResultsPage extends StatelessWidget {
                         if( !checkmeProvider.isSync ){
                           //checkmeProvider.currentEcg.isSync = true;
                           checkmeProvider.currentSyncDlc ??= dlc;
-                          await checkmeProvider.getMeasurementDetails( dtcDate: dlc.dtcDate, detail: 'DLC' );
+                          final res = await checkmeProvider.getMeasurementDetails( dtcDate: dlc.dtcDate, detail: 'DLC' );
+
+                          res
+                          ? Platform.isIOS 
+                            ? Navigator.pushNamed(context, 'checkme/dlc/details')
+                            : Navigator.pushNamed(context, 'checkme/dlc-android/details')
+                          : showDialog(
+                              context: context, 
+                              builder: (_){
+                                return const CustomAlertDialog(
+                                  message: 'Please try again or check the connection with the device', 
+                                  iconData: Icons.error
+                                );
+                              }
+                            );
                         }
 
                       }else{
                         showDialog(context: context, builder: (_){
-                          return const CustomAlertDialog();
+                          return const CustomAlertDialog(
+                            message: 'Check the connection with the device.',
+                            iconData: Icons.bluetooth_disabled,
+                          );
                         });
                         return;
                       }
+                    }else{
+                      Platform.isIOS 
+                            ? Navigator.pushNamed(context, 'checkme/dlc/details')
+                            : Navigator.pushNamed(context, 'checkme/dlc-android/details');
                     }
-                    Platform.isIOS 
-                    ? Navigator.pushNamed(context, 'checkme/dlc/details')
-                    : Navigator.pushNamed(context, 'checkme/dlc-android/details');
                 },
               ),
               const Divider()

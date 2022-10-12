@@ -12,4 +12,9 @@ export 'package:checkme_pro_develop/src/models/temperature_model.dart';
 export 'package:checkme_pro_develop/src/models/type_file_model.dart';
 export 'package:checkme_pro_develop/src/models/user_model.dart';
 export 'package:checkme_pro_develop/src/models/ecg_details_android_model.dart';
+export 'package:checkme_pro_develop/src/models/user_list_model.dart';
+export 'package:checkme_pro_develop/src/models/ecg_list_model.dart';
+export 'package:checkme_pro_develop/src/models/dlc_list_model.dart';
+export 'package:checkme_pro_develop/src/models/tmp_list_model.dart';
+export 'package:checkme_pro_develop/src/models/slm_list_model.dart';
 

@@ -16,11 +16,14 @@ class DeviceInfoPage extends StatelessWidget {
   final device = Provider.of<CheckmeChannelProvider>(context).informationModel;
 
     return Scaffold(
-      appBar: AppBar( title: const Text('Device information'), actions: const [ ConnectionIndicator() ],),
+      appBar: AppBar( 
+        title: const Text('Device information', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1)),), 
+        actions: const [ ConnectionIndicator() ],
+      ),
+      
       body: ListView(
         padding: const EdgeInsets.only( left: 15, right: 15, top: 10, bottom: 10),
         children: [
-
           // descriptions
           deviceDescription(title: device?.application ?? 'unknown', subtitle: 'Application'),
           deviceDescription(title: device?.branchCode ?? 'unknown', subtitle: 'Brach Code'),

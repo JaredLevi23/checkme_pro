@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'models.dart';
 
 class UserListModel {
@@ -14,9 +15,11 @@ class UserListModel {
 
     String toRawJson() => json.encode(toJson());
 
-    factory UserListModel.fromJson(Map<String, dynamic> json) => UserListModel(
-        type: json["type"],
-        userList: List<UserModel>.from(json["userList"].map((x) => UserModel.fromJson(x))),
+    factory UserListModel.fromJson(Map<String, dynamic> jsonMap) => UserListModel(
+        type: jsonMap["type"],
+        userList: Platform.isIOS ?
+        List<UserModel>.from(jsonMap["userList"].map((x) => UserModel.fromJson(x)))
+        : List<UserModel>.from( json.decode( jsonMap["userList"] ).map( (x) => UserModel.fromJson( x ) ) ),
     );
 
     Map<String, dynamic> toJson() => {

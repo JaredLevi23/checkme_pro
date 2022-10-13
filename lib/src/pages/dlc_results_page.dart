@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:checkme_pro_develop/src/db/db_provider.dart';
 import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -44,52 +45,48 @@ class DlcResultsPage extends StatelessWidget {
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('HR: ${ dlc.hrValue } ', textAlign: TextAlign.center,),
                     Text('SPO2: ${ dlc.spo2Value }%', textAlign: TextAlign.center,),
+                    Text('HR: ${ dlc.hrValue } ', textAlign: TextAlign.center,),
                   ],
                 ),
                 subtitle: Text( Platform.isIOS ? '${ getMeasurementDateTime( measurementDate: dlc.dtcDate ) }' : dlc.dtcDate ),
                 onTap: ()async {
                   checkmeProvider.currentDlc = dlc;
 
-                    if( !checkmeProvider.dlcDetailsList.containsKey( dlc.dtcDate ) ){
+                  final search = await DBProvider.db.getValue(tableName: 'EcgDetails', dtcDate: dlc.dtcDate );
 
-                      if(checkmeProvider.isConnected){
-
-                        if( !checkmeProvider.isSync ){
-                          //checkmeProvider.currentEcg.isSync = true;
-                          checkmeProvider.currentSyncDlc ??= dlc;
-                          final res = await checkmeProvider.getMeasurementDetails( dtcDate: dlc.dtcDate, detail: 'DLC' );
-
-                          res
-                          ? Platform.isIOS 
-                            ? Navigator.pushNamed(context, 'checkme/dlc/details')
-                            : Navigator.pushNamed(context, 'checkme/dlc-android/details')
-                          : showDialog(
-                              context: context, 
-                              builder: (_){
-                                return const CustomAlertDialog(
-                                  message: 'Please try again or check the connection with the device', 
-                                  iconData: Icons.error
-                                );
-                              }
+                  if( search.isEmpty ){
+                    if( checkmeProvider.isConnected ){
+                     final res = await checkmeProvider.getMeasurementDetails( dtcDate: dlc.dtcDate, detail: 'DLC' );
+                      if( !res ){
+                        showDialog(
+                          context: context, 
+                          builder: (_){
+                            return const CustomAlertDialog(
+                              message: 'Please try again or check the connection with the device', 
+                              iconData: Icons.error
                             );
-                        }
-
-                      }else{
-                        showDialog(context: context, builder: (_){
-                          return const CustomAlertDialog(
-                            message: 'Check the connection with the device.',
-                            iconData: Icons.bluetooth_disabled,
-                          );
-                        });
+                          }
+                        );
                         return;
                       }
                     }else{
-                      Platform.isIOS 
-                            ? Navigator.pushNamed(context, 'checkme/dlc/details')
-                            : Navigator.pushNamed(context, 'checkme/dlc-android/details');
+                      showDialog(
+                          context: context, 
+                          builder: (_){
+                            return const CustomAlertDialog(
+                              message: 'Please try again or check the connection with the device', 
+                              iconData: Icons.error
+                            );
+                          }
+                        );
+                        return;
                     }
+                  }else{
+                    checkmeProvider.currentEcgDetailsModel = search[0];
+                  }
+
+                  Navigator.pushNamed(context, 'checkme/dlc/details');  
                 },
               ),
               const Divider()

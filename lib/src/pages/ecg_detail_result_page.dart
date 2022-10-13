@@ -16,7 +16,7 @@ class EcgDetailResultPage extends StatelessWidget {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
     final EcgModel currentEcgModel = checkmeProvider.currentEcg;
-    EcgDetailsModel? ecgDetails = checkmeProvider.ecgDetailsList[ currentEcgModel.dtcDate ];
+    EcgDetailsModel? ecgDetails = checkmeProvider.currentEcgDetailsModel;
 
     return SafeArea(
       child: Scaffold(
@@ -45,7 +45,7 @@ class EcgDetailResultPage extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: checkmeProvider.isSync || checkmeProvider.ecgDetailsList[ currentEcgModel.dtcDate ] == null 
+              child: checkmeProvider.isSync || ecgDetails == null 
               ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
@@ -53,7 +53,7 @@ class EcgDetailResultPage extends StatelessWidget {
                       Text('Please wait')
                     ],
                 )
-              : listResults( ecgDetails!, context )
+              : listResults( ecgDetails, context )
             )
           ],
         )

@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 
@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class EcgGrap extends StatelessWidget {
 
   const EcgGrap({Key? key, required this.graphData, this.sizeY}) : super(key: key);
-  final List<double> graphData;
+  final List graphData;
   final double? sizeY;
 
   @override
@@ -35,7 +35,7 @@ class PaintGraph extends CustomPainter{
 
   PaintGraph( {required this.graph} );
 
-  final List<double> graph;
+  final List graph;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -50,7 +50,9 @@ class PaintGraph extends CustomPainter{
     double x = 0;
 
     for (var coord in graph) {
-      path.lineTo(x, ((coord * 90)- ( 2* (coord*90) )) + size.height/2 );
+      Platform.isIOS
+      ? path.lineTo(x, ((coord * 90)- ( 2* (coord*90) )) + size.height/2 )
+      : path.lineTo(x, size.height/2 + coord/8 );
       x = x + 0.3;
     }
 

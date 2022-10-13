@@ -12,7 +12,7 @@ class EcgModel {
         required this.userId,
         required this.haveVoice,
         this.id,
-        this.inServer
+        this.upload
     });
 
     final int? id;
@@ -21,7 +21,7 @@ class EcgModel {
     final int haveVoice;
     final int enLeadKind;
     final int enPassKind;
-    final int? inServer;
+    final int? upload;
 
     factory EcgModel.fromRawJson(String str) => EcgModel.fromJson(json.decode(str));
 
@@ -34,7 +34,7 @@ class EcgModel {
         userId    : json["userId"],
         haveVoice : json["haveVoice"],
         enLeadKind: json["enLeadKind"],
-        inServer  : json["inServer"] ?? 0
+        upload  : json["upload"] ?? 0
     );
 
     Map<String, dynamic> toJson() => {
@@ -44,6 +44,6 @@ class EcgModel {
         "dtcDate"   : dtcDate,
         "userID"    : userId,
         "haveVoice" : haveVoice,
-        "inServer"  : inServer ?? 0
+        "upload"  : upload ?? 0
     };
 }

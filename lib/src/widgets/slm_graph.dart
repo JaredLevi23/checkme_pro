@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:checkme_pro_develop/src/models/models.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
@@ -14,7 +15,7 @@ class SlmGraph extends StatelessWidget {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
     final currentSlm = checkmeProvider.currentSlm;
-    SlmDetailsModel? currentSlmDetails = checkmeProvider.slmDetailsList[ currentSlm.dtcDate ];
+    //SlmDetailsModel? currentSlmDetails = checkmeProvider.slmDetailsList[ currentSlm.dtcDate ];
 
     return Column(
       children: [
@@ -26,7 +27,9 @@ class SlmGraph extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('SPO2'),
-              Text( '${getMeasurementDateTime(measurementDate: currentSlm.dtcDate)}' )
+              Platform.isIOS 
+              ? Text( '${getMeasurementDateTime(measurementDate: currentSlm.dtcDate)}' )
+              : Text( currentSlm.dtcDate)
             ],
           )
         ),
@@ -52,10 +55,10 @@ class SlmGraph extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      CustomPaint(
-                        painter: Spo2Graph(spo2List:currentSlmDetails?.arrOxValue ?? []),
-                        size: const Size( 1500, double.infinity ),
-                      ),
+                      // CustomPaint(
+                      //   painter: Spo2Graph(spo2List:currentSlmDetails?.arrOxValue ?? []),
+                      //   size: const Size( 1500, double.infinity ),
+                      // ),
                     ],
                   ),
                 )
@@ -92,10 +95,10 @@ class SlmGraph extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      CustomPaint(
-                        painter: PrGraph(prList:currentSlmDetails?.arrPrValue ?? []),
-                        size: const Size( 1500, double.infinity ),
-                      ),
+                      // CustomPaint(
+                      //   painter: PrGraph(prList:currentSlmDetails?.arrPrValue ?? []),
+                      //   size: const Size( 1500, double.infinity ),
+                      // ),
                     ],
                   ),
                 )

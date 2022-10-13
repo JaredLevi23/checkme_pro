@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:checkme_pro_develop/src/db/db_provider.dart';
 import 'package:checkme_pro_develop/src/models/ecg_details_model.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/utils/utils_date.dart';
@@ -26,7 +27,6 @@ class EcgResultsPage extends StatelessWidget {
         itemBuilder: (_, index){
 
           final ecg = checkmeProvider.ecgList[ index ];
-          EcgDetailsModel? checkmeDetails = checkmeProvider.ecgDetailsList[ ecg.dtcDate ];
 
           return Card(
             child: ListTile(
@@ -34,7 +34,20 @@ class EcgResultsPage extends StatelessWidget {
                 children: [
                   const Icon( Icons.favorite, color: Colors.red ),
                   const SizedBox( width:  5,),
-                  Text( 'HR: ${checkmeDetails?.hrValue ?? 'Unknown'}' ),
+                  FutureBuilder(
+                    future: DBProvider.db.getValue(tableName: 'EcgDetails', dtcDate: ecg.dtcDate ),
+                    builder: (_, AsyncSnapshot<List<dynamic>> snapshot){
+
+                      if( snapshot.data != null ){
+                        if( snapshot.data!.isNotEmpty ){
+                          final res = snapshot.data![0] as EcgDetailsModel;
+                          return Text('HR: ${ res.hrValue }');
+                        }
+                      }
+                      return const Text('Need Sync');
+
+                    } 
+                  )
                 ],
               ),
               subtitle: Text( Platform.isIOS ? '${getMeasurementDateTime( measurementDate: ecg.dtcDate )}' :ecg.dtcDate ),
@@ -48,14 +61,27 @@ class EcgResultsPage extends StatelessWidget {
 
                 checkmeProvider.currentEcg = ecg;
 
-                if( !checkmeProvider.ecgDetailsList.containsKey( ecg.dtcDate ) ){
+                final search = await DBProvider.db.getValue(tableName: 'EcgDetails', dtcDate: ecg.dtcDate );
+
+                if( search.isEmpty ){
 
                   if(checkmeProvider.isConnected){
 
                     if( !checkmeProvider.isSync ){
                       checkmeProvider.currentSyncEcg ??= ecg;
-                      await checkmeProvider.getMeasurementDetails( dtcDate: ecg.dtcDate, detail: 'ECG' );
-                    }
+                      final res = await checkmeProvider.getMeasurementDetails( dtcDate: ecg.dtcDate, detail: 'ECG' );
+                      if( !res ){
+                        return;
+                      }
+                    }else{
+                    showDialog(context: context, builder: (_){
+                      return const CustomAlertDialog(
+                        message: 'Check the connection with the device.',
+                        iconData: Icons.bluetooth_disabled,
+                      );
+                    });
+                    return;
+                  }
 
                   }else{
                     showDialog(context: context, builder: (_){
@@ -66,11 +92,11 @@ class EcgResultsPage extends StatelessWidget {
                     });
                     return;
                   }
+                }else{
+                  checkmeProvider.currentEcgDetailsModel = search[0];
                 }
 
-                Platform.isIOS 
-                ? Navigator.pushNamed(context, 'checkme/ecg/details')
-                : Navigator.pushNamed(context, 'checkme/ecg-android/details');
+                Navigator.pushNamed(context, 'checkme/ecg/details');
               },
             ),
           );

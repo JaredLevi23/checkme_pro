@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:checkme_pro_develop/src/models/dlc_model.dart';
 
 class DlcListModel {
@@ -14,9 +15,12 @@ class DlcListModel {
 
     String toRawJson() => json.encode(toJson());
 
-    factory DlcListModel.fromJson(Map<String, dynamic> json) => DlcListModel(
-        dlcList: List<DlcModel>.from(json["dlcList"].map((x) => DlcModel.fromJson(x))),
-        type: json["type"],
+    factory DlcListModel.fromJson(Map<String, dynamic> jsonMap) => DlcListModel(
+        type: jsonMap["type"],
+        //dlcList: List<DlcModel>.from(json["dlcList"].map((x) => DlcModel.fromJson(x))),
+        dlcList: Platform.isIOS ?
+        List<DlcModel>.from(jsonMap["dlcList"].map((x) => DlcModel.fromJson(x)))
+        : List<DlcModel>.from( json.decode( jsonMap["dlcList"] ).map( (x) => DlcModel.fromJson( x ) ) ),
     );
 
     Map<String, dynamic> toJson() => {

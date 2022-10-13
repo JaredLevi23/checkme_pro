@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'models.dart';
 
 class SlmListModel {
@@ -15,9 +16,12 @@ class SlmListModel {
 
     String toRawJson() => json.encode(toJson());
 
-    factory SlmListModel.fromJson(Map<String, dynamic> json) => SlmListModel(
-        type: json["type"],
-        slmList: List<SlmModel>.from(json["slmList"].map((x) => SlmModel.fromJson(x))),
+    factory SlmListModel.fromJson(Map<String, dynamic> jsonMap) => SlmListModel(
+        type: jsonMap["type"],
+        //slmList: List<SlmModel>.from(json["slmList"].map((x) => SlmModel.fromJson(x))),
+        slmList: Platform.isIOS ?
+        List<SlmModel>.from(jsonMap["slmList"].map((x) => SlmModel.fromJson(x)))
+        : List<SlmModel>.from( json.decode( jsonMap["slmList"] ).map( (x) => SlmModel.fromJson( x ) ) ),
     );
 
     Map<String, dynamic> toJson() => {

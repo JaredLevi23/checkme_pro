@@ -17,7 +17,7 @@ class DlcModel {
         required this.spo2Result,
         required this.bpFlag,
         this.id,
-        this.inServer
+        this.upload
     });
 
     final int? id;
@@ -31,7 +31,7 @@ class DlcModel {
     final int spo2Result;
     final int spo2Value;
     final int userId;
-    final int? inServer;
+    final int? upload;
 
     factory DlcModel.fromRawJson(String str) => DlcModel.fromJson(json.decode(str));
 
@@ -49,7 +49,7 @@ class DlcModel {
         spo2Result: json["spo2Result"],
         bpFlag: json["bpFlag"],
         id: json["id"],
-        inServer: json["inServer"] ?? 0
+        upload: json["upload"] ?? 0
     );
 
     Map<String, dynamic> toJson() => {
@@ -64,6 +64,6 @@ class DlcModel {
         "spo2Result": spo2Result,
         "bpFlag": bpFlag,
         "id": id,
-        "inServer": inServer ?? 0 
+        "upload": upload ?? 0 
     };
 }

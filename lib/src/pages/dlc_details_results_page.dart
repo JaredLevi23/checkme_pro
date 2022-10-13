@@ -16,7 +16,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
     final DlcModel currentDlcModel = checkmeProvider.currentDlc;
-    EcgDetailsModel? ecgDetails = checkmeProvider.dlcDetailsList[ currentDlcModel.dtcDate ];
+    EcgDetailsModel? ecgDetails = checkmeProvider.currentEcgDetailsModel;
 
     return Scaffold(
       appBar: AppBar(
@@ -47,7 +47,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: checkmeProvider.isSync || checkmeProvider.dlcDetailsList[ currentDlcModel.dtcDate ] == null 
+            child: checkmeProvider.isSync || ecgDetails == null 
             ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
@@ -55,7 +55,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
                     Text('Please wait')
                   ],
               )
-            : listResults( ecgDetails: ecgDetails!, dlcModel: currentDlcModel, context: context )
+            : listResults( ecgDetails: ecgDetails , dlcModel: currentDlcModel, context: context )
           )
         ],
       )

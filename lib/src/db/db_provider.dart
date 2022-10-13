@@ -1,6 +1,7 @@
 
 import 'dart:io';
 
+import 'package:checkme_pro_develop/src/db/db_tables.dart';
 import 'package:checkme_pro_develop/src/models/models.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -26,227 +27,24 @@ class DBProvider{
       path,
       version: 1,
       onOpen: ( db ) async {
-
-        await db.execute('''
-            CREATE TABLE IF NOT EXISTS Users(
-              id INTEGER PRIMARY KEY,
-              userId INTEGER,
-              userName TEXT,
-              birthDay TEXT,
-              gender TEXT,
-              weight TEXT,
-              height TEXT,
-              age TEXT,
-              iconID TEXT,
-              inServer INTEGER
-            )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Ecg(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            userId INTEGER,
-            haveVoice INTEGER,
-            enLeadKind INTEGER,
-            enPassKind INTEGER,
-            inServer INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Dlc(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            pIndex REAL,
-            haveVoice INTEGER,
-            bpFlag INTEGER,
-            bpValue INTEGER,
-            hrValue INTEGER,
-            hrResult INTEGER,
-            spo2Result INTEGER,
-            spo2Value INTEGER,
-            userId INTEGER,
-            inServer INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Tmp(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            userId INTEGER,
-            tempValue REAL,
-            measureMode INTEGER,
-            enPassKind INTEGER,
-            inServer INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Spo(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            userId INTEGER,
-            spo2Value INTEGER,
-            prValue INTEGER,
-            enPassKind INTEGER,
-            pIndex REAL,
-            inServer INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Ped(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            calorie REAL,
-            distance REAL,
-            fat REAL,
-            speed REAL,
-            steps INTEGER,
-            totalTime INTEGER,
-            userId INTEGER,
-            inServer INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Slm(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            enPassKind INTEGER,
-            lowOxNumber INTEGER,
-            lowOxTime INTEGER,
-            lowestOx INTEGER,
-            averangeOx INTEGER,
-            totalTime INTEGER,
-            userId INTEGER,
-            inServer INTEGER
-          )
-        ''');
+        await db.execute( DbTables.usersTable );
+        await db.execute( DbTables.ecgTable );
+        await db.execute( DbTables.dlcTable);
+        await db.execute( DbTables.tmpTable);
+        await db.execute( DbTables.spoTable);
+        await db.execute( DbTables.pedTable);
+        await db.execute( DbTables.slmTable);
+        await db.execute( DbTables.ecgDetailsTable);
       },
       onCreate: ( Database db, int version ) async {
-
-        await db.execute('''
-            CREATE TABLE IF NOT EXISTS Users(
-              id INTEGER PRIMARY KEY,
-              userId INTEGER,
-              userName TEXT,
-              birthDay TEXT,
-              gender TEXT,
-              weight TEXT,
-              height TEXT,
-              age TEXT,
-              iconID TEXT,
-              inServer INTEGER
-            )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Ecg(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            userId INTEGER,
-            haveVoice INTEGER,
-            enLeadKind INTEGER,
-            enPassKind INTEGER,
-            inServer INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Dlc(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            pIndex REAL,
-            haveVoice INTEGER,
-            bpFlag INTEGER,
-            bpValue INTEGER,
-            hrValue INTEGER,
-            hrResult INTEGER,
-            spo2Result INTEGER,
-            spo2Value INTEGER,
-            userId INTEGER,
-            inServer INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Tmp(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            userId INTEGER,
-            tempValue REAL,
-            measureMode INTEGER,
-            enPassKind INTEGER,
-            inServer INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Spo(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            userId INTEGER,
-            spo2Value INTEGER,
-            prValue INTEGER,
-            enPassKind INTEGER,
-            pIndex REAL,
-            inServer INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Ped(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            calorie REAL,
-            distance REAL,
-            fat REAL,
-            speed REAL,
-            steps INTEGER,
-            totalTime INTEGER,
-            userId INTEGER,
-            inServer INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS Slm(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            enPassKind INTEGER,
-            lowOxNumber INTEGER,
-            lowOxTime INTEGER,
-            lowestOx INTEGER,
-            averageOx INTEGER,
-            totalTime INTEGER,
-            userId INTEGER,
-            inServer INTEGER
-          )
-        ''');
-
-        await db.execute('''
-          CREATE TABLE IF NOT EXISTS EcgDetails(
-            id INTEGER PRIMARY KEY,
-            dtcDate TEXT,
-            timeLength INTEGER,
-            hrValue INTEGER,
-            pvcsValue INTEGER,
-            qrsValue INTEGER,
-            qtcValue INTEGER,
-            qtValue INTEGER,
-            stValue INTEGER,
-            ecgResult TEXT,
-            isQT INTEGER,
-            arrEcgHeartRate TEXT,
-            arrEcgContet TEXT,
-            enLeadKind INTEGER,
-            enFilterKind INTEGER
-          )
-        ''');
-
+        await db.execute( DbTables.usersTable );
+        await db.execute( DbTables.ecgTable );
+        await db.execute( DbTables.dlcTable);
+        await db.execute( DbTables.tmpTable);
+        await db.execute( DbTables.spoTable);
+        await db.execute( DbTables.pedTable);
+        await db.execute( DbTables.slmTable);
+        await db.execute( DbTables.ecgDetailsTable);
       }
     );
   }
@@ -296,9 +94,10 @@ class DBProvider{
       return res;
     }
 
-    if( tableName == 'InfoSync'){
-      final user = value as Map<String, dynamic>;
-      final res = await db.insert(tableName, user );
+    if( tableName == 'EcgDetails'){
+      final user = value as EcgDetailsModel;
+      final res = await db.insert(tableName, user.toJson() );
+      return res;
     }
 
     return 0;
@@ -352,12 +151,8 @@ class DBProvider{
   Future<List<dynamic>> getValue( {required String tableName, required String dtcDate} )async{
     final db = await database;
     final res = tableName != 'Users'
-    ? await db.rawQuery('''
-        SELECT * FROM $tableName WHERE dtcDate = '$dtcDate'
-      ''')
-    : await db.rawQuery('''
-        SELECT * FROM $tableName WHERE userName = '$dtcDate'
-      ''');
+    ? await db.rawQuery('SELECT * FROM $tableName WHERE dtcDate=?', [ dtcDate ])
+    : await db.rawQuery('SELECT * FROM $tableName WHERE userName=?',[ dtcDate ]);
 
     if( res.isNotEmpty ){
 
@@ -387,6 +182,10 @@ class DBProvider{
 
       if( tableName == 'Slm' ){
         return res.map((e) => SlmModel.fromJson(e)).toList();
+      }
+
+      if( tableName == 'EcgDetails' ){
+        return res.map((e) => EcgDetailsModel.fromJson(e)).toList();
       }
     }
     return [];

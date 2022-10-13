@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'models.dart';
 
 class EcgListModel {
@@ -14,9 +15,12 @@ class EcgListModel {
 
     String toRawJson() => json.encode(toJson());
 
-    factory EcgListModel.fromJson(Map<String, dynamic> json) => EcgListModel(
-        type: json["type"],
-        ecgList: List<EcgModel>.from(json["ecgList"].map((x) => EcgModel.fromJson(x))),
+    factory EcgListModel.fromJson(Map<String, dynamic> jsonMap) => EcgListModel(
+        type: jsonMap["type"],
+        //ecgList: List<EcgModel>.from(json["ecgList"].map((x) => EcgModel.fromJson(x))),
+        ecgList: Platform.isIOS ?
+        List<EcgModel>.from(jsonMap["ecgList"].map((x) => EcgModel.fromJson(x)))
+        : List<EcgModel>.from( json.decode( jsonMap["ecgList"] ).map( (x) => EcgModel.fromJson( x ) ) ),
     );
 
     Map<String, dynamic> toJson() => {

@@ -8,7 +8,7 @@ class TemperatureModel {
         required this.measureMode,
         required this.enPassKind,
         this.id,
-        this.inServer
+        this.upload
     });
 
     final int? id;
@@ -17,7 +17,7 @@ class TemperatureModel {
     final double tempValue;
     final int measureMode;
     final int enPassKind;
-    final int? inServer;
+    final int? upload;
 
     factory TemperatureModel.fromRawJson(String str) => TemperatureModel.fromJson(json.decode(str));
 
@@ -30,7 +30,7 @@ class TemperatureModel {
         measureMode: json["measureMode"],
         enPassKind: json["enPassKind"],
         id: json["id"],
-        inServer: json["inServer"]
+        upload: json["upload"]
     );
 
     Map<String, dynamic> toJson() => {
@@ -40,6 +40,6 @@ class TemperatureModel {
         "measureMode": measureMode,
         "enPassKind": enPassKind,
         "id": id,
-        "inServer": inServer ?? 0
+        "upload": upload ?? 0
     };
 }

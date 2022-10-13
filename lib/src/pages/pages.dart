@@ -1,12 +1,8 @@
 export 'package:checkme_pro_develop/src/pages/device_info_page.dart';
-export 'package:checkme_pro_develop/src/pages/dlc_detail_result_android_page.dart';
-export 'package:checkme_pro_develop/src/pages/dlc_details_record_android_page.dart';
 export 'package:checkme_pro_develop/src/pages/dlc_details_record_page.dart';
 export 'package:checkme_pro_develop/src/pages/dlc_details_results_page.dart';
 export 'package:checkme_pro_develop/src/pages/dlc_results_page.dart';
-export 'package:checkme_pro_develop/src/pages/ecg_detail_result_android_page.dart';
 export 'package:checkme_pro_develop/src/pages/ecg_detail_result_page.dart';
-export 'package:checkme_pro_develop/src/pages/ecg_details_record_android_page.dart';
 export 'package:checkme_pro_develop/src/pages/ecg_details_record_page.dart';
 export 'package:checkme_pro_develop/src/pages/ecg_results_page.dart';
 export 'package:checkme_pro_develop/src/pages/home_page.dart';

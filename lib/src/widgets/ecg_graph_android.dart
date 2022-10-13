@@ -47,7 +47,7 @@ class _PaintGraphAndroid extends CustomPainter{
     double x = 0;
 
     for (var coord in graph) {
-      path.lineTo(x, size.height/2 + coord/5 );
+      path.lineTo(x, size.height/2 + coord/7 );
       x = x + 0.3;
     }
 

@@ -14,7 +14,6 @@ class SlmDetailsPage extends StatelessWidget {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
     final currentSlm = checkmeProvider.currentSlm;
-    SlmDetailsModel? slmDetails = checkmeProvider.slmDetailsList[ currentSlm.dtcDate ];
 
     return SafeArea(
       child: Scaffold(

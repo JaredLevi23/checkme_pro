@@ -11,7 +11,7 @@ class PedModel {
         required this.steps,
         required this.fat,
         this.id,
-        this.inServer
+        this.upload
     });
 
     final int? id;
@@ -23,7 +23,7 @@ class PedModel {
     final int steps;
     final int totalTime;
     final int userId;
-    final int? inServer;
+    final int? upload;
 
     factory PedModel.fromRawJson(String str) => PedModel.fromJson(json.decode(str));
 
@@ -39,7 +39,7 @@ class PedModel {
         distance: json["distance"].toDouble(),
         steps: json["steps"],
         fat: json["fat"].toDouble(),
-        inServer: json["inServer"]
+        upload: json["upload"]
     );
 
     Map<String, dynamic> toJson() => {
@@ -52,6 +52,6 @@ class PedModel {
         "distance": distance,
         "steps": steps,
         "fat": fat,
-        "inServer": inServer ?? 0
+        "upload": upload ?? 0
     };
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:checkme_pro_develop/src/db/db_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -41,7 +43,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void initBtServices()async{
-    DBProvider.db.deleteAllTable('InfoSync');
     final checkProvider = Provider.of<CheckmeChannelProvider>(context, listen: false);
     checkProvider.startEvents();
   }
@@ -138,11 +139,9 @@ class _HomePageState extends State<HomePage> {
                   titleOption: 'Read User List',
                   iconData: Icons.group,
                   onPressed: ()async {
-
                     if( checkmeProvider.isConnected ){
                       await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
                     }
-
                     await checkmeProvider.loadData(tableName: 'Users');
                     Navigator.pushNamed(context, 'checkme/users');
                   },
@@ -166,7 +165,8 @@ class _HomePageState extends State<HomePage> {
                   onPressed: ()async{
 
                     if( checkmeProvider.isConnected ){
-                      await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
+                      final res = await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
+                      log( 'ECG VALUE: $res' );
                     }
 
                     await checkmeProvider.loadData(tableName: 'Ecg');

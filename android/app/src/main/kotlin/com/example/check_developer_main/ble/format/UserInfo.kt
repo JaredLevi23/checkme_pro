@@ -32,9 +32,9 @@ class UserInfo constructor(var bytes: ByteArray) {
             user[k].weight = toUInt(setRange(start + 23, 2)) / 200
             user[k].height = toUInt(setRange(start + 25, 2)) / 200
             //user[k].pacemakeflag = toUInt(setRange(start + 27, 1))
-            user[k].pacemakeflag = 1
+            //user[k].pacemakeflag = 1
             //user[k].medicalId = String(setRange(start + 28, 19))
-            user[k].medicalId = "1"
+            //user[k].medicalId = "1"
 
         }
 

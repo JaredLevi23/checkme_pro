@@ -15,7 +15,7 @@ class SlmModel {
         required this.averageOx,
         required this.totalTime,
         this.id,
-        this.inServer
+        this.upload
     });
 
     final int? id;
@@ -27,7 +27,7 @@ class SlmModel {
     final int lowestOx;
     final int averageOx;
     final int totalTime;
-    final int? inServer;
+    final int? upload;
 
     factory SlmModel.fromRawJson(String str) => SlmModel.fromJson(json.decode(str));
 
@@ -43,7 +43,7 @@ class SlmModel {
         averageOx: json["averageOx"],
         totalTime: json["totalTime"],
         id: json["id"],
-        inServer: json["inServer"]
+        upload: json["upload"]
     );
 
     Map<String, dynamic> toJson() => {
@@ -56,6 +56,6 @@ class SlmModel {
         "averageOx": averageOx,
         "totalTime": totalTime,
         "id": id,
-        "inServer": inServer ?? 0
+        "upload": upload ?? 0
     };
 }

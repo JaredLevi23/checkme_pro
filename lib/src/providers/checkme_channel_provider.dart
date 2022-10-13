@@ -38,12 +38,7 @@ class CheckmeChannelProvider with ChangeNotifier{
   DlcModel? currentSyncDlc;
   SlmModel? currentSyncSlm;
 
-  Map<String, EcgDetailsModel> ecgDetailsList = {};
-  Map<String, EcgDetailsModel> dlcDetailsList = {};
-  Map<String, SlmDetailsModel > slmDetailsList = {};
-
-  Map<String, EcgDetailsAndroidModel> ecgDetailsAndroidList = {};
-  Map<String, EcgDetailsAndroidModel> dlcDetailsAndroidList = {};
+  EcgDetailsModel? currentEcgDetailsModel;
 
   // SET/GET
   bool get isSync => _isSync;
@@ -146,7 +141,7 @@ class CheckmeChannelProvider with ChangeNotifier{
 
         return res;
       }catch( err ){
-        log( '$err' );
+        log( 'ERROR READ FILE: $err' );
         return false;
       }
   }
@@ -220,6 +215,7 @@ class CheckmeChannelProvider with ChangeNotifier{
         final search = await DBProvider.db.getValue( tableName: 'Dlc', dtcDate: dlc.dtcDate );
         if( search.isEmpty ){
           await DBProvider.db.newValue('Dlc', dlc );
+          dlcList.insert(0, dlc );
         }
       }
 
@@ -301,11 +297,12 @@ class CheckmeChannelProvider with ChangeNotifier{
       try{
         
         final detailECGTemp = EcgDetailsModel.fromRawJson( event.toString() );
+        await Future.delayed( const Duration( milliseconds: 1500 ));
+        final search = await DBProvider.db.getValue(tableName: 'EcgDetails', dtcDate: detailECGTemp.dtcDate );
 
-        if( currentSyncEcg != null && !ecgDetailsList.containsKey( currentSyncEcg!.dtcDate ) && currentSyncDlc == null){
-          ecgDetailsList.addAll( {currentSyncEcg!.dtcDate : detailECGTemp} );
-        }else if(currentSyncDlc != null && !dlcDetailsList.containsKey( currentSyncDlc!.dtcDate ) && currentSyncEcg == null ){
-          dlcDetailsList.addAll( {currentSyncDlc!.dtcDate : detailECGTemp } );
+        if( search.isEmpty ){
+          await DBProvider.db.newValue('EcgDetails', detailECGTemp );
+          currentEcgDetailsModel = detailECGTemp;
         }
 
       }catch( err ){
@@ -321,9 +318,7 @@ class CheckmeChannelProvider with ChangeNotifier{
     if( headerType.type == 'DETAILS_SLM' ){
       try{
         final smlDetailTemp = SlmDetailsModel.fromRawJson( event.toString() );
-        if( currentSyncSlm != null && !slmDetailsList.containsKey( currentSyncSlm!.dtcDate)){
-          slmDetailsList.addAll({ currentSyncSlm!.dtcDate : smlDetailTemp });
-        }
+        // TODO: ADD SEARCH
 
       }catch( err ){
         log( '$err' );
@@ -333,26 +328,26 @@ class CheckmeChannelProvider with ChangeNotifier{
       }
     }
 
-    // DETAILS_EKG (ECG/DLC)
-    if( headerType.type == 'DETAILS_EKG_ANDROID'){
-      try{
-        final detailECGTemp = EcgDetailsAndroidModel.fromRawJson( event.toString() );
-        await Future.delayed( const Duration( seconds: 3 ));
+    // // DETAILS_EKG (ECG/DLC)
+    // if( headerType.type == 'DETAILS_EKG_ANDROID'){
+    //   try{
+    //     final detailECGTemp = EcgDetailsAndroidModel.fromRawJson( event.toString() );
+    //     await Future.delayed( const Duration( seconds: 3 ));
         
-        if( currentSyncEcg != null && !ecgDetailsAndroidList.containsKey( currentSyncEcg!.dtcDate ) && currentSyncDlc == null){
-          ecgDetailsAndroidList.addAll( {currentSyncEcg!.dtcDate : detailECGTemp} );
-        }else if(currentSyncDlc != null && !dlcDetailsAndroidList.containsKey( currentSyncDlc!.dtcDate ) && currentSyncEcg == null ){
-          dlcDetailsAndroidList.addAll( {currentSyncDlc!.dtcDate : detailECGTemp } );
-        }
+    //     if( currentSyncEcg != null && !ecgDetailsAndroidList.containsKey( currentSyncEcg!.dtcDate ) && currentSyncDlc == null){
+    //       ecgDetailsAndroidList.addAll( {currentSyncEcg!.dtcDate : detailECGTemp} );
+    //     }else if(currentSyncDlc != null && !dlcDetailsAndroidList.containsKey( currentSyncDlc!.dtcDate ) && currentSyncEcg == null ){
+    //       dlcDetailsAndroidList.addAll( {currentSyncDlc!.dtcDate : detailECGTemp } );
+    //     }
 
-      }catch( err ){
-        log('$err');
-      } finally{
-        currentSyncEcg = null;
-        currentSyncDlc = null;
-        isSync = false;
-      }
-    }
+    //   }catch( err ){
+    //     log('$err');
+    //   } finally{
+    //     currentSyncEcg = null;
+    //     currentSyncDlc = null;
+    //     isSync = false;
+    //   }
+    // }
 
     notifyListeners();
 

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:checkme_pro_develop/src/models/temperature_model.dart';
 
@@ -15,9 +16,12 @@ class TmpListModel {
 
     String toRawJson() => json.encode(toJson());
 
-    factory TmpListModel.fromJson(Map<String, dynamic> json) => TmpListModel(
-        tmpList: List<TemperatureModel>.from(json["tmpList"].map((x) => TemperatureModel.fromJson(x))),
-        type: json["type"],
+    factory TmpListModel.fromJson(Map<String, dynamic> jsonMap) => TmpListModel(
+        type: jsonMap["type"],
+        //tmpList: List<TemperatureModel>.from(json["tmpList"].map((x) => TemperatureModel.fromJson(x))),
+        tmpList: Platform.isIOS ?
+        List<TemperatureModel>.from(jsonMap["tmpList"].map((x) => TemperatureModel.fromJson(x)))
+        : List<TemperatureModel>.from( json.decode( jsonMap["tmpList"] ).map( (x) => TemperatureModel.fromJson( x ) ) ),
     );
 
     Map<String, dynamic> toJson() => {

@@ -15,7 +15,7 @@ class UserModel {
         required this.age,
         required this.userName,
         this.id,
-        this.inServer
+        this.upload
     });
 
     final int? id;
@@ -27,7 +27,7 @@ class UserModel {
     final String height;
     final String age;
     final String iconID;
-    final int? inServer;
+    final int? upload;
 
     factory UserModel.fromRawJson(String str) => UserModel.fromJson(json.decode(str));
 
@@ -42,7 +42,7 @@ class UserModel {
         userName: json["userName"],
         weight:   json["weight"],
         age:      json["age"],
-        inServer: json["inServer"] ?? 0,
+        upload: json["upload"] ?? 0,
         id:       json["id"]
     );
 
@@ -55,7 +55,7 @@ class UserModel {
         "weight"  : weight,
         "age"     : age,
         "userName": userName,
-        "inServer": inServer,
+        "upload": upload,
         "id"      : id
     };
 }

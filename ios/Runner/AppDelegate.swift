@@ -560,8 +560,8 @@ enum MyFlutterErrorCode{
                 let ecgDetailTemp :[String: Any] = [
                     "type": "DETAILS_EKG",
                     "userId": self.idUser,
-                    "arrEcgContent": detail?.arrEcgContent ?? [],
-                    "arrEcgHeartRate": detail?.arrEcgHeartRate ?? [],
+                    "arrEcg": detail?.arrEcgContent ?? [],
+                    "arrHR": detail?.arrEcgHeartRate ?? [],
                     "hrValue": detail?.hrValue ?? 0,
                     "stValue": detail?.stValue ?? 0,
                     "qrsValue": detail?.qrsValue ?? 0,

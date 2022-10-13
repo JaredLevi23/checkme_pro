@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:checkme_pro_develop/src/db/db_provider.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,7 +38,7 @@ class SlmResultsPage extends StatelessWidget {
                     width: 90,
                     height: 120,
                     decoration: const BoxDecoration(
-                      color: const Color.fromRGBO(50, 97, 148, 1),
+                      color:  Color.fromRGBO(50, 97, 148, 1),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -61,35 +62,35 @@ class SlmResultsPage extends StatelessWidget {
               onTap: () async {
                 checkmeProvider.currentSlm = slm;
 
-                if( !checkmeProvider.slmDetailsList.containsKey( slm.dtcDate ) ){
-                  if(checkmeProvider.isConnected){
-                    if( !checkmeProvider.isSync ){
-                      checkmeProvider.currentSyncSlm ??= slm;
-                      final res = await checkmeProvider.getMeasurementDetails(dtcDate: slm.dtcDate, detail: 'SLM');
+                // if( !checkmeProvider.slmDetailsList.containsKey( slm.dtcDate ) ){
+                //   if(checkmeProvider.isConnected){
+                //     if( !checkmeProvider.isSync ){
+                //       checkmeProvider.currentSyncSlm ??= slm;
+                //       final res = await checkmeProvider.getMeasurementDetails(dtcDate: slm.dtcDate, detail: 'SLM');
 
-                      if( !res ){
-                        showDialog(
-                            context: context, 
-                            builder: (_){ 
-                              return const CustomAlertDialog(
-                                message: 'Please try again or check the connection with the device', 
-                                iconData: Icons.info
-                              );
-                            }
-                          );
-                      }
-                    }
-                  }else{
-                    showDialog(context: context, builder: (_){
-                      return const CustomAlertDialog(
-                        message: 'Check the connection with the device.',
-                        iconData: Icons.bluetooth_disabled,
-                      );
-                    });
-                    return;
-                  }
-                }
-                Navigator.pushNamed(context, 'checkme/slm/details');
+                //       if( !res ){
+                //         showDialog(
+                //             context: context, 
+                //             builder: (_){ 
+                //               return const CustomAlertDialog(
+                //                 message: 'Please try again or check the connection with the device', 
+                //                 iconData: Icons.info
+                //               );
+                //             }
+                //           );
+                //       }
+                //     }
+                //   }else{
+                //     showDialog(context: context, builder: (_){
+                //       return const CustomAlertDialog(
+                //         message: 'Check the connection with the device.',
+                //         iconData: Icons.bluetooth_disabled,
+                //       );
+                //     });
+                //     return;
+                //   }
+                // }
+                // Navigator.pushNamed(context, 'checkme/slm/details');
               },
              ),
           );

@@ -201,7 +201,7 @@ class BleDataWorker{
                     var json = JSONObject()
                     json.put("type", "DEVICE-ONLINE")
                     MainActivity.eventSink?.success( json.toString() )
-
+                    MainActivity.isConnected = true
                     dataScope.launch {
                         connectChannel.send("yes")
                     }
@@ -239,6 +239,7 @@ class BleDataWorker{
         var json = JSONObject()
         json.put("type", "DEVICE-OFFLINE")
         MainActivity.eventSink?.success( json.toString() )
+        MainActivity.isConnected = false
         myBleDataManager?.disconnect()?.enqueue();
     }
 

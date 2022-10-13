@@ -12,8 +12,9 @@ class CustomAlertDialog extends StatelessWidget {
       backgroundColor: Colors.transparent,
       elevation: 0,
       content: Container(
+        padding: const EdgeInsets.symmetric( horizontal: 20 ),
         width: 200,
-        height: 200,
+        height: 300,
         decoration: const BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle
@@ -23,8 +24,8 @@ class CustomAlertDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon( iconData ),
-              Text( message , textAlign: TextAlign.center,),
+              Icon( iconData, size: 50, ),
+              Text( message , textAlign: TextAlign.center, style: const TextStyle( fontSize: 14 ),),
             ],
           ),
         ),

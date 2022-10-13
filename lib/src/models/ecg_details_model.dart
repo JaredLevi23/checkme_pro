@@ -1,78 +1,86 @@
 import 'dart:convert';
 
+import 'dart:io';
+
 class EcgDetailsModel {
     EcgDetailsModel({
         required this.pvcsValue,
-        required this.enFilterKind,
-        required this.enLeadKind,
         required this.timeLength,
         required this.qtcValue,
         required this.stValue,
-        this.arrEcgHeartRate,
+        this.arrHR,
         required this.qtValue,
-        required this.isQt,
-        this.arrEcgContent,
+        this.arrEcg,
         required this.qrsValue,
-        required this.type,
-        required this.ecgResult,
         required this.hrValue,
-        required this.dtcDate
+        required this.dtcDate,
+        this.id,
+        this.upload
+        //required this.isQt,
+        //required this.ecgResult,
+        //required this.enFilterKind,
+        //required this.enLeadKind,
     });
 
-    int enFilterKind;
-    int enLeadKind;
-    int hrValue;
-    int pvcsValue;
-    int qrsValue;
-    int qtcValue;
-    int qtValue;
-    int stValue;
-    int timeLength;
-    String ecgResult;
-    String type;
+    //int enFilterKind;
+    //int enLeadKind;
+    //int isQt;
+    //String ecgResult;
+    int? id;
     String dtcDate;
-    int isQt;
-    List<int>? arrEcgHeartRate;
-    List<double>? arrEcgContent;
+    int hrValue;
+    int stValue;
+    int qrsValue;
+    int qtValue;
+    int qtcValue;
+    int pvcsValue;
+    int timeLength;
+    List? arrEcg;
+    List? arrHR;
+    int? upload;
     
 
     factory EcgDetailsModel.fromRawJson(String str) => EcgDetailsModel.fromJson(json.decode(str));
 
     String toRawJson() => json.encode(toJson());
 
-    factory EcgDetailsModel.fromJson(Map<String, dynamic> json) => EcgDetailsModel(
-        pvcsValue: json["pvcsValue"],
-        enFilterKind: json["enFilterKind"],
-        enLeadKind: json["enLeadKind"],
-        timeLength: json["timeLength"],
-        qtcValue: json["qtcValue"],
-        stValue: json["stValue"],
-        arrEcgHeartRate: List<int>.from(json["arrEcgHeartRate"].map((x) => x)),
-        qtValue: json["qtValue"],
-        isQt: json["isQT"],
-        arrEcgContent: List<double>.from(json["arrEcgContent"].map((x) => x.toDouble())),
-        qrsValue: json["qrsValue"],
-        type: json["type"],
-        ecgResult: json["ecgResult"],
-        hrValue: json["hrValue"],
-        dtcDate: json["dtcDate"]
+    factory EcgDetailsModel.fromJson(Map<String, dynamic> jsonMap) => EcgDetailsModel(
+        pvcsValue: jsonMap["pvcsValue"],
+        timeLength: jsonMap["timeLength"],
+        qtcValue: jsonMap["qtcValue"],
+        stValue: jsonMap["stValue"],
+        arrHR: Platform.isIOS 
+          ?List<int>.from(jsonMap["arrHR"].map((x) => x.toInt() ))
+          : List<int>.from(json.decode( jsonMap["arrHR"] ).map((x) => x.toInt() )),
+        arrEcg: Platform.isIOS
+          ? List<double>.from(jsonMap["arrEcg"].map((x) => x.toDouble()))
+          : List<double>.from(json.decode(jsonMap["arrEcg"]).map((x) => x.toDouble())),
+        qtValue: jsonMap["qtValue"],
+        qrsValue: jsonMap["qrsValue"],
+        hrValue: jsonMap["hrValue"],
+        dtcDate: jsonMap["dtcDate"],
+        upload  : jsonMap["upload"] ?? 0
+        //isQt: json["isQT"],
+        //ecgResult: json["ecgResult"],
+        //enFilterKind: json["enFilterKind"],
+        //enLeadKind: json["enLeadKind"],
     );
 
     Map<String, dynamic> toJson() => {
         "pvcsValue": pvcsValue,
-        "enFilterKind": enFilterKind,
-        "enLeadKind": enLeadKind,
         "timeLength": timeLength,
         "qtcValue": qtcValue,
         "stValue": stValue,
-        "arrEcgHeartRate": arrEcgHeartRate != null ? List<dynamic>.from(arrEcgHeartRate!.map((x) => x)) : [] ,
+        "arrHR": arrHR != null ? List<dynamic>.from(arrHR!.map((x) => x)).toString() : [].toString() ,
         "qtValue": qtValue,
-        "isQT": isQt,
-        "arrEcgContent": arrEcgContent != null ? List<dynamic>.from(arrEcgContent!.map((x) => x)) : [],
+        "arrEcg": arrEcg != null ? List<dynamic>.from(arrEcg!.map((x) => x)).toString() : [].toString(),
         "qrsValue": qrsValue,
-        "type": type,
-        "ecgResult": ecgResult,
         "hrValue": hrValue,
-        "dtcDate": dtcDate
+        "dtcDate": dtcDate,
+        "upload": upload ?? 0
+        //"enFilterKind": enFilterKind,
+        //"enLeadKind": enLeadKind,
+        //"isQT": isQt,
+        //"ecgResult": ecgResult,
     };
 }

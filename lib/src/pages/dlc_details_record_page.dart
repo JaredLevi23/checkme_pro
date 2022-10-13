@@ -40,7 +40,7 @@ class _EcgRecordDetailsState extends State<DlcDetailsRecordPage> {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
     final currentModel = checkmeProvider.currentDlc;
-    EcgDetailsModel? dlcDetails = checkmeProvider.dlcDetailsList[ currentModel.dtcDate ];
+    EcgDetailsModel? dlcDetails = checkmeProvider.currentEcgDetailsModel;
 
     return SafeArea(
       child: Scaffold(
@@ -123,7 +123,7 @@ class _EcgRecordDetailsState extends State<DlcDetailsRecordPage> {
                       ),
                     ],
                   ),
-                  EcgGrap(graphData: dlcDetails?.arrEcgContent ?? [] )
+                  EcgGrap(graphData: dlcDetails?.arrEcg ?? [] )
                 ],
               )
             )

@@ -31,9 +31,7 @@ class DlcDetailsResultsPage extends StatelessWidget {
           Card(
             child: ListTile(
               title: Text( 
-                Platform.isIOS
-                ? getMeasurementDateTime( measurementDate: currentDlcModel.dtcDate ).toString().split('.')[0]
-                : currentDlcModel.dtcDate,
+                getMeasurementDateTime( measurementDate: currentDlcModel.dtcDate ).toString().split('.')[0],
                 style: const TextStyle( 
                   fontSize: 18,
                   fontWeight: FontWeight.w500

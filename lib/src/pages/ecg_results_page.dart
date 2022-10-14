@@ -50,7 +50,7 @@ class EcgResultsPage extends StatelessWidget {
                   )
                 ],
               ),
-              subtitle: Text( Platform.isIOS ? '${getMeasurementDateTime( measurementDate: ecg.dtcDate )}' :ecg.dtcDate ),
+              subtitle: Text( '${getMeasurementDateTime( measurementDate: ecg.dtcDate )}'),
               leading: CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.cyan,

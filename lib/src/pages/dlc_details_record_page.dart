@@ -61,9 +61,7 @@ class _EcgRecordDetailsState extends State<DlcDetailsRecordPage> {
                         children: [
                           const Text( 'Daily Check', style: TextStyle( fontSize: 18, color: Colors.white),),
                           Text( 
-                            Platform.isIOS
-                            ? getMeasurementDateTime(measurementDate: currentModel.dtcDate).toString().split('.')[0]
-                            : currentModel.dtcDate,
+                            getMeasurementDateTime(measurementDate: currentModel.dtcDate).toString().split('.')[0],
                             style: const TextStyle( fontSize: 18, color: Colors.white)
                           )
                         ],

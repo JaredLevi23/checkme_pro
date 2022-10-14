@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/widgets.dart';
@@ -22,12 +23,11 @@ class TemperaturesResultsPage extends StatelessWidget {
         itemBuilder: (context, index){
 
           final temp = checkmeProvider.tmpList[ index ];
-          final date = temp.dtcDate.split(' ');
 
           return  Column(
             children: [
               ListTile(
-                title: Text( Platform.isIOS ? 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}' : 'Date: ${temp.dtcDate}'),
+                title: Text( '${getMeasurementDateTime(measurementDate: temp.dtcDate )}' ),
                 subtitle: const Text('Date'),
                 leading: const Icon( Icons.thermostat ),
                 trailing: Text( '${temp.tempValue } °C', style: const TextStyle( fontSize: 19 ),),

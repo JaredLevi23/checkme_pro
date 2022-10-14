@@ -37,9 +37,7 @@ class PedResultsPage extends StatelessWidget {
               children: [
 
                 Text(
-                  Platform.isIOS
-                  ? getMeasurementDateTime( measurementDate : ped.dtcDate ).toString().split('.')[0]
-                  : ped.dtcDate,
+                  getMeasurementDateTime( measurementDate : ped.dtcDate ).toString().split('.')[0],
                   style: const TextStyle( fontSize: 22, fontStyle: FontStyle.italic ),
                   ),
 

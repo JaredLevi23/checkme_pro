@@ -50,7 +50,7 @@ class DlcResultsPage extends StatelessWidget {
                     Text('HR: ${ dlc.hrValue } ', textAlign: TextAlign.center,),
                   ],
                 ),
-                subtitle: Text( Platform.isIOS ? '${ getMeasurementDateTime( measurementDate: dlc.dtcDate ) }' : dlc.dtcDate ),
+                subtitle: Text( '${ getMeasurementDateTime( measurementDate: dlc.dtcDate ) }' ),
                 onTap: ()async {
                   checkmeProvider.currentDlc = dlc;
 

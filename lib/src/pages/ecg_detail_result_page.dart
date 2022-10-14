@@ -32,9 +32,7 @@ class EcgDetailResultPage extends StatelessWidget {
             Card(
               child: ListTile(
                 title: Text( 
-                  Platform.isIOS 
-                  ? getMeasurementDateTime( measurementDate: currentEcgModel.dtcDate ).toString().split('.')[0]
-                  : currentEcgModel.dtcDate,
+                  getMeasurementDateTime( measurementDate: currentEcgModel.dtcDate ).toString().split('.')[0],
                   style: const TextStyle( fontSize: 18 ),
                 ),
                 trailing: const CircleAvatar( 

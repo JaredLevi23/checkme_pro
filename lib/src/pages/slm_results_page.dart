@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:checkme_pro_develop/src/db/db_provider.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/widgets.dart';
@@ -52,7 +53,10 @@ class SlmResultsPage extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text( Platform.isIOS ? 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}' : 'Date: ${ slm.dtcDate }', style: const TextStyle(  fontWeight: FontWeight.bold ), ),
+                      Text( 
+                        '${getMeasurementDateTime(measurementDate: slm.dtcDate )}', 
+                        style: const TextStyle(  fontWeight: FontWeight.bold ), 
+                      ),
                       Text( 'Averange OX: ${slm.averageOx}\nLow Ox:${slm.lowOxTime}\nLowest Ox:${slm.lowestOx}\nLow Ox Number: ${slm.lowOxNumber}' ),
                       //Text( 'Duration: ${slm.totalTime}', style: const TextStyle( fontSize: 17),),
                     ],

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
@@ -20,22 +21,22 @@ class BluetoothProvider with ChangeNotifier{
     initSubscription();
   }
 
-  checkBtState()async{
-    isEnabled = await flutterBlue.isOn;
-  }
-
-  initSubscription()async{
-    btStateSuscription = flutterBlue.state.listen((event) { 
+  Future<void>initSubscription() async {
+    btStateSuscription = flutterBlue.state.listen((event) async {
+      log( "$event" );
        if( event == BluetoothState.on ){
         isEnabled = true;
        } else if( event == BluetoothState.off ){
         isEnabled = false;
+       } else{
+        await finishSuscription();
+        await initSubscription();
        }
     });
   }
 
-  finishSuscription(){
-    btStateSuscription?.cancel();
+  Future<void> finishSuscription() async {
+    await btStateSuscription?.cancel();
   }
 
 }

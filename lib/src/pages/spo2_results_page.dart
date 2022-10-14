@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -36,7 +37,7 @@ class Spo2ResultsPage extends StatelessWidget {
                   Text( 'PR: ${spo2.prValue}' ),
                 ],
               ),
-              subtitle: Text( Platform.isIOS ? 'Date: ${date[1]}/${date[3].padLeft(2,'0')}/${date[5]} ${date[7]}:${date[9]}:${date[11]}' : 'Date: ${spo2.dtcDate}'),
+              subtitle: Text( '${ getMeasurementDateTime( measurementDate: spo2.dtcDate ) }'),
               leading: const CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.cyan,

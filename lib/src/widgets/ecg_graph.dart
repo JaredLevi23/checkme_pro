@@ -51,8 +51,8 @@ class PaintGraph extends CustomPainter{
 
     for (var coord in graph) {
       Platform.isIOS
-      ? path.lineTo(x, ((coord * 90)- ( 2* (coord*90) )) + size.height/2 )
-      : path.lineTo(x, size.height/2 + coord/8 );
+      ? path.lineTo(x, ((coord * 90) - ( 2* (coord*90) )) + size.height/2 )
+      : path.lineTo(x, size.height/2 + ((coord/8) * -1 ) );
       x = x + 0.3;
     }
 

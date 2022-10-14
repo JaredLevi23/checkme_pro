@@ -27,9 +27,8 @@ class SlmGraph extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('SPO2'),
-              Platform.isIOS 
-              ? Text( '${getMeasurementDateTime(measurementDate: currentSlm.dtcDate)}' )
-              : Text( currentSlm.dtcDate)
+              Text( '${getMeasurementDateTime(measurementDate: currentSlm.dtcDate)}' )
+             
             ],
           )
         ),

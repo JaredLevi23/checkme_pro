@@ -324,7 +324,19 @@ class CheckmeChannelProvider with ChangeNotifier{
 
         if( search.isEmpty ){
           await DBProvider.db.newValue('SlmDetails', slmDetailTemp );
-          currentSlmDetailsModel = slmDetailTemp;
+          if( currentSlm.dtcDate == slmDetailTemp.dtcDate){
+            currentSlmDetailsModel = slmDetailTemp;
+          }else{
+            final search = await DBProvider.db.getValue(tableName: 'SlmDetails', dtcDate: slmDetailTemp.dtcDate );
+            if( search.isEmpty ){
+              final res = await getMeasurementDetails(dtcDate:  currentSlm.dtcDate, detail: 'SLM');
+              if( !res ){
+                log('NO SE LOGRO :(');
+              }
+            }else{
+              currentSlmDetailsModel = search[0];
+            }
+          }
         }
 
       }catch( err ){

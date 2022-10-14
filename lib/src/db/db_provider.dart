@@ -185,7 +185,7 @@ class DBProvider{
       }
 
       if( tableName == 'EcgDetails' ){
-        return res.map((e) => EcgDetailsModel.fromJson(e)).toList();
+        return res.map((e) => EcgDetailsModel.fromJsonDB(e)).toList();
       }
     }
     return [];

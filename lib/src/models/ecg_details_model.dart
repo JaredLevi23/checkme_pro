@@ -16,10 +16,6 @@ class EcgDetailsModel {
         required this.dtcDate,
         this.id,
         this.upload
-        //required this.isQt,
-        //required this.ecgResult,
-        //required this.enFilterKind,
-        //required this.enLeadKind,
     });
 
     //int enFilterKind;
@@ -60,10 +56,20 @@ class EcgDetailsModel {
         hrValue: jsonMap["hrValue"],
         dtcDate: jsonMap["dtcDate"],
         upload  : jsonMap["upload"] ?? 0
-        //isQt: json["isQT"],
-        //ecgResult: json["ecgResult"],
-        //enFilterKind: json["enFilterKind"],
-        //enLeadKind: json["enLeadKind"],
+    );
+
+    factory EcgDetailsModel.fromJsonDB(Map<String, dynamic> jsonMap) => EcgDetailsModel(
+        pvcsValue: jsonMap["pvcsValue"],
+        timeLength: jsonMap["timeLength"],
+        qtcValue: jsonMap["qtcValue"],
+        stValue: jsonMap["stValue"],
+        arrHR: List<int>.from(json.decode( jsonMap["arrHR"] ).map((x) => x.toInt() )),
+        arrEcg: List<double>.from(json.decode(jsonMap["arrEcg"]).map((x) => x.toDouble())),
+        qtValue: jsonMap["qtValue"],
+        qrsValue: jsonMap["qrsValue"],
+        hrValue: jsonMap["hrValue"],
+        dtcDate: jsonMap["dtcDate"],
+        upload  : jsonMap["upload"] ?? 0
     );
 
     Map<String, dynamic> toJson() => {
@@ -78,9 +84,5 @@ class EcgDetailsModel {
         "hrValue": hrValue,
         "dtcDate": dtcDate,
         "upload": upload ?? 0
-        //"enFilterKind": enFilterKind,
-        //"enLeadKind": enLeadKind,
-        //"isQT": isQt,
-        //"ecgResult": ecgResult,
     };
 }

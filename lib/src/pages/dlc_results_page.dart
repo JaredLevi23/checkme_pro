@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:checkme_pro_develop/src/db/db_provider.dart';
+import 'package:checkme_pro_develop/src/models/ecg_details_model.dart';
 import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

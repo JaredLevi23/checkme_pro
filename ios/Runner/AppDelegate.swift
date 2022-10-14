@@ -805,7 +805,7 @@ enum MyFlutterErrorCode{
     // MARK: Events
     public func onListen(withArguments arguments: Any?,
                            eventSink: @escaping FlutterEventSink) -> FlutterError? {
-        self.eventSink = eventSink    
+        self.eventSink = eventSink
         return nil
       }
 

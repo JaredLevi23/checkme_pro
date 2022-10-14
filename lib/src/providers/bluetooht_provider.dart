@@ -22,8 +22,10 @@ class BluetoothProvider with ChangeNotifier{
   }
 
   Future<void>initSubscription() async {
+
+    await finishSuscription();
+
     btStateSuscription = flutterBlue.state.listen((event) async {
-      log( "$event" );
        if( event == BluetoothState.on ){
         isEnabled = true;
        } else if( event == BluetoothState.off ){

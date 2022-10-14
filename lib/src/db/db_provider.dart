@@ -35,6 +35,7 @@ class DBProvider{
         await db.execute( DbTables.pedTable);
         await db.execute( DbTables.slmTable);
         await db.execute( DbTables.ecgDetailsTable);
+        await db.execute( DbTables.slmDetailsTable );
       },
       onCreate: ( Database db, int version ) async {
         await db.execute( DbTables.usersTable );
@@ -45,6 +46,7 @@ class DBProvider{
         await db.execute( DbTables.pedTable);
         await db.execute( DbTables.slmTable);
         await db.execute( DbTables.ecgDetailsTable);
+        await db.execute( DbTables.slmDetailsTable );
       }
     );
   }
@@ -96,6 +98,12 @@ class DBProvider{
 
     if( tableName == 'EcgDetails'){
       final user = value as EcgDetailsModel;
+      final res = await db.insert(tableName, user.toJson() );
+      return res;
+    }
+
+    if( tableName == 'SlmDetails' ){
+      final user = value as SlmDetailsModel;
       final res = await db.insert(tableName, user.toJson() );
       return res;
     }
@@ -186,6 +194,10 @@ class DBProvider{
 
       if( tableName == 'EcgDetails' ){
         return res.map((e) => EcgDetailsModel.fromJsonDB(e)).toList();
+      }
+
+      if( tableName == 'SlmDetails'){
+        return res.map((e) => SlmDetailsModel.fromJsonDB(e)).toList();
       }
     }
     return [];

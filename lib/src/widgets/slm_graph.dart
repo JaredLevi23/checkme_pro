@@ -15,7 +15,7 @@ class SlmGraph extends StatelessWidget {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
     final currentSlm = checkmeProvider.currentSlm;
-    //SlmDetailsModel? currentSlmDetails = checkmeProvider.slmDetailsList[ currentSlm.dtcDate ];
+    SlmDetailsModel? currentSlmDetails = checkmeProvider.currentSlmDetailsModel;
 
     return Column(
       children: [
@@ -54,10 +54,10 @@ class SlmGraph extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      // CustomPaint(
-                      //   painter: Spo2Graph(spo2List:currentSlmDetails?.arrOxValue ?? []),
-                      //   size: const Size( 1500, double.infinity ),
-                      // ),
+                      CustomPaint(
+                        painter: Spo2Graph(spo2List:currentSlmDetails?.arrOxValue ?? []),
+                        size: const Size( 1500, double.infinity ),
+                      ),
                     ],
                   ),
                 )
@@ -94,10 +94,10 @@ class SlmGraph extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      // CustomPaint(
-                      //   painter: PrGraph(prList:currentSlmDetails?.arrPrValue ?? []),
-                      //   size: const Size( 1500, double.infinity ),
-                      // ),
+                      CustomPaint(
+                        painter: PrGraph(prList:currentSlmDetails?.arrPrValue ?? []),
+                        size: const Size( 1500, double.infinity ),
+                      ),
                     ],
                   ),
                 )
@@ -220,7 +220,7 @@ class _GraphGridSp extends CustomPainter{
 
 class Spo2Graph extends CustomPainter{
 
-  final List<int> spo2List;
+  final List spo2List;
   Spo2Graph( { required this.spo2List } );
 
   @override
@@ -250,7 +250,7 @@ class Spo2Graph extends CustomPainter{
 
 class PrGraph extends CustomPainter{
 
-  final List<int> prList;
+  final List prList;
   PrGraph({ required this.prList });
 
   @override

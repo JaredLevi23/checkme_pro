@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:developer';
 
 import 'package:checkme_pro_develop/src/db/db_provider.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
@@ -66,35 +66,41 @@ class SlmResultsPage extends StatelessWidget {
               onTap: () async {
                 checkmeProvider.currentSlm = slm;
 
-                // if( !checkmeProvider.slmDetailsList.containsKey( slm.dtcDate ) ){
-                //   if(checkmeProvider.isConnected){
-                //     if( !checkmeProvider.isSync ){
-                //       checkmeProvider.currentSyncSlm ??= slm;
-                //       final res = await checkmeProvider.getMeasurementDetails(dtcDate: slm.dtcDate, detail: 'SLM');
+                final search = await DBProvider.db.getValue(tableName: 'SlmDetails', dtcDate: slm.dtcDate );
 
-                //       if( !res ){
-                //         showDialog(
-                //             context: context, 
-                //             builder: (_){ 
-                //               return const CustomAlertDialog(
-                //                 message: 'Please try again or check the connection with the device', 
-                //                 iconData: Icons.info
-                //               );
-                //             }
-                //           );
-                //       }
-                //     }
-                //   }else{
-                //     showDialog(context: context, builder: (_){
-                //       return const CustomAlertDialog(
-                //         message: 'Check the connection with the device.',
-                //         iconData: Icons.bluetooth_disabled,
-                //       );
-                //     });
-                //     return;
-                //   }
-                // }
-                // Navigator.pushNamed(context, 'checkme/slm/details');
+                if( search.isEmpty ){
+                  if( checkmeProvider.isConnected ){
+                    checkmeProvider.currentSyncSlm ??= slm;
+                    final res = await checkmeProvider.getMeasurementDetails(dtcDate: slm.dtcDate, detail: 'SLM');
+
+                    if( !res ){
+                      showDialog(
+                          context: context, 
+                          builder: (_){ 
+                            return const CustomAlertDialog(
+                              message: 'Please try again or check the connection with the device', 
+                              iconData: Icons.info
+                            );
+                          }
+                        );
+                        return;
+                    }
+                  }else{
+                    showDialog(
+                          context: context, 
+                          builder: (_){ 
+                            return const CustomAlertDialog(
+                              message: 'Please try again or check the connection with the device', 
+                              iconData: Icons.info
+                            );
+                          }
+                        );
+                        return;
+                  }
+                }else{
+                  checkmeProvider.currentSlmDetailsModel = search[0];
+                }
+                Navigator.pushNamed(context, 'checkme/slm/details');
               },
              ),
           );

@@ -3,11 +3,7 @@ package com.example.check_developer_main
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.util.Log
+import kotlin.math.round
 import com.example.check_developer_main.bean.BleBean
 import com.example.check_developer_main.ble.format.*
 import com.example.check_developer_main.ble.manager.BleScanManager
@@ -22,6 +18,7 @@ import kotlinx.coroutines.channels.Channel
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
+import kotlin.math.roundToInt
 
 class MainActivity: FlutterActivity(), BleScanManager.Scan{
 
@@ -303,7 +300,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                             json.put("hrValue"      , dlcArray.hr);
                             json.put("spo2Result"   , dlcArray.oface)
                             json.put("spo2Value"    , dlcArray.oxy);
-                            json.put("pIndex"       , dlcArray.pi );
+                            json.put("pIndex"       , dlcArray.pi.toDouble()/10 );
                             json.put("bpValue"      , dlcArray.pr)
                             json.put("prFlag"       , dlcArray.prFlag)
                             json.put("dtcDate"      , dlcArray.timeString);
@@ -498,12 +495,6 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
 
         if( type == "ECG" || type == "DLC"){
             val info = EcgWaveInfo( fileValue )
-            //var fileList: String = ""
-            //for ( k in fileValue ){
-            //    fileList += "$k, "
-            //}
-            //println("VALOR DE FILEVALUE: $fileList")
-            //eventSink?.success( fileList )
 
             val json = JSONObject()
             try {
@@ -516,7 +507,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                 json.put("qtValue"  , info.qt )
                 json.put("qtcValue" , info.qtc )
                 json.put("pvcsValue", info.pvcs )
-                json.put("timeLength", info.total )
+                json.put("timeLength", (info.waveSize.toDouble() / 500).roundToInt() )
 
                 json.put("hrSize"   , info.hrSize )
                 json.put("total"    , info.total )
@@ -543,14 +534,34 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
             }catch ( e: JSONException ){
                 println("ERROR DETAILS : $e")
             }
-        } else if ( type == "OXY" ){
-            println( "FILE VALUE SLM: $fileValue" )
-            val info = OxyWaveInfo( fileValue )
-            val json = JSONObject()
-            try {
+        } else if ( type == "SLM" ){
+            val info = SlmInfo( fileValue )
+            var json = JSONObject()
 
+            try {
+                json.put( "type", "DETAILS_SLM" )
+                json.put( "dtcDate", timeString )
+
+
+                var oxList : MutableList< Byte > = ArrayList()
+                var hrList: MutableList< Byte > = ArrayList()
+
+                for ( k in info.arrOX ){
+                    oxList.add( k )
+                    println("ENTRE EN OX")
+                }
+
+                for ( j in info.arrHR ){
+                    hrList.add( j )
+                    println("ENTRE EN HR")
+                }
+
+                json.put( "arrOxValue", oxList.toString() )
+                json.put( "arrPrValue", hrList.toString() )
+
+                eventSink?.success( json.toString() )
             }catch ( e: JSONException ){
-                println("ERROR DETAILS : $e")
+                println("ERROR SLM DETAILS: $e")
             }
         }
     }

@@ -117,4 +117,13 @@ class DbTables{
       upload INTEGER
     )
   ''';
+
+  static const String slmDetailsTable = '''
+    CREATE TABLE IF NOT EXISTS SlmDetails(
+      id INTEGER PRIMARY KEY,
+      dtcDate TEXT,
+      arrPrValue TEXT,
+      arrOxValue TEXT
+    )
+  ''';
 }

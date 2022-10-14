@@ -21,7 +21,7 @@ DateTime getMeasurementDateTime( { required String measurementDate } ){
       int.parse( dateFormat[6] + dateFormat[7] ), // day
       int.parse( dateFormat[8] + dateFormat[9] ), // hour
       int.parse( dateFormat[10] + dateFormat[11] ), // minute
-      int.parse( dateFormat[11] + dateFormat[13] ) // seconds
+      int.parse( dateFormat[12] + dateFormat[13] ) // seconds
     );
 
     return date;

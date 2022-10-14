@@ -39,6 +39,7 @@ class CheckmeChannelProvider with ChangeNotifier{
   SlmModel? currentSyncSlm;
 
   EcgDetailsModel? currentEcgDetailsModel;
+  SlmDetailsModel? currentSlmDetailsModel;
 
   // SET/GET
   bool get isSync => _isSync;
@@ -317,8 +318,14 @@ class CheckmeChannelProvider with ChangeNotifier{
     // Details Sleep Monitor
     if( headerType.type == 'DETAILS_SLM' ){
       try{
-        final smlDetailTemp = SlmDetailsModel.fromRawJson( event.toString() );
-        // TODO: ADD SEARCH
+        final slmDetailTemp = SlmDetailsModel.fromRawJson( event.toString() );
+
+        final search = await DBProvider.db.getValue(tableName: 'SlmDetails', dtcDate: slmDetailTemp.dtcDate );
+
+        if( search.isEmpty ){
+          await DBProvider.db.newValue('SlmDetails', slmDetailTemp );
+          currentSlmDetailsModel = slmDetailTemp;
+        }
 
       }catch( err ){
         log( '$err' );
@@ -327,27 +334,6 @@ class CheckmeChannelProvider with ChangeNotifier{
         isSync = false;
       }
     }
-
-    // // DETAILS_EKG (ECG/DLC)
-    // if( headerType.type == 'DETAILS_EKG_ANDROID'){
-    //   try{
-    //     final detailECGTemp = EcgDetailsAndroidModel.fromRawJson( event.toString() );
-    //     await Future.delayed( const Duration( seconds: 3 ));
-        
-    //     if( currentSyncEcg != null && !ecgDetailsAndroidList.containsKey( currentSyncEcg!.dtcDate ) && currentSyncDlc == null){
-    //       ecgDetailsAndroidList.addAll( {currentSyncEcg!.dtcDate : detailECGTemp} );
-    //     }else if(currentSyncDlc != null && !dlcDetailsAndroidList.containsKey( currentSyncDlc!.dtcDate ) && currentSyncEcg == null ){
-    //       dlcDetailsAndroidList.addAll( {currentSyncDlc!.dtcDate : detailECGTemp } );
-    //     }
-
-    //   }catch( err ){
-    //     log('$err');
-    //   } finally{
-    //     currentSyncEcg = null;
-    //     currentSyncDlc = null;
-    //     isSync = false;
-    //   }
-    // }
 
     notifyListeners();
 

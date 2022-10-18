@@ -9,6 +9,7 @@ ThemeData themeData(){
           color: Color.fromRGBO(50, 97, 148, 1),
           size: 30
         ),
-    )
+    ),
+    scaffoldBackgroundColor: const Color.fromRGBO(203, 232, 250, 1)
   );
 }

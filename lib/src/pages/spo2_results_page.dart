@@ -1,9 +1,8 @@
-import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:checkme_pro_develop/src/widgets/widgets.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class Spo2ResultsPage extends StatelessWidget {
   const Spo2ResultsPage({Key? key}) : super(key: key);
@@ -12,6 +11,8 @@ class Spo2ResultsPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
+    const subtitleStyle = TextStyle( fontSize: 20, fontWeight: FontWeight.bold );
+    const titleStyle = TextStyle( fontSize: 35, fontWeight: FontWeight.bold, color: Colors.blue );
 
     return Scaffold(
       appBar: AppBar(
@@ -26,26 +27,72 @@ class Spo2ResultsPage extends StatelessWidget {
         itemBuilder: (context, index){
 
           final spo2 = checkmeProvider.spo2sList[index];
-          final date = spo2.dtcDate.split(' ');
 
-          return Card(
-            child: ListTile(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text( 'SPO2: ${spo2.spo2Value}' ),
-                  Text( 'PR: ${spo2.prValue}' ),
-                ],
-              ),
-              subtitle: Text( '${ getMeasurementDateTime( measurementDate: spo2.dtcDate ) }'),
-              leading: const CircleAvatar(
-                radius: 30,
-                backgroundColor: Colors.cyan,
-                foregroundColor: Colors.white,
-                child: Icon( Icons.air_rounded, size: 25,),
-              ),
+          return Container(
+            margin: const EdgeInsets.symmetric( horizontal: 8, vertical: 5 ),
+            height: 150,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular( 15 ),
+              border: Border.all( width: 2, color: Colors.grey )
+            ),
+
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('SPO2', style: subtitleStyle ,),
+                        Text( '${spo2.spo2Value}', style: titleStyle )
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('PR', style: subtitleStyle,),
+                        Text( '${spo2.prValue}', style: titleStyle, )
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('PI', style: subtitleStyle ,),
+                        Text( '${spo2.pIndex }', style: titleStyle, )
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox( height: 5, ),
+                Text( 
+                  getMeasurementDateTime( measurementDate: spo2.dtcDate ).toString().split('.')[0],
+                  style: subtitleStyle,
+                ),
+              ],
             ),
           );
+
+
+          // return Card(
+          //   child: ListTile(
+          //     title: Column(
+          //       crossAxisAlignment: CrossAxisAlignment.start,
+          //       children: [
+          //         Text( 'SPO2: ${spo2.spo2Value}' ),
+          //         Text( 'PR: ${spo2.prValue}' ),
+          //       ],
+          //     ),
+          //     subtitle: Text( getMeasurementDateTime( measurementDate: spo2.dtcDate ).toString().split('.')[0]),
+          //     leading: const CircleAvatar(
+          //       radius: 30,
+          //       backgroundColor: Colors.cyan,
+          //       foregroundColor: Colors.white,
+          //       child: Icon( Icons.air_rounded, size: 25,),
+          //     ),
+          //   ),
+          // );
       }),
     );
   }

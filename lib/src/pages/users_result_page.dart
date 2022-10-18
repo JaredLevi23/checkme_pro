@@ -3,6 +3,8 @@ import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../utils/utils_date.dart';
+
 class UserResultPage extends StatelessWidget {
   const UserResultPage({Key? key}) : super(key: key);
 
@@ -13,7 +15,11 @@ class UserResultPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User List', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1)),),
+        title: Column(
+          children: const [
+            Text('User List', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1)),),
+          ],
+        ),
         actions: const [ ConnectionIndicator() ],
       ),
 
@@ -23,9 +29,13 @@ class UserResultPage extends StatelessWidget {
         itemBuilder: (_, index){
 
           final user = checkmeProvider.userList[index];
-          final birthDay = user.birthDay.split(' ');
 
-          return Card(
+          return Container(
+            margin: const EdgeInsets.symmetric( horizontal: 10,vertical: 5 ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.white
+            ),
             child: ListTile(
               leading: CircleAvatar( 
                 child: Text( '${user.userId}' ),
@@ -37,11 +47,14 @@ class UserResultPage extends StatelessWidget {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text( 'Birtday: ${birthDay[1]}-${birthDay[3]}-${birthDay[5]}'),
+                  Text( 'Birtday: ${ getBirthday( birthday: user.birthDay ).toString().split(' ')[0] }'),
                 ],
               ),
+              onTap: (){
+                checkmeProvider.currentUser = user;
+                Navigator.pushNamed(context, 'checkme/users/details');
+              },
             ),
-
           );
 
       }),

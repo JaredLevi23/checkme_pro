@@ -33,6 +33,7 @@ class CheckmeChannelProvider with ChangeNotifier{
   late EcgModel currentEcg;
   late DlcModel currentDlc;
   late SlmModel currentSlm;
+  late UserModel currentUser;
 
   EcgModel? currentSyncEcg;
   DlcModel? currentSyncDlc;
@@ -367,32 +368,32 @@ class CheckmeChannelProvider with ChangeNotifier{
 
       if( tableName == 'Ecg' ){
         final res = data as List<EcgModel>;
-        ecgList = [ ...res ];
+        ecgList = res.reversed.toList();;
       }
 
       if( tableName == 'Dlc' ){
         final res = data as List<DlcModel>;
-        dlcList = [ ...res ];
+        dlcList = res.reversed.toList();;
       }
 
       if( tableName == 'Tmp' ){
         final res = data as List<TemperatureModel>;
-        tmpList = [ ...res ];
+        tmpList = res.reversed.toList();
       }
 
       if( tableName == 'Spo' ){
         final res = data as List<Spo2Model>;
-        spo2sList = [ ...res ];
+        spo2sList = res.reversed.toList() ;
       }
 
       if( tableName == 'Ped' ){
         final res = data as List<PedModel>;
-        pedList = [ ...res ];
+        pedList = res.reversed.toList();
       }
 
       if( tableName == 'Slm' ){
         final res = data as List<SlmModel>;
-        slmList = [ ...res ];
+        slmList = res.reversed.toList();;
       }
 
       notifyListeners();

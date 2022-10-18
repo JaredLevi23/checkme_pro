@@ -1,8 +1,7 @@
-import 'dart:developer';
-
-import 'package:checkme_pro_develop/src/db/db_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'dart:developer';
 
 import 'package:checkme_pro_develop/src/models/device_model.dart';
 import 'package:checkme_pro_develop/src/providers/bluetooht_provider.dart';
@@ -55,13 +54,10 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          const ConnectionIndicator(),
-          //checkmeProvider.isSync ? const SizedBox( width: 10, height: 10, ) : const Center(child: SizedBox( width: 20, height: 20, child: CircularProgressIndicator(  ))),
-          checkmeProvider.isSync ? const Center(child: Icon( Icons.bluetooth_audio_sharp, )) : const Center(child: Icon( Icons.bluetooth, color: Colors.grey, )),
-          const SizedBox( width: 15,),
+        actions: const [
+          ConnectionIndicator(),
         ],
-        title: const Text('HOYRPM', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1) , fontWeight: FontWeight.bold),),
+        title: Center(child: SvgPicture.asset('assets/svg/hoyrpm_logo.svg')),
       ),
 
       drawer: const CustomDrawer(),
@@ -92,166 +88,151 @@ class _HomePageState extends State<HomePage> {
       ? SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Color.fromRGBO(203, 232, 250, 1)
-            ),
-            child: Column(
-              children: [
-                // CheckmeOption(
-                //   titleOption: 'Get Info',
-                //   iconData: Icons.info,
-                //   onPressed: ()async{
-                //     if( checkmeProvider.informationModel == null ){
-                //       await checkmeProvider.getInfoCheckmePRO();
-                //     }
-                //     Navigator.pushNamed(context, 'checkme/info');
-                //   },
-                // ),
+          child: Column(
+            children: [
         
-                // CheckmeOption(
-                //   titleOption: 'Sync Time',
-                //   iconData: Icons.sync_alt,
-                //   onPressed: () async {
+              CheckmeOption(
+                title: 'Read User List',
+                assetSVG: 'assets/svg/person.svg',
+                onPressed: ()async {
+                  if( checkmeProvider.isConnected ){
+                    await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
+                  }
+                  await checkmeProvider.loadData(tableName: 'Users');
+                  Navigator.pushNamed(context, 'checkme/users');
+                },
+              ),
         
-                //     await checkmeProvider.beginSyncTime();
+              CheckmeOption(
+                title: 'Daily Check',
+                assetSVG: 'assets/svg/morning.svg',
+                onPressed: ()async{
+                  if( checkmeProvider.isConnected ){
+                    await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
+                  }
+                  await checkmeProvider.loadData(tableName: 'Users');
+                  Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'DLC'});
+                },
+              ),
         
-                //     showDialog(context: context, builder: ( _){
-                //       return AlertDialog(
-                //         shape: RoundedRectangleBorder(
-                //           borderRadius: BorderRadius.circular(15)
-                //         ),
-                //         content: Container(
-                //           width: 200,
-                //           height: 200,
-                //           decoration: BoxDecoration(
-                //             borderRadius: BorderRadius.circular(15),
-                //             color: Colors.white
-                //           ),
-                //           child: const Center(child: Text( 'Sync Time' )),
-                //         ),
-                //       );
-                //     });
-                //   },
-                // ),
-        
-                CheckmeOption(
-                  titleOption: 'Read User List',
-                  iconData: Icons.group,
-                  onPressed: ()async {
-                    if( checkmeProvider.isConnected ){
-                      await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
-                    }
-                    await checkmeProvider.loadData(tableName: 'Users');
-                    Navigator.pushNamed(context, 'checkme/users');
-                  },
-                ),
-        
-                CheckmeOption(
-                  titleOption: 'Daily Check',
-                  iconData: Icons.how_to_reg_rounded,
-                  onPressed: ()async{
-                    if( checkmeProvider.isConnected ){
-                      await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
-                    }
-                    await checkmeProvider.loadData(tableName: 'Users');
-                    Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'DLC'});
-                  },
-                ),
-        
-                CheckmeOption(
-                  titleOption: 'Ecg Recorder',
-                  iconData: Icons.monitor_heart,
-                  onPressed: ()async{
+              CheckmeOption(
+                title: 'Ecg Recorder',
+                assetSVG: 'assets/svg/blood_preasure.svg',
+                onPressed: ()async{
 
-                    if( checkmeProvider.isConnected ){
-                      final res = await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
-                      log( 'ECG VALUE: $res' );
-                    }
+                  if( checkmeProvider.isConnected ){
+                    final res = await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
+                    log( 'ECG VALUE: $res' );
+                  }
 
-                    await checkmeProvider.loadData(tableName: 'Ecg');
-                    Navigator.pushNamed(context, 'checkme/ecg');
-                  },
-                ),
+                  await checkmeProvider.loadData(tableName: 'Ecg');
+                  Navigator.pushNamed(context, 'checkme/ecg');
+                },
+              ),
         
-                CheckmeOption(
-                  titleOption: 'Pulse Oxymeter',
-                  iconData: Icons.invert_colors_on_sharp,
-                  onPressed: ()async{
-                    if( checkmeProvider.isConnected ){
-                      await checkmeProvider.beginReadFileList( indexTypeFile: 4 );
-                    }
-                    await checkmeProvider.loadData(tableName: 'Spo');
-                    Navigator.pushNamed(context, 'checkme/spo2');
-                  },
-                ),
+              CheckmeOption(
+                title: 'Pulse Oxymeter',
+                assetSVG: 'assets/svg/oxygenation.svg',
+                onPressed: ()async{
+                  if( checkmeProvider.isConnected ){
+                    await checkmeProvider.beginReadFileList( indexTypeFile: 4 );
+                  }
+                  await checkmeProvider.loadData(tableName: 'Spo');
+                  Navigator.pushNamed(context, 'checkme/spo2');
+                },
+              ),
         
-                CheckmeOption(
-                  titleOption: 'Thermometer',
-                  iconData: Icons.thermostat,
-                  onPressed: ()async{
-                    if( checkmeProvider.isConnected){
-                      await checkmeProvider.beginReadFileList( indexTypeFile: 7 );
-                    }
-                    await checkmeProvider.loadData(tableName: 'Tmp');
-                    Navigator.pushNamed(context, 'checkme/temp');
-                  },
-                ),
+              CheckmeOption(
+                title: 'Thermometer',
+                assetSVG: 'assets/svg/temperature.svg',
+                onPressed: ()async{
+                  if( checkmeProvider.isConnected){
+                    await checkmeProvider.beginReadFileList( indexTypeFile: 7 );
+                  }
+                  await checkmeProvider.loadData(tableName: 'Tmp');
+                  Navigator.pushNamed(context, 'checkme/temp');
+                },
+              ),
         
         
-                 CheckmeOption(
-                  titleOption: 'Sleep Monitor',
-                  iconData: Icons.bed,
-                  onPressed: ()async{
-                    if( checkmeProvider.isConnected ){
-                      await checkmeProvider.beginReadFileList( indexTypeFile: 8 );
-                    }
-                    await checkmeProvider.loadData(tableName: 'Slm');
-                    Navigator.pushNamed(context, 'checkme/sml');
-                  },
-                ),
+               CheckmeOption(
+                title: 'Sleep Monitor',
+                assetSVG: 'assets/svg/night.svg',
+                onPressed: ()async{
+                  if( checkmeProvider.isConnected ){
+                    await checkmeProvider.beginReadFileList( indexTypeFile: 8 );
+                  }
+                  await checkmeProvider.loadData(tableName: 'Slm');
+                  Navigator.pushNamed(context, 'checkme/sml');
+                },
+              ),
         
-                CheckmeOption(
-                  titleOption: 'Pedometer',
-                  iconData: Icons.directions_walk_outlined,
-                  onPressed: ()async{
-                    if( checkmeProvider.isConnected ){
-                      await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
-                    }
-                    await checkmeProvider.loadData(tableName: 'Users');
-                    Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'PED'});
-                  },
-                ),
+              CheckmeOption(
+                title: 'Pedometer',
+                assetSVG: 'assets/svg/spirometer.svg',
+                onPressed: ()async{
+                  if( checkmeProvider.isConnected ){
+                    await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
+                  }
+                  await checkmeProvider.loadData(tableName: 'Users');
+                  Navigator.pushNamed(context,'checkme/selectUser', arguments: {'title':'PED'});
+                },
+              ),
         
-                // CheckmeOption(
-                //   titleOption: 'X User List',
-                //   iconData: Icons.group_rounded,
-                //   onPressed: ()async{
-                //     final res = await checkmeProvider.beginReadFileList( indexTypeFile: 10 );
-                //     log( res );
-                //   },
-                // ),
+              // CheckmeOption(
+              //   title: 'X User List',
+              //   assetSVG: 'assets/svg/blood_preasure.svg',
+              //   onPressed: ()async{
+              //     final res = await checkmeProvider.beginReadFileList( indexTypeFile: 10 );
+              //     log( res );
+              //   },
+              // ),
         
-                // CheckmeOption(
-                //   titleOption: 'Blood Preassure',
-                //   iconData: Icons.air,
-                //   onPressed: ()async{
-                //     final res = await checkmeProvider.beginReadFileList( indexTypeFile: 5 );
-                //     log( res );
-                //   },
-                // ),
+              // CheckmeOption(
+              //   title: 'Blood Preassure',
+              //   assetSVG: 'assets/svg/blood_preasure.svg',
+              //   onPressed: ()async{
+              //     final res = await checkmeProvider.beginReadFileList( indexTypeFile: 5 );
+              //     log( res );
+              //   },
+              // ),
         
-                // CheckmeOption(
-                //   titleOption: 'Blood Glucose',
-                //   iconData: Icons.air,
-                //   onPressed: ()async{
-                //     final res = await checkmeProvider.beginReadFileList( indexTypeFile: 6 );
-                //     log( res );
-                //   },
-                // ),
+              // CheckmeOption(
+              //   title: 'Blood Glucose',
+              //   assetSVG: 'assets/svg/blood_preasure.svg',
+              //   onPressed: ()async{
+              //     final res = await checkmeProvider.beginReadFileList( indexTypeFile: 6 );
+              //     log( res );
+              //   },
+              // ),
         
-              ],
-            ),
+              // CheckmeOption(
+              //   title: 'Sync Time',
+              //   assetSVG: 'assets/svg/blood_preasure.svg',
+              //   onPressed: () async {
+        
+              //     await checkmeProvider.beginSyncTime();
+        
+              //     showDialog(context: context, builder: ( _){
+              //       return AlertDialog(
+              //         shape: RoundedRectangleBorder(
+              //           borderRadius: BorderRadius.circular(15)
+              //         ),
+              //         content: Container(
+              //           width: 200,
+              //           height: 200,
+              //           decoration: BoxDecoration(
+              //             borderRadius: BorderRadius.circular(15),
+              //             color: Colors.white
+              //           ),
+              //           child: const Center(child: Text( 'Sync Time' )),
+              //         ),
+              //       );
+              //     });
+              //   },
+              // ),
+        
+            ],
           ),
         ),
       ): Column(

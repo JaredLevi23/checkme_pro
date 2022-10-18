@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class CheckmeOption extends StatelessWidget {
-  const CheckmeOption({Key? key, required this.titleOption, required this.iconData, required this.onPressed}) : super(key: key);
+  const CheckmeOption({Key? key, required this.title, required this.assetSVG, required this.onPressed}) : super(key: key);
 
-  final String titleOption;
-  final IconData iconData;
+  final String title;
+  final String assetSVG;
   final Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only( left: 15, right: 15, top: 7, bottom: 8),
+      margin: const EdgeInsets.only( left: 15, right: 15, top: 10, bottom: 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        //border: Border.all( color: Colors.blue, width: 2 ),
         color: Colors.white
       ),
       child: MaterialButton(
@@ -27,14 +27,29 @@ class CheckmeOption extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Icon( iconData, size: 50, color: const Color.fromRGBO(10, 72, 113, 1),),
+              SizedBox(
+                width: 60,
+                child: SvgPicture.asset( 
+                  assetSVG,
+                  width: 50,
+                  height: 50,
+                ),
+              ),
               const SizedBox(width: 10,),
-              Text( titleOption , style: const TextStyle( fontSize: 21, color: Colors.black, fontWeight: FontWeight.bold ),),
+              Text( title , style: const TextStyle( fontSize: 21, color: Colors.black87, fontWeight: FontWeight.bold ),),
               const Spacer(),
-              const Icon(
-                Icons.add_box_rounded,
-                color: Colors.green,
-                size: 40,
+              Container(
+                width: 45,
+                height: 35,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.green,
+                ),
+                child: const Icon(
+                  Icons.remove_red_eye,
+                  color: Colors.white,
+                  size: 28,
+                ),
               )
             ],
           ),

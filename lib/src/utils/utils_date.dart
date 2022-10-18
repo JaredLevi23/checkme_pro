@@ -33,3 +33,21 @@ String getMeasureFormatTime( { required int seconds} ){
   final time = DateTime( 0 ,0 ,0 ,0,0, seconds ).toString().split(' ')[1].split('.')[0];
   return time;
 }
+
+DateTime getBirthday( { required String birthday } ){
+  
+  if( birthday.startsWith('year')){
+    final dateTime = birthday.split(' ');
+
+    final date = DateTime(
+      int.parse( dateTime[1] ),
+      int.parse( dateTime[3] ),
+      int.parse( dateTime[5] ),
+    );
+
+    return date;
+  }
+
+  return DateTime.now();
+
+}

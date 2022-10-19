@@ -45,12 +45,13 @@ class _EcgRecordDetailsState extends State<EcgDetailsRecordPage> {
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: Column(
           children: [
             Container(
               width: double.infinity,
               height: 50,
-              color: Colors.cyan,
+              color: Color.fromRGBO(50, 97, 148, 1),
               child: Stack(
                 children: [
                   Row(

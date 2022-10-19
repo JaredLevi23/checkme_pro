@@ -320,7 +320,7 @@ enum MyFlutterErrorCode{
                     
                     let userTemp :[String:Any] = [
                         "userId"    : user.userID,
-                        "gender"    : "\( user.gender)",
+                        "gender"    : "\( user.gender.rawValue)",
                         "birthDay"  : "\( user.birthday)",
                         "height"    : "\( user.height)",
                         "iconID"    : "\( user.iconID)",

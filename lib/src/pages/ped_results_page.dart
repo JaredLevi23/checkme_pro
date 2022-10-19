@@ -15,6 +15,7 @@ class PedResultsPage extends StatelessWidget {
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('PED Results', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
       ),

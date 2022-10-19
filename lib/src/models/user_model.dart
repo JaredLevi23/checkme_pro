@@ -18,7 +18,7 @@ class UserModel {
         this.upload
     });
 
-    final int? id;
+    int? id;
     final int userId;
     final String userName;
     final String birthDay;

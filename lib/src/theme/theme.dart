@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 ThemeData themeData(){
   return ThemeData.light().copyWith(
     appBarTheme: const AppBarTheme(
+      foregroundColor: Color.fromRGBO(50, 97, 148, 1),
       backgroundColor: Colors.white,
       elevation: 0,
       iconTheme: IconThemeData(

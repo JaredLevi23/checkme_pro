@@ -250,7 +250,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         json.put("iconID", "${user.ico}");
                         json.put("userName", "${user.name}");
                         json.put("weight", "${user.weight}");
-                        json.put("age", "${user.pacemakeflag}");
+                        json.put("age", "${user.pacemakeflag }");
 
                         userList.add( json )
                     }catch ( e: JSONException){

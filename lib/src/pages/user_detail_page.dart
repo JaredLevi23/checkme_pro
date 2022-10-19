@@ -13,54 +13,48 @@ class UserDetailPage extends StatelessWidget {
     final birthday = getBirthday(birthday:  currentUser.birthDay );
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('User Detail'),
       ),
 
-      body: Column(
-        
-        children: [
+      body: SingleChildScrollView(
+        child: Column(
+          
+          children: [
 
-          const SizedBox(
-            height: 20,
-          ),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              CircleAvatar(
-                radius: 40,
-                child: Icon( Icons.person, size: 50,),
-              ),
-            ],
-          ),
-
-          const SizedBox(
-            height: 20,
-          ),
-
-          Text( 'ID: ${currentUser.userId}' ),
-          _description(title: 'ID', value: '${currentUser.userId}' ),
-          _description(title: 'User Name', value: currentUser.userName ),
-          _description(title: 'Birthday', value: birthday.toString().split(' ')[0] ),
-          _description(title: 'Age', value: '${  DateTime.now().year -  birthday.year } years' ),
-          Text( 'gender: ${currentUser.gender}' ),
-          Text( 'height: ${currentUser.height}' ),
-          Text( 'weight: ${currentUser.weight}' ),
-        ],
+            Text( 'ID: ${ currentUser.id }' , style: const TextStyle( fontSize: 20 ),),
+            _description( title: 'User Name', value: currentUser.userName, iconData: Icons.person ),
+            _description( title: 'Birthday', value: birthday.toString().split(' ')[0], iconData: Icons.cake),
+            _description( title: 'Age', value: '${  DateTime.now().year -  birthday.year } years', iconData: Icons.calendar_today_rounded ),
+            _description( title:'Gender', value: currentUser.gender == '0' ? 'Male' : 'Female', iconData: Icons.male ),
+            _description( title:'Height', value:currentUser.height, iconData: Icons.height ),
+            _description( title:'Weight', value:currentUser.weight, iconData: Icons.balance ),
+            const Divider(),
+      
+          ],
+        ),
       )
     );
   }
 
-  Widget _description( { required String title, required String value } ){
-    return Container(
-      margin: const EdgeInsets.symmetric( vertical: 5 ),
-      child: Column(
-        children: [
-          Text( title, style: const TextStyle( fontSize: 20, fontWeight: FontWeight.bold ),),
-          Text( value, style: const TextStyle( fontSize: 20, fontWeight: FontWeight.w500 ),),
-        ],
-      ),
+
+  Widget _description( {required String title, required String value, IconData? iconData} ){
+    return Column(
+      children: [
+        const Divider(),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            color: Colors.white
+          ),
+          child: ListTile(
+            title:    Text( value, style: const TextStyle( fontSize: 22, fontWeight: FontWeight.w400 ),),
+            subtitle: Text( title, style: const TextStyle( fontSize: 18 ),),
+            leading: Icon( iconData ?? Icons.star, size: 40, ),
+          ),
+        ),
+      ],
     );
   }
 }

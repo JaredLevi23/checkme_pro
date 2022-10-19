@@ -33,7 +33,8 @@ class Spo2ResultsPage extends StatelessWidget {
             height: 150,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular( 15 ),
-              border: Border.all( width: 2, color: Colors.grey )
+              //border: Border.all( width: 2, color: Colors.grey ),
+              color: Colors.white
             ),
 
             child: Column(

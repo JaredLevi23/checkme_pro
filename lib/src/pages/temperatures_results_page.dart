@@ -41,7 +41,8 @@ class TemperaturesResultsPage extends StatelessWidget {
             margin: const EdgeInsets.symmetric( horizontal: 15, vertical: 5 ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular( 15 ),
-              border: Border.all( width: 2, color: Colors.grey )
+              //border: Border.all( width: 2, color: Colors.grey ),
+              color: Colors.white
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

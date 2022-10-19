@@ -117,6 +117,13 @@ class DBProvider{
     return res;
   }
 
+  Future<int> updateUserById( UserModel userModel )async{
+    final db = await database;
+    final res = db.update( 'Users' , userModel.toJson(), where: 'id=?', whereArgs: [ userModel.id ] );
+    return res;
+
+  }
+
   Future<List<dynamic>> getAllDb( String tableName )async{
     final db = await database;
     final res = await db.query( tableName );
@@ -160,7 +167,7 @@ class DBProvider{
     final db = await database;
     final res = tableName != 'Users'
     ? await db.rawQuery('SELECT * FROM $tableName WHERE dtcDate=?', [ dtcDate ])
-    : await db.rawQuery('SELECT * FROM $tableName WHERE userName=?',[ dtcDate ]);
+    : await db.rawQuery('SELECT * FROM $tableName WHERE userId=?',[ int.parse( dtcDate ) ]);
 
     if( res.isNotEmpty ){
 

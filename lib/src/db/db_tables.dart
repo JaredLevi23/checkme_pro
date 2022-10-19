@@ -3,22 +3,22 @@ class DbTables{
 
   static const String usersTable = '''
     CREATE TABLE IF NOT EXISTS Users(
-                  id INTEGER PRIMARY KEY,
-                  userId INTEGER,
-                  userName TEXT,
-                  birthDay TEXT,
-                  gender TEXT,
-                  weight TEXT,
-                  height TEXT,
-                  age TEXT,
-                  iconID TEXT,
-                  upload INTEGER
-                )
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId INTEGER,
+      userName TEXT,
+      birthDay TEXT,
+      gender TEXT,
+      weight TEXT,
+      height TEXT,
+      age TEXT,
+      iconID TEXT,
+      upload INTEGER
+    )
   ''';
 
   static const String ecgTable = '''
     CREATE TABLE IF NOT EXISTS Ecg(
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       dtcDate TEXT,
       userId INTEGER,
       haveVoice INTEGER,
@@ -30,7 +30,7 @@ class DbTables{
 
   static const String dlcTable = '''
     CREATE TABLE IF NOT EXISTS Dlc(
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       dtcDate TEXT,
       pIndex REAL,
       haveVoice INTEGER,
@@ -47,7 +47,7 @@ class DbTables{
 
   static const String tmpTable = '''
     CREATE TABLE IF NOT EXISTS Tmp(
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       dtcDate TEXT,
       userId INTEGER,
       tempValue REAL,
@@ -59,7 +59,7 @@ class DbTables{
 
   static const String spoTable = '''
     CREATE TABLE IF NOT EXISTS Spo(
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       dtcDate TEXT,
       userId INTEGER,
       spo2Value INTEGER,
@@ -72,7 +72,7 @@ class DbTables{
 
   static const String pedTable = '''
     CREATE TABLE IF NOT EXISTS Ped(
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       dtcDate TEXT,
       calorie REAL,
       distance REAL,
@@ -87,7 +87,7 @@ class DbTables{
 
   static const String slmTable = '''
     CREATE TABLE IF NOT EXISTS Slm(
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       dtcDate TEXT,
       enPassKind INTEGER,
       lowOxNumber INTEGER,
@@ -103,7 +103,7 @@ class DbTables{
 
   static const String ecgDetailsTable = '''
     CREATE TABLE IF NOT EXISTS EcgDetails(
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       dtcDate TEXT,
       hrValue INTEGER,
       stValue INTEGER,
@@ -120,7 +120,7 @@ class DbTables{
 
   static const String slmDetailsTable = '''
     CREATE TABLE IF NOT EXISTS SlmDetails(
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       dtcDate TEXT,
       arrPrValue TEXT,
       arrOxValue TEXT

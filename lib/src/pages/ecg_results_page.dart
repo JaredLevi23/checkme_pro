@@ -31,7 +31,8 @@ class EcgResultsPage extends StatelessWidget {
             margin: const EdgeInsets.symmetric( horizontal: 15, vertical: 5 ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              border: Border.all( width: 1, color: Colors.blueGrey )
+              //border: Border.all( width: 1, color: Colors.blueGrey ),
+              color: Colors.white
             ),
             child: ListTile(
               title: Row(

@@ -286,11 +286,14 @@ class CheckmeChannelProvider with ChangeNotifier{
       final userListTemp = UserListModel.fromRawJson( event.toString() );
 
       for (UserModel user in userListTemp.userList) {
-        final search = await DBProvider.db.getValue( tableName: 'Users', dtcDate: user.userName );
+        final search = await DBProvider.db.getValue( tableName: 'Users', dtcDate: '${user.userId}' );
         if( search.isEmpty ){
           await DBProvider.db.newValue('Users', user );
-          userList.add( user );
+        }else{
+          final updateUser = user..id=search[0].id;
+          await DBProvider.db.updateUserById( updateUser );
         }
+        //userList.add( user );
       }
     }
 

@@ -35,7 +35,8 @@ class DlcResultsPage extends StatelessWidget {
             margin: const EdgeInsets.symmetric( horizontal: 10, vertical: 5 ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular( 15 ),
-              border: Border.all( width: 2, color: Colors.grey )
+              border: Border.all( width: 2, color: Color.fromRGBO(50, 97, 148, 1) ),
+              color: Colors.white
             ),
             child: MaterialButton(
               padding: const EdgeInsets.symmetric( horizontal: 20, vertical: 10 ),

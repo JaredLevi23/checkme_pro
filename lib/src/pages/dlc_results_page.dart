@@ -35,7 +35,7 @@ class DlcResultsPage extends StatelessWidget {
             margin: const EdgeInsets.symmetric( horizontal: 10, vertical: 5 ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular( 15 ),
-              border: Border.all( width: 2, color: Color.fromRGBO(50, 97, 148, 1) ),
+              // border: Border.all( width: 2, color: Color.fromRGBO(50, 97, 148, 1) ),
               color: Colors.white
             ),
             child: MaterialButton(
@@ -47,11 +47,12 @@ class DlcResultsPage extends StatelessWidget {
                 children: [
                   
                   Text( 
-                    '${ getMeasurementDateTime( measurementDate: dlc.dtcDate ) }',
-                    style: const TextStyle( fontSize: 19 ),
+                    getMeasurementDateTime( measurementDate: dlc.dtcDate ).toString().split('.')[0],
+                    style: const TextStyle( fontSize: 19, fontWeight: FontWeight.bold ),
                   ),
 
-                  const SizedBox( height: 5,),
+                  //const SizedBox( height: 5,),
+                  const Divider(),
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -59,22 +60,14 @@ class DlcResultsPage extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'SPO2: ${ dlc.spo2Value }%', 
-                            textAlign: TextAlign.start, 
-                            style: const TextStyle( fontSize: 22 ), 
-                          ),
+                          _description('SPO2: ', '${dlc.spo2Value}%' ),
                           const SizedBox(height: 5,),
-                          Text(
-                            'HR: ${ dlc.hrValue } /min'    , 
-                            textAlign: TextAlign.start, 
-                            style: const TextStyle( fontSize: 22 ), 
-                          ),  
+                          _description('HR: ', '${dlc.hrValue}/min' ),
                         ],
                       ),
                       Column(
                         children: const [
-                          Icon( Icons.remove_red_eye )
+                          Icon( Icons.remove_red_eye, color: Colors.blue,)
                         ],
                       ),
                     ],
@@ -123,6 +116,23 @@ class DlcResultsPage extends StatelessWidget {
           );
         }
       ),
+    );
+  }
+
+  Widget _description( String title, String value ){
+    return Row(
+      children: [
+        Text(
+          title, 
+          textAlign: TextAlign.start, 
+          style: const TextStyle( fontSize: 22, color: Colors.blue ), 
+        ),
+        Text(
+          value, 
+          textAlign: TextAlign.start, 
+          style: const TextStyle( fontSize: 22 ), 
+        ),
+      ],
     );
   }
 }

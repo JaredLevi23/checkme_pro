@@ -1,5 +1,7 @@
 
 // getMeasurementDateTime
+import 'dart:developer';
+
 DateTime getMeasurementDateTime( { required String measurementDate } ){
 
   if( measurementDate.length > 14 ){
@@ -34,8 +36,7 @@ String getMeasureFormatTime( { required int seconds} ){
   return time;
 }
 
-DateTime getBirthday( { required String birthday } ){
-  
+DateTime getBirthday( { required String birthday } ){  
   if( birthday.startsWith('year')){
     final dateTime = birthday.split(' ');
 
@@ -46,8 +47,56 @@ DateTime getBirthday( { required String birthday } ){
     );
 
     return date;
+  }else{
+    final dateTime = birthday.split(' ');
+    final date = DateTime( 
+      int.parse( dateTime[5]),
+      getMonth( dateTime[1] ),
+      int.parse( dateTime[2] )
+     );
+
+     return date;
+  }
+}
+
+
+int getMonth( String month ){
+  if( month == "Jan" ){
+    return 1; 
+  }
+  if( month == "Feb" ){
+    return 2; 
+  }
+  if( month == "Mar" ){
+    return 3; 
+  }
+  if( month == "Abr" ){
+    return 4; 
+  }
+  if( month == "May" ){
+    return 5; 
+  }
+  if( month == "Jun" ){
+    return 6; 
+  }
+  if( month == "Jul" ){
+    return 7; 
+  }
+  if( month == "Aug" ){
+    return 8; 
+  }
+  if( month == "Sep" ){
+    return 9; 
+  }
+  if( month == "Oct" ){
+    return 10; 
+  }
+  if( month == "Nov" ){
+    return 11; 
+  }
+  if( month == "Dec" ){
+    return 12; 
   }
 
-  return DateTime.now();
-
+  return 1;
 }

@@ -1,5 +1,4 @@
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
-import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -37,31 +36,52 @@ class UserResultPage extends StatelessWidget {
 
           final user = checkmeProvider.userList[index];
 
-          return Container(
-            margin: const EdgeInsets.symmetric( horizontal: 10,vertical: 5 ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Colors.white
-            ),
-            child: ListTile(
-              leading: CircleAvatar( 
-                child: Text( '${user.id}' ),
-                radius: 30,
-                backgroundColor: Colors.cyan,
-                foregroundColor: Colors.white,
+          return GestureDetector(
+            child: Container(
+              margin: const EdgeInsets.symmetric( horizontal: 10,vertical: 5 ),
+              height: 90,
+              padding: const EdgeInsets.symmetric( horizontal: 15 ),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white
               ),
-              title: Text( user.userName ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Text( 'Birtday: ${ getBirthday( birthday: user.birthDay ).toString().split(' ')[0] }'),
+          
+                  const CircleAvatar(
+                    child: Icon( Icons.person ),
+                  ),
+          
+                  const SizedBox(
+                    width: 10,
+                  ),
+          
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text( 'ID: ${user.userId}' ),
+                      Text( 
+                        user.userName , 
+                        style: const TextStyle( fontSize: 20, fontWeight: FontWeight.w600 ),
+                      ),
+                      Text( 
+                        getBirthday( birthday: user.birthDay ).toString().split(' ')[0], 
+                        style: const TextStyle( fontSize: 17),
+                      ),
+                    ],
+                  ),
+          
+                  const Spacer(),
+          
+                  const Icon( Icons.remove_red_eye )
                 ],
               ),
-              onTap: (){
-                checkmeProvider.currentUser = user;
-                Navigator.pushNamed(context, 'checkme/users/details');
-              },
             ),
+            onTap: (){
+              checkmeProvider.currentUser = user;
+              Navigator.pushNamed(context, 'checkme/users/details');
+            },
           );
 
       }),

@@ -44,39 +44,26 @@ class _EcgRecordDetailsState extends State<DlcDetailsRecordPage> {
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: const Color.fromRGBO(203, 232, 250, 1),
+          title: const Text( 'Daily Check', style: TextStyle( fontSize: 18),),
+          actions: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric( horizontal: 8 ),
+                child: Text( 
+                  getMeasurementDateTime(measurementDate: currentModel.dtcDate).toString().split('.')[0],
+                  style: const TextStyle( fontSize: 18)
+                ),
+              ),
+            )
+          ],
+        ),
+
         body: Column(
           children: [
-            Container(
-              width: double.infinity,
-              height: 50,
-              color: Colors.cyan,
-              child: Stack(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Text( 'Daily Check', style: TextStyle( fontSize: 18, color: Colors.white),),
-                          Text( 
-                            getMeasurementDateTime(measurementDate: currentModel.dtcDate).toString().split('.')[0],
-                            style: const TextStyle( fontSize: 18, color: Colors.white)
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-
-                  IconButton(
-                    icon: const Icon( Icons.arrow_back_ios_rounded, size: 30, color: Colors.white),
-                    onPressed: ()=> Navigator.pop(context), 
-                  ),
-                ],
-              ),
-            ),
-
+            const SizedBox( height: 5,),
             Expanded(
               child: ListView(
                 children: [

@@ -51,7 +51,7 @@ class _EcgRecordDetailsState extends State<EcgDetailsRecordPage> {
             Container(
               width: double.infinity,
               height: 50,
-              color: Color.fromRGBO(50, 97, 148, 1),
+              color: const Color.fromRGBO(50, 97, 148, 1),
               child: Stack(
                 children: [
                   Row(

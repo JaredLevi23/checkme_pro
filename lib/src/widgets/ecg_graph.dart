@@ -11,9 +11,16 @@ class EcgGrap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 250,
+    return Container(
+      margin: const EdgeInsets.all( 4 ),
+      //height: MediaQuery.of(context).size.height * 0.63,
+      height: 240,
       width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        //borderRadius: BorderRadius.circular(15),
+        border: Border.all( width: 2, color: const Color.fromRGBO(203, 232, 250, 1) )
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -21,7 +28,7 @@ class EcgGrap extends StatelessWidget {
           children: [
             CustomPaint(
               painter: PaintGraph( graph: graphData ),
-              size: Size( sizeY ?? 3000 , 250 ),
+              size: Size( sizeY ?? 3000 , 220 ),
             ),
           ],
         ),
@@ -57,7 +64,7 @@ class PaintGraph extends CustomPainter{
     }
 
     final paint2 = Paint();
-    paint2.color = Colors.pink.shade100;
+    paint2.color = const Color.fromRGBO(203, 232, 250, 1);
     paint2.strokeWidth = 0.5; 
     paint2.style = PaintingStyle.stroke;
 

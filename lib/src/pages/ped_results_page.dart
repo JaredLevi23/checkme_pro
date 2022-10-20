@@ -15,7 +15,7 @@ class PedResultsPage extends StatelessWidget {
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      //backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('PED Results', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
       ),
@@ -31,7 +31,7 @@ class PedResultsPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric( vertical: 15),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              border: Border.all( color: Colors.cyan, width: 5 )
+              border: Border.all( color: const Color.fromRGBO(50, 97, 148, 1), width: 5 )
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -54,7 +54,7 @@ class PedResultsPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _information(units: 'km/h', value: '${ped.speed}', icondata: Icons.speed ),
-                    const Icon( Icons.directions_run_rounded,  size: 70, color: Colors.cyan, ),
+                    const Icon( Icons.directions_run_rounded,  size: 70, color: Color.fromRGBO(50, 97, 148, 1), ),
                     _information(units: 'Km', value: '${ped.distance }', icondata: Icons.mode_of_travel_outlined ),
                   ],
                 ),
@@ -78,7 +78,7 @@ class PedResultsPage extends StatelessWidget {
     return Row(
       children: [
 
-        Icon( icondata , size: 40, color: Colors.cyan,),
+        Icon( icondata , size: 40, color: const Color.fromRGBO(50, 97, 148, 1),),
         const SizedBox( width: 8, ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,

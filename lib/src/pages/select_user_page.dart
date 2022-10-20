@@ -36,11 +36,17 @@ class SelectUserPage extends StatelessWidget {
           final user = checkmeProvider.userList[ index ];
           final userName = user.userName.replaceAll( RegExp('[^A-Za-z0-9 ]'), '' );
           return GestureDetector(
-            child: Card(
+            child: Container(
+              margin: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular( 15 ),
+                color: Colors.white,
+                //border: Border.all( width: 2, color: Colors.grey )
+              ) ,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon( Icons.person, size: 80, color: Colors.black54,),
+                  const Icon( Icons.person, size: 80, color: Colors.deepOrange,),
                   Text( 
                     userName, 
                     style: const TextStyle( fontSize:  18 ), 

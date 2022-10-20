@@ -13,7 +13,14 @@ class UserInfo constructor(var bytes: ByteArray) {
     }
 
     init {
-        println("BYTES SIZE: ${bytes.size}")
+        println("BYTES SIZE: $bytes")
+        var value: String = "";
+        for ( j in bytes ){
+            value+="$j"
+        }
+
+        println( "RESPONSE: $value" )
+
         var start: Int
         for (k in 0 until size) {
             start = k * 27
@@ -29,8 +36,8 @@ class UserInfo constructor(var bytes: ByteArray) {
             calendar[Calendar.MONTH] = month
             calendar[Calendar.DATE] = date
             user[k].birthday = calendar.time
-            user[k].weight = toUInt(setRange(start + 23, 2)) / 200
-            user[k].height = toUInt(setRange(start + 25, 2)) / 200
+            user[k].weight = toUInt(setRange(start + 23, 2))
+            user[k].height = toUInt(setRange(start + 25, 2))
             //user[k].pacemakeflag = toUInt(setRange(start + 27, 1))
             //user[k].pacemakeflag = 1
             //user[k].medicalId = String(setRange(start + 28, 19))

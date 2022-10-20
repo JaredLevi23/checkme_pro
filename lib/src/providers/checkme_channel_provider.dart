@@ -106,6 +106,7 @@ class CheckmeChannelProvider with ChangeNotifier{
         return result;
       }
   }
+  
   Future< void >   cancelConnect ()async{
       try{
           await platform.invokeMethod('checkmepro/disconnect');
@@ -120,6 +121,13 @@ class CheckmeChannelProvider with ChangeNotifier{
         final String result = await platform.invokeMethod('checkmepro/getInfoCheckmePRO');
         informationModel = DeviceInformationModel.fromRawJson( result );
         notifyListeners();
+      }catch( err ){
+        log( '$err' );
+      }
+  }
+  Future<void> beginGetInfo ()async{
+      try{
+        await platform.invokeMethod('checkmepro/beginGetInfo');
       }catch( err ){
         log( '$err' );
       }

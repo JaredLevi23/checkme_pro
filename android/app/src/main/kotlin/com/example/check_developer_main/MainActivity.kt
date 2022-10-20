@@ -93,6 +93,10 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                 }
                 "checkmepro/beginGetInfo" -> {
                     // MARK: begin get info device
+                    GlobalScope.launch ( Dispatchers.Main ) {
+                        readUser()
+                    }
+                    result.success( true )
                 }
                 "checkmepro/getInfoCheckmePRO" -> {
                     // MARK: set info

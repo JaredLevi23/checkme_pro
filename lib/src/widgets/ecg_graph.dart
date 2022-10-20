@@ -13,12 +13,10 @@ class EcgGrap extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all( 4 ),
-      //height: MediaQuery.of(context).size.height * 0.63,
-      height: 240,
+      height: MediaQuery.of(context).size.height * 0.57,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         color: Colors.white,
-        //borderRadius: BorderRadius.circular(15),
         border: Border.all( width: 2, color: const Color.fromRGBO(203, 232, 250, 1) )
       ),
       child: SingleChildScrollView(

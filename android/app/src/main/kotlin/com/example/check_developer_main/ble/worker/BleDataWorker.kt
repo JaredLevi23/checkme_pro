@@ -114,12 +114,10 @@ class BleDataWorker{
                             fileData = add(fileData, this)
                             fileData?.let {
                                 dataScope.launch {
-                                    Log.d("FILENAME", "$currentFileName")
-                                    Log.d("FILESIZE", "$currentFileSize")
                                     fileProgressChannel.send(
                                         FileProgress(
                                             currentFileName,
-                                            it.size * 100 / currentFileSize,
+                                            100,//it.size * 100 / currentFileSize,
                                             true
                                         )
                                     )

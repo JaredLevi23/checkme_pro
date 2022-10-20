@@ -11,9 +11,9 @@ class Spo2Graph extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          margin: const EdgeInsets.symmetric( horizontal: 15),
           decoration: BoxDecoration(
-            border: Border.all( color: Colors.red.shade300, width: 2 )
+            border: Border.all( color: const Color.fromRGBO(203, 232, 250, 1), width: 2 ),
+            color: Colors.white
           ),
           width: double.infinity,
           height: double.infinity,
@@ -21,17 +21,17 @@ class Spo2Graph extends StatelessWidget {
             painter: _GraphGridSp(),
           )
         ),
-        Container(
-          margin: const EdgeInsets.symmetric( horizontal: 15),
+        SizedBox(
           width: double.infinity,
           height: double.infinity,
           child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
                 CustomPaint(
                   painter: Spo2GraphPainter(spo2List: spoList ),
-                  size: const Size( 1500, double.infinity ),
+                  size: Size( spoList.length.toDouble() , double.infinity ),
                 ),
               ],
             ),
@@ -49,6 +49,7 @@ class Spo2GraphPainter extends CustomPainter{
 
   @override
   void paint(Canvas canvas, Size size) {
+
     final paint = Paint();
     paint.color = Colors.black;
     paint.strokeWidth = 1;
@@ -77,7 +78,7 @@ class _GraphGridSp extends CustomPainter{
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint();
-    paint.color = Colors.pink.shade100;
+    paint.color = const Color.fromRGBO(203, 232, 250, 1);
     paint.strokeWidth = 1;
     paint.style = PaintingStyle.stroke;
 

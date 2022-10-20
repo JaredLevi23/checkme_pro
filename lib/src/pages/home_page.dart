@@ -95,12 +95,12 @@ class _HomePageState extends State<HomePage> {
                 title: 'Read User List',
                 assetSVG: 'assets/svg/person.svg',
                 onPressed: ()async {
-                  if( checkmeProvider.userList.isEmpty ){
-                    if( checkmeProvider.isConnected ){
-                      await checkmeProvider.beginGetInfo();
-                    }
-                    //await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
+                  
+                  if( checkmeProvider.isConnected ){
+                    //await checkmeProvider.beginGetInfo();
+                    await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
                   }
+                  
                   await checkmeProvider.loadData(tableName: 'Users');
                   Navigator.pushNamed(context, 'checkme/users');
                 },

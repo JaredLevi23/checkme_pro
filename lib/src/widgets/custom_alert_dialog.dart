@@ -24,7 +24,10 @@ class CustomAlertDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon( iconData, size: 50, ),
+              Icon( iconData, size: 50, color: const Color.fromRGBO(50, 97, 148, 1),),
+              const SizedBox(
+                height: 10,
+              ),
               Text( message , textAlign: TextAlign.center, style: const TextStyle( fontSize: 14 ),),
             ],
           ),

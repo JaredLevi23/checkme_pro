@@ -305,8 +305,6 @@ enum MyFlutterErrorCode{
     
     // MARK: READ COMPLETE
     func readComplete(withData fileData: VTProFileToRead) {
-        print("readComplete called! TYPE: \(fileData.fileType)")
-        print("readComplete called! DATA: \(fileData.fileData)")
 
         if fileData.fileType == VTProFileTypeUserList {
             if fileData.enLoadResult == VTProFileLoadResultSuccess {

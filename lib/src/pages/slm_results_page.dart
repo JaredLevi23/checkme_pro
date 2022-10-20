@@ -43,9 +43,8 @@ class SlmResultsPage extends StatelessWidget {
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon( Icons.night_shelter_outlined, size: 70, color: Colors.white,),
-                        Text('Duration ${ slm.totalTime }', style: const TextStyle( color: Colors.white), textAlign: TextAlign.center,)
+                      children: const [
+                        Icon( Icons.night_shelter_outlined, size: 70, color: Colors.white,),
                       ],
                     )
                   ),
@@ -54,11 +53,12 @@ class SlmResultsPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text( 
-                        '${getMeasurementDateTime(measurementDate: slm.dtcDate )}', 
-                        style: const TextStyle(  fontWeight: FontWeight.bold ), 
+                        getMeasurementDateTime(measurementDate: slm.dtcDate ).toString().split('.')[0], 
+                        style: const TextStyle(  fontWeight: FontWeight.bold, fontSize: 17 ), 
                       ),
-                      Text( 'Averange OX: ${slm.averageOx}\nLow Ox:${slm.lowOxTime}\nLowest Ox:${slm.lowestOx}\nLow Ox Number: ${slm.lowOxNumber}' ),
-                      //Text( 'Duration: ${slm.totalTime}', style: const TextStyle( fontSize: 17),),
+                      _description( 'Duration: ' , getMeasureFormatTime( seconds: slm.totalTime ) ),
+                      _description( 'Average: ' , '${slm.averageOx}' ),
+                      _description( 'Lowest: ' , '${slm.lowestOx}' ),
                     ],
                   )
                 ],
@@ -106,6 +106,15 @@ class SlmResultsPage extends StatelessWidget {
           );
         }
       ),
+    );
+  }
+
+  Widget _description( String title, String value ){
+    return Row(
+      children: [
+        Text( title, style: const TextStyle( fontWeight: FontWeight.bold, fontSize: 15 ), ),
+        Text( value, style: const TextStyle( fontWeight: FontWeight.w500, fontSize: 15 ), ),
+      ],
     );
   }
 }

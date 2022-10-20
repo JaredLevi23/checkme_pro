@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.util.Log
 import com.example.check_developer_main.MainActivity
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -102,12 +103,15 @@ class BleDataManager(context: Context) : BleManager(context) {
 
         override fun onDeviceDisconnected() {
             // Device disconnected. Release your references here.
-            GlobalScope.launch( Dispatchers.Main ) {
-                var json = JSONObject()
-                json.put("type", "DEVICE-OFFLINE")
+
+            var json = JSONObject()
+            json.put("type", "DEVICE-OFFLINE")
+            GlobalScope.launch( Dispatchers.Main ){
                 MainActivity.eventSink?.success( json.toString() )
                 MainActivity.isConnected = false
             }
+
+
             write_char = null
             notify_char = null
         }

@@ -1,8 +1,5 @@
 
-import 'dart:io';
-
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
-import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,39 +43,12 @@ class _EcgRecordDetailsState extends State<EcgDetailsRecordPage> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: const Color.fromRGBO(203, 232, 250, 1),
+          title: const Text('Ecg Details', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
+        ),
         body: Column(
           children: [
-            Container(
-              width: double.infinity,
-              height: 50,
-              color: const Color.fromRGBO(50, 97, 148, 1),
-              child: Stack(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Text( 'Record ECG', style: TextStyle( fontSize: 18, color: Colors.white),),
-                          Text( 
-                            getMeasurementDateTime(measurementDate: currentModel.dtcDate).toString().split('.')[0],
-                            style: const TextStyle( fontSize: 18, color: Colors.white)
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-
-                  IconButton(
-                    icon: const Icon( Icons.arrow_back_ios_rounded, size: 30, color: Colors.white),
-                    onPressed: ()=> Navigator.pop(context), 
-                  ),
-                ],
-              ),
-            ),
-
             Expanded(
               child: ListView(
                 children: [

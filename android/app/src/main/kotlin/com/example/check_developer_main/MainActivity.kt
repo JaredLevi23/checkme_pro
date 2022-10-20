@@ -1,9 +1,7 @@
 package com.example.check_developer_main
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import kotlin.math.round
 import com.example.check_developer_main.bean.BleBean
 import com.example.check_developer_main.ble.format.*
 import com.example.check_developer_main.ble.manager.BleScanManager
@@ -93,14 +91,22 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                 }
                 "checkmepro/beginGetInfo" -> {
                     // MARK: begin get info device
-                    GlobalScope.launch ( Dispatchers.Main ) {
-                        readUser()
+                    try{
+                        dataScope.launch {
+                            readUser()
+                        }
+                    }catch ( e: Exception ){
+
                     }
+                    println("YA PASE READ USER")
+                    //GlobalScope.launch ( Dispatchers.Main ) {
+                    //    readUser()
+                    //}
                     result.success( true )
                 }
                 "checkmepro/getInfoCheckmePRO" -> {
                     // MARK: set info
-                    GlobalScope.launch( Dispatchers.Main ) {
+                    dataScope.launch {
                         var info = bleWorker.getDeviceInfo()
                         var json = info.json
                         var deviceInfo = JSONObject()
@@ -137,7 +143,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                         if( indexTypeFile == 1 || indexTypeFile == 3 || indexTypeFile == 4 || indexTypeFile == 7 || indexTypeFile == 8){
                             // LEER SIN USUARIO
                             if( fileName != null){
-                                GlobalScope.launch( Dispatchers.Main ) {
+                                dataScope.launch {
                                     bleWorker.getFile( fileName )
                                 }
                                 readFile( fileName, "" );
@@ -167,7 +173,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                     val type = args["detail"]
 
                     if( timeString != null && type != null ){
-                        GlobalScope.launch( Dispatchers.Main ) {
+                        dataScope.launch {
                             getFileDetails( timeString,type )
                         }
                         result.success(true );
@@ -280,6 +286,13 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
     }
 
     private fun readFile( fileName: String, userId: String = "" ){
+        println( "ESTA CONECTADO: $isConnected" )
+        if( isConnected ){
+            dataScope.launch(){
+                bleWorker.getFile( userId + fileName  )
+            }
+        }
+
         val fileTemp = File(Constant.getPathX( userId + fileName ));
 
         if( !fileTemp.exists() ){

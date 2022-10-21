@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
@@ -11,15 +13,27 @@ class ConnectionIndicator extends StatelessWidget {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
     final isConnected = checkmeProvider.isConnected;
+    final isSync = checkmeProvider.isSync;
 
     return GestureDetector(
-      child: Container(
-        width: 50,
+      child: Container(        
         margin: const EdgeInsets.only( right: 15),
-        child: Icon(
-          Icons.circle,
-          color: isConnected ? Colors.greenAccent : Colors.red,
-          size: 15,
+        child: Row(
+          children: [
+            if( isSync )
+              const SizedBox(
+                width: 40,
+                height: 3,
+                child: LinearProgressIndicator()
+              ),
+            
+            const SizedBox( width: 5, ),
+            Icon(
+              Icons.circle,
+              color: isConnected ? Colors.greenAccent : Colors.red,
+              size: 15,
+            ),
+          ],
         ),
       ),
       onTap: () async {

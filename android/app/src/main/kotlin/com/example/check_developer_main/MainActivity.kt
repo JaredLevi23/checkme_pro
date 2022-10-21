@@ -79,12 +79,8 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                 }
                 "checkmepro/disconnect" -> {
                     // MARK: status<
-                    bleWorker.disconnect();
-                    isConnected = false
-                    var json = JSONObject()
-                    json.put("type", "DEVICE-OFFLINE")
-                    eventSink?.success( json.toString() )
-                    result.success("DISCONNECTED");
+                   disconnectBT()
+                    result.success(true );
                 }
                 "checkmepro/isConnected" -> {
 
@@ -98,10 +94,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                     }catch ( e: Exception ){
 
                     }
-                    println("YA PASE READ USER")
-                    //GlobalScope.launch ( Dispatchers.Main ) {
-                    //    readUser()
-                    //}
+
                     result.success( true )
                 }
                 "checkmepro/getInfoCheckmePRO" -> {
@@ -125,8 +118,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                             result.success( deviceInfo.toString() )
 
                         }catch ( e: JSONException){
-                            println("ERROR INFO: $e")
-                            result.success("NO-INFO")
+                            result.success(false)
                         }
                     }
                 }
@@ -173,7 +165,7 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                     val type = args["detail"]
 
                     if( timeString != null && type != null ){
-                        dataScope.launch {
+                        uiScope.launch {
                             getFileDetails( timeString,type )
                         }
                         result.success(true );
@@ -238,6 +230,16 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
     private suspend fun readUser() {
         userChannel.receive()
         val userTemp = File(Constant.getPathX("usr.dat")).readBytes()
+
+        if( userTemp.isEmpty() ){
+            return
+        }
+
+        var json2 = JSONObject()
+        json2.put( "type", "SYNC:true" )
+        eventSink?.success( json2.toString() )
+
+
         userTemp.apply {
             try {
                 userInfo = UserInfo(this)
@@ -276,6 +278,12 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
                     bleWorker.getFile( f )
                     tIndex++
                 }
+
+                var json2 = JSONObject()
+                json2.put( "type", "SYNC:false" )
+                eventSink?.success( json2.toString() )
+
+
             }catch (e: Exception){
                 println("ERROR: $e")
             }
@@ -286,7 +294,6 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
     }
 
     private fun readFile( fileName: String, userId: String = "" ){
-        println( "ESTA CONECTADO: $isConnected" )
         if( isConnected ){
             dataScope.launch(){
                 bleWorker.getFile( userId + fileName  )
@@ -493,6 +500,14 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
         }
     }
 
+    private fun disconnectBT( ){
+        bleWorker.disconnect();
+        isConnected = false
+        var json = JSONObject()
+        json.put("type", "DEVICE-OFFLINE")
+        eventSink?.success( json.toString() )
+    }
+
     private suspend fun getFileDetails( timeString :String, type: String ){
         var file = File( Constant.getPathX( timeString ) )
 
@@ -506,7 +521,9 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
         val fileValue = file.readBytes();
 
         if( fileValue.isEmpty() ){
-            println("NO HAY VALORES GETFILEDETAILS")
+            var json = JSONObject()
+            json.put( "type", "DETAILS_EKG" )
+            json.put( "message", "No found $timeString" )
             return;
         }
 

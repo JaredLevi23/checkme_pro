@@ -106,11 +106,12 @@ class BleDataManager(context: Context) : BleManager(context) {
 
             var json = JSONObject()
             json.put("type", "DEVICE-OFFLINE")
-            GlobalScope.launch( Dispatchers.Main ){
+
+            MainActivity.uiScope.launch( Dispatchers.Main  ){
+                MainActivity.bleWorker.disconnect();
                 MainActivity.eventSink?.success( json.toString() )
                 MainActivity.isConnected = false
             }
-
 
             write_char = null
             notify_char = null

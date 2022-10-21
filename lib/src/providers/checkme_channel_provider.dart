@@ -180,6 +180,22 @@ class CheckmeChannelProvider with ChangeNotifier{
     // event
     final headerType = TypeFileModel.fromRawJson( event.toString() );
 
+    if( headerType.message != null ){
+      isSync = false;
+      currentSyncDlc = null;
+      currentSyncEcg = null;
+      currentSyncSlm = null;
+      return;
+    }
+
+    if( headerType.type == "SYNC:true" ){
+      isSync = true;
+    }
+
+    if( headerType.type == "SYNC:false" ){
+      isSync = false;
+    }
+
     // DISCOVER DEVICES
     if( headerType.type == 'DiscoverDevices' ){
       final deviceModel = DeviceModel.fromRawJson( event.toString() );
@@ -201,6 +217,8 @@ class CheckmeChannelProvider with ChangeNotifier{
     // Disconnected
     if( headerType.type == "DEVICE-OFFLINE" ){
       isConnected = false;
+      isSync = false;
+
     }
 
     if( headerType.type == "GETALL" ){
@@ -315,7 +333,18 @@ class CheckmeChannelProvider with ChangeNotifier{
 
         if( search.isEmpty ){
           await DBProvider.db.newValue('EcgDetails', detailECGTemp );
-          currentEcgDetailsModel = detailECGTemp;
+
+          if( currentEcg.dtcDate == detailECGTemp.dtcDate ){
+            currentEcgDetailsModel = detailECGTemp;
+            currentSyncEcg = null;
+            currentSyncDlc = null;
+            isSync = false;
+          }else{
+            final search = await DBProvider.db.getValue(tableName: 'EcgDetails', dtcDate: currentEcg.dtcDate );
+            if( search.isEmpty ){
+              await getMeasurementDetails(dtcDate: currentEcg.dtcDate, detail: 'ECG');
+            }
+          }
         }
 
       }catch( err ){

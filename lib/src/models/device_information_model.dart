@@ -1,4 +1,4 @@
-
+// Device Information Model 
 import 'dart:convert';
 
 DeviceInformationModel deviceInformationModelFromJson(String str) => DeviceInformationModel.fromJson(json.decode(str));

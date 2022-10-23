@@ -22,28 +22,18 @@ class TemperaturesResultsPage extends StatelessWidget {
         itemCount: checkmeProvider.tmpList.length,
         itemBuilder: (context, index){
 
+          // temperature model 
           final temp = checkmeProvider.tmpList[ index ];
-
-          // return  Column(
-          //   children: [
-          //     ListTile(
-          //       title: Text( '${getMeasurementDateTime(measurementDate: temp.dtcDate )}' ),
-          //       subtitle: const Text('Date'),
-          //       leading: const Icon( Icons.thermostat ),
-          //       trailing: Text( '${temp.tempValue } °C', style: const TextStyle( fontSize: 19 ),),
-          //     ),
-          //     const Divider()
-          //   ],
-          // );
 
           return Container(
             height: 100,
             margin: const EdgeInsets.symmetric( horizontal: 15, vertical: 5 ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular( 15 ),
-              //border: Border.all( width: 2, color: Colors.grey ),
               color: Colors.white
             ),
+
+            // results 
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -57,6 +47,8 @@ class TemperaturesResultsPage extends StatelessWidget {
                     ),
                   ],
                 ),
+
+                // date time 
                 Text( 
                   getMeasurementDateTime(measurementDate: temp.dtcDate ).toString().split('.')[0],
                   style: const TextStyle( fontSize: 17 ),

@@ -303,7 +303,12 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
         val fileTemp = File(Constant.getPathX( userId + fileName ));
 
         if( !fileTemp.exists() ){
-            //TODO: AGREGAR MENSAJE QUE INDICA QUE NO EXISTE EL ARCHIVO
+
+            var json = JSONObject()
+            json.put("type", "Error")
+            json.put("message", "File not found!. FILE: $userId$fileName ")
+            eventSink?.success( json.toString() )
+
             return;
         }
 
@@ -521,9 +526,11 @@ class MainActivity: FlutterActivity(), BleScanManager.Scan{
         val fileValue = file.readBytes();
 
         if( fileValue.isEmpty() ){
+
             var json = JSONObject()
-            json.put( "type", "DETAILS_EKG" )
-            json.put( "message", "No found $timeString" )
+            json.put("type", "Error")
+            json.put("message", "File not found. DTC: $timeString ")
+            eventSink?.success( json.toString() )
             return;
         }
 

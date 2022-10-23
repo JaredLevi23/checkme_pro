@@ -1,7 +1,9 @@
+// ECG Graph 
+
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-
 
 class EcgGrap extends StatelessWidget {
 
@@ -11,24 +13,27 @@ class EcgGrap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all( 4 ),
-      height: MediaQuery.of(context).size.height * 0.57,
-      width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all( width: 2, color: const Color.fromRGBO(203, 232, 250, 1) )
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        child: Row(
-          children: [
-            CustomPaint(
-              painter: PaintGraph( graph: graphData ),
-              size: Size( sizeY ?? 3000 , 220 ),
-            ),
-          ],
+    log( '${ graphData.length }' );
+    return Card(
+      child: Container(
+        margin: const EdgeInsets.all( 4 ),
+        height: MediaQuery.of(context).size.height * 0.57,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all( width: 2, color: const Color.fromRGBO(203, 232, 250, 1) )
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          child: Row(
+            children: [
+              CustomPaint(
+                painter: PaintGraph( graph: graphData ),
+                size: Size( graphData.length * 0.3 , 220 ),
+              ),
+            ],
+          ),
         ),
       ),
     );

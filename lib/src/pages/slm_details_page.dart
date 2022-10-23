@@ -18,7 +18,6 @@ class SlmDetailsPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color.fromRGBO(203, 232, 250, 1),
           title: const Text('Sleep Monitor Details', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
         ),
         body: SingleChildScrollView(
@@ -29,10 +28,11 @@ class SlmDetailsPage extends StatelessWidget {
         
               const SizedBox( height: 5, ),
 
+              // date time 
               Center(
                 child: Text( 
                   getMeasurementDateTime(measurementDate: currentSlm.dtcDate).toString().split('.')[0],
-                  style: const TextStyle( fontSize: 20, fontWeight: FontWeight.bold ),
+                  style: const TextStyle( fontSize: 18, fontWeight: FontWeight.bold ),
                 ),
               ),
 
@@ -41,10 +41,12 @@ class SlmDetailsPage extends StatelessWidget {
              Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon( Icons.night_shelter, size: 80, color: Color.fromRGBO(50, 97, 148, 1),),
+                const Icon( Icons.night_shelter, size: 60, color: Color.fromRGBO(50, 97, 148, 1),),
                 const SizedBox(
-                  width: 20,
+                  width: 10,
                 ),
+
+                // results 
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -62,15 +64,16 @@ class SlmDetailsPage extends StatelessWidget {
                 child: Text(
                   'PR/min', 
                   style: TextStyle( 
-                    fontSize: 20, 
+                    fontSize: 17, 
                     fontWeight: FontWeight.bold, 
                     color: Color.fromRGBO(50, 97, 148, 1)
                   ),
                 )
               ),
 
+              // pr graph 
               SizedBox(
-                height:  MediaQuery.of(context).size.height * 0.3,
+                height:  250,
                 child: PrGraph(prList: currentDetailsSlm?.arrPrValue ?? [])
               ),
       
@@ -80,15 +83,16 @@ class SlmDetailsPage extends StatelessWidget {
                 child: Text(
                   '% SPO2',
                   style: TextStyle( 
-                    fontSize: 20, 
+                    fontSize: 17, 
                     fontWeight: FontWeight.bold, 
                     color: Color.fromRGBO(50, 97, 148, 1) 
                   ),
                 )
               ),
 
+              // spo2 graph 
               SizedBox(
-                height:  MediaQuery.of(context).size.height * 0.3,
+                height:  250,
                   child: Spo2Graph(spoList: currentDetailsSlm?.arrOxValue ?? [])
               ),
               
@@ -104,8 +108,8 @@ class SlmDetailsPage extends StatelessWidget {
   Widget _description( String title, String value ){
     return Row(
       children: [
-        Text( title, style: const TextStyle( fontWeight: FontWeight.bold, fontSize: 19 ), ),
-        Text( value, style: const TextStyle( fontWeight: FontWeight.w500, fontSize: 19 ), ),
+        Text( title, style: const TextStyle( fontWeight: FontWeight.bold, fontSize: 16 ), ),
+        Text( value, style: const TextStyle( fontWeight: FontWeight.w500, fontSize: 16 ), ),
       ],
     );
   }

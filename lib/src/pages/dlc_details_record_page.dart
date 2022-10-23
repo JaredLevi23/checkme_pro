@@ -1,12 +1,9 @@
-import 'dart:io';
-
-import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
-import 'package:checkme_pro_develop/src/utils/utils_date.dart';
-import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
+import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/utils/utils_date.dart';
+import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import '../models/models.dart';
 
 class DlcDetailsRecordPage extends StatefulWidget {
@@ -46,9 +43,11 @@ class _EcgRecordDetailsState extends State<DlcDetailsRecordPage> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          backgroundColor: const Color.fromRGBO(203, 232, 250, 1),
+          //backgroundColor: const Color.fromRGBO(203, 232, 250, 1),
           title: const Text( 'Daily Check', style: TextStyle( fontSize: 18),),
           actions: [
+
+            // date time
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric( horizontal: 8 ),
@@ -63,10 +62,12 @@ class _EcgRecordDetailsState extends State<DlcDetailsRecordPage> {
 
         body: Column(
           children: [
-            const SizedBox( height: 5,),
+            const SizedBox( height: 10 ),
             Expanded(
               child: ListView(
                 children: [
+
+                  // results 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -108,6 +109,8 @@ class _EcgRecordDetailsState extends State<DlcDetailsRecordPage> {
                       ),
                     ],
                   ),
+
+                  // graph 
                   EcgGrap(graphData: dlcDetails?.arrEcg ?? [] )
                 ],
               )

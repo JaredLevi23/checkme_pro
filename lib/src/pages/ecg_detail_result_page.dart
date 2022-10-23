@@ -1,9 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/providers/providers.dart';
 import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import '../models/models.dart';
 import '../utils/utils_date.dart';
@@ -29,6 +27,8 @@ class EcgDetailResultPage extends StatelessWidget {
     
         body: Column(
           children: [
+
+            // date time
             Card(
               child: ListTile(
                 title: Text( 
@@ -42,6 +42,8 @@ class EcgDetailResultPage extends StatelessWidget {
                 ),
               ),
             ),
+
+            // results 
             Expanded(
               child: checkmeProvider.isSync || ecgDetails == null 
               ? Column(
@@ -130,9 +132,6 @@ class EcgDetailResultPage extends StatelessWidget {
             )
           ],
         ),
-       
-
-        //EcgGrap(graphData: ecgDetails.arrEcgContent, sizeY: 4500, ) ,
 
     ]);
   }

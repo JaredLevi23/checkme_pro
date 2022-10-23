@@ -18,6 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final checkmeProvider = Provider.of< CheckmeChannelProvider >(context);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Settings', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
       ),
@@ -25,6 +26,7 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         children: [
 
+          // checkme pro name 
           ListTile(
             title: const Text('Delete device'),
             subtitle: Text( _prefs.deviceName == '' ? 'No device connected' : _prefs.deviceName ),

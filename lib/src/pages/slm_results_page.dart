@@ -1,10 +1,9 @@
-import 'dart:developer';
-
-import 'package:checkme_pro_develop/src/db/db_provider.dart';
-import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
-import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'package:checkme_pro_develop/src/db/db_provider.dart';
+import 'package:checkme_pro_develop/src/providers/providers.dart';
+import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import '../widgets/widgets.dart';
 
 class SlmResultsPage extends StatelessWidget {
@@ -29,9 +28,12 @@ class SlmResultsPage extends StatelessWidget {
         itemBuilder: (_, index){
 
           final slm = checkmeProvider.slmList[ index ];
-          final date = slm.dtcDate.split(' ');
 
           return Card(
+            elevation: 2.0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular( 15 )
+            ),
             child: GestureDetector( 
               child: Row(
                 children: [
@@ -39,7 +41,8 @@ class SlmResultsPage extends StatelessWidget {
                     width: 90,
                     height: 120,
                     decoration: const BoxDecoration(
-                      color:  Color.fromRGBO(50, 97, 148, 1),
+                      color: Color.fromRGBO(50, 97, 148, 1),
+                      borderRadius: BorderRadius.only( topLeft: Radius.circular( 15 ), bottomLeft: Radius.circular( 15)  )
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -52,10 +55,13 @@ class SlmResultsPage extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // date time 
                       Text( 
                         getMeasurementDateTime(measurementDate: slm.dtcDate ).toString().split('.')[0], 
                         style: const TextStyle(  fontWeight: FontWeight.bold, fontSize: 17 ), 
                       ),
+
+                      // results 
                       _description( 'Duration: ' , getMeasureFormatTime( seconds: slm.totalTime ) ),
                       _description( 'Average: ' , '${slm.averageOx}' ),
                       _description( 'Lowest: ' , '${slm.lowestOx}' ),
@@ -64,13 +70,17 @@ class SlmResultsPage extends StatelessWidget {
                 ],
               ),
               onTap: () async {
-                checkmeProvider.currentSlm = slm;
 
+                // change the current sleep monitor model 
+                checkmeProvider.currentSlm = slm;
+                // find current model details
                 final search = await DBProvider.db.getValue(tableName: 'SlmDetails', dtcDate: slm.dtcDate );
 
                 if( search.isEmpty ){
                   if( checkmeProvider.isConnected ){
+                    // current sync 
                     checkmeProvider.currentSyncSlm ??= slm;
+                    // get details by bluetooth
                     final res = await checkmeProvider.getMeasurementDetails(dtcDate: slm.dtcDate, detail: 'SLM');
 
                     if( !res ){
@@ -98,6 +108,7 @@ class SlmResultsPage extends StatelessWidget {
                         return;
                   }
                 }else{
+                  // change the current sleep monitor details model 
                   checkmeProvider.currentSlmDetailsModel = search[0];
                 }
                 Navigator.pushNamed(context, 'checkme/slm/details');

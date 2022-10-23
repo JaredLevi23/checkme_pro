@@ -1,3 +1,5 @@
+// Application Theme 
+
 import 'package:flutter/material.dart';
 
 ThemeData themeData(){
@@ -5,7 +7,6 @@ ThemeData themeData(){
     appBarTheme: const AppBarTheme(
       foregroundColor: Color.fromRGBO(50, 97, 148, 1),
       backgroundColor: Colors.white,
-      elevation: 0,
       iconTheme: IconThemeData(
           color: Color.fromRGBO(50, 97, 148, 1),
           size: 30

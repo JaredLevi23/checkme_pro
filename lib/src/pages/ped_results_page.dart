@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +13,7 @@ class PedResultsPage extends StatelessWidget {
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
 
     return Scaffold(
-      //backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('PED Results', style: TextStyle( color: Color.fromRGBO(50, 97, 148, 1))),
       ),
@@ -24,6 +22,7 @@ class PedResultsPage extends StatelessWidget {
         itemCount: checkmeProvider.pedList.length,
         itemBuilder: (_, index){
 
+          // pedometer model 
           final ped = checkmeProvider.pedList[index];
 
           return Container(
@@ -37,6 +36,7 @@ class PedResultsPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
 
+                // date time 
                 Text(
                   getMeasurementDateTime( measurementDate : ped.dtcDate ).toString().split('.')[0],
                   style: const TextStyle( fontSize: 22, fontStyle: FontStyle.italic ),
@@ -44,12 +44,15 @@ class PedResultsPage extends StatelessWidget {
 
                 const SizedBox(height: 10,),
                 
+                // Duration / Time 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _information(units: 'Time', value: getMeasureFormatTime(seconds: ped.totalTime), icondata: Icons.timer),
                   ],
                 ),
+
+                // route 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -58,6 +61,8 @@ class PedResultsPage extends StatelessWidget {
                     _information(units: 'Km', value: '${ped.distance }', icondata: Icons.mode_of_travel_outlined ),
                   ],
                 ),
+
+                // results 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -77,7 +82,6 @@ class PedResultsPage extends StatelessWidget {
   Widget _information({ required String units, required String value, required IconData icondata }){
     return Row(
       children: [
-
         Icon( icondata , size: 40, color: const Color.fromRGBO(50, 97, 148, 1),),
         const SizedBox( width: 8, ),
         Column(

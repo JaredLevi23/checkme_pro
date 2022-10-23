@@ -1,3 +1,5 @@
+// Select bluetooth device
+
 import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
 import 'package:checkme_pro_develop/src/shar_prefs/device_preferences.dart';
 import 'package:checkme_pro_develop/src/widgets/sync_button.dart';
@@ -62,7 +64,7 @@ class DialogSelector extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SyncButton(title: 'Cancel', onPressed: (){
+                CustomButton(title: 'Cancel', onPressed: (){
                   checkmeProvider.stopScan();
                   Navigator.pop(context);
                 }),

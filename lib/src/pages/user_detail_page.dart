@@ -9,6 +9,7 @@ class UserDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    // current user 
     final currentUser = Provider.of<CheckmeChannelProvider>(context).currentUser;
     final birthday = getBirthday(birthday:  currentUser.birthDay );
 
@@ -18,11 +19,10 @@ class UserDetailPage extends StatelessWidget {
         title: const Text('User Detail'),
       ),
 
+      // user info 
       body: SingleChildScrollView(
         child: Column(
-          
           children: [
-
             Text( 'ID: ${ currentUser.id }' , style: const TextStyle( fontSize: 20 ),),
             _description( title: 'User Name', value: currentUser.userName, iconData: Icons.person ),
             _description( title: 'Birthday', value: birthday.toString().split(' ')[0], iconData: Icons.cake),

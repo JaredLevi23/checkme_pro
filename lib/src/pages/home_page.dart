@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:developer';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'dart:developer';
 
-import 'package:checkme_pro_develop/src/models/device_model.dart';
-import 'package:checkme_pro_develop/src/providers/bluetooht_provider.dart';
-import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/models/models.dart';
+import 'package:checkme_pro_develop/src/providers/providers.dart';
 import 'package:checkme_pro_develop/src/shar_prefs/device_preferences.dart';
 import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 
@@ -74,7 +73,7 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(
             width: 300,
-            child: SyncButton(
+            child: CustomButton(
               title: 'Continue Offline',
               onPressed: (){
                 checkmeProvider.offlineMode = true;
@@ -90,22 +89,21 @@ class _HomePageState extends State<HomePage> {
           physics: const BouncingScrollPhysics(),
           child: Column(
             children: [
-        
+
+              // read user list 
               CheckmeOption(
                 title: 'Read User List',
                 assetSVG: 'assets/svg/person.svg',
                 onPressed: ()async {
-                  
                   if( checkmeProvider.isConnected ){
-                    //await checkmeProvider.beginGetInfo();
                     await checkmeProvider.beginReadFileList( indexTypeFile: 1 );
                   }
-                  
                   await checkmeProvider.loadData(tableName: 'Users');
                   Navigator.pushNamed(context, 'checkme/users');
                 },
               ),
-        
+
+              // daily check 
               CheckmeOption(
                 title: 'Daily Check',
                 assetSVG: 'assets/svg/morning.svg',
@@ -118,21 +116,21 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
         
+              // Ecg Recorder
               CheckmeOption(
                 title: 'Ecg Recorder',
                 assetSVG: 'assets/svg/blood_preasure.svg',
                 onPressed: ()async{
-
                   if( checkmeProvider.isConnected ){
                     final res = await checkmeProvider.beginReadFileList( indexTypeFile:  3 );
                     log( 'ECG VALUE: $res' );
                   }
-
                   await checkmeProvider.loadData(tableName: 'Ecg');
                   Navigator.pushNamed(context, 'checkme/ecg');
                 },
               ),
         
+              // Pulse Oxymeter 
               CheckmeOption(
                 title: 'Pulse Oxymeter',
                 assetSVG: 'assets/svg/oxygenation.svg',
@@ -144,7 +142,8 @@ class _HomePageState extends State<HomePage> {
                   Navigator.pushNamed(context, 'checkme/spo2');
                 },
               ),
-        
+
+              // Thermometer 
               CheckmeOption(
                 title: 'Thermometer',
                 assetSVG: 'assets/svg/temperature.svg',
@@ -157,8 +156,8 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
         
-        
-               CheckmeOption(
+              // Sleep Monitor 
+              CheckmeOption(
                 title: 'Sleep Monitor',
                 assetSVG: 'assets/svg/night.svg',
                 onPressed: ()async{
@@ -169,7 +168,8 @@ class _HomePageState extends State<HomePage> {
                   Navigator.pushNamed(context, 'checkme/sml');
                 },
               ),
-        
+
+              // Pedometer 
               CheckmeOption(
                 title: 'Pedometer',
                 assetSVG: 'assets/svg/spirometer.svg',
@@ -249,7 +249,7 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(
             width: 300,
-            child: SyncButton(
+            child: CustomButton(
               title: 'Search Device',
               onPressed: ()async{
                 await checkmeProvider.startScan();
@@ -262,7 +262,7 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(
             width: 300,
-            child: SyncButton(
+            child: CustomButton(
               title: 'Continue Offline',
               onPressed: (){
                 checkmeProvider.offlineMode = true;
@@ -274,5 +274,4 @@ class _HomePageState extends State<HomePage> {
       )
     );
   }
-
 }

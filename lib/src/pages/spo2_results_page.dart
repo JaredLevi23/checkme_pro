@@ -26,6 +26,7 @@ class Spo2ResultsPage extends StatelessWidget {
         itemCount: checkmeProvider.spo2sList.length,
         itemBuilder: (context, index){
 
+          // spo2 model 
           final spo2 = checkmeProvider.spo2sList[index];
 
           return Container(
@@ -33,10 +34,9 @@ class Spo2ResultsPage extends StatelessWidget {
             height: 150,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular( 15 ),
-              //border: Border.all( width: 2, color: Colors.grey ),
               color: Colors.white
             ),
-
+            // results 
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -67,6 +67,8 @@ class Spo2ResultsPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox( height: 5, ),
+
+                // date time 
                 Text( 
                   getMeasurementDateTime( measurementDate: spo2.dtcDate ).toString().split('.')[0],
                   style: subtitleStyle,
@@ -74,26 +76,6 @@ class Spo2ResultsPage extends StatelessWidget {
               ],
             ),
           );
-
-
-          // return Card(
-          //   child: ListTile(
-          //     title: Column(
-          //       crossAxisAlignment: CrossAxisAlignment.start,
-          //       children: [
-          //         Text( 'SPO2: ${spo2.spo2Value}' ),
-          //         Text( 'PR: ${spo2.prValue}' ),
-          //       ],
-          //     ),
-          //     subtitle: Text( getMeasurementDateTime( measurementDate: spo2.dtcDate ).toString().split('.')[0]),
-          //     leading: const CircleAvatar(
-          //       radius: 30,
-          //       backgroundColor: Colors.cyan,
-          //       foregroundColor: Colors.white,
-          //       child: Icon( Icons.air_rounded, size: 25,),
-          //     ),
-          //   ),
-          // );
       }),
     );
   }

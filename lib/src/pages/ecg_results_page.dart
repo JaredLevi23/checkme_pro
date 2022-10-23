@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:checkme_pro_develop/src/db/db_provider.dart';
-import 'package:checkme_pro_develop/src/models/ecg_details_model.dart';
-import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/models/models.dart';
+import 'package:checkme_pro_develop/src/providers/providers.dart';
 import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import '../widgets/widgets.dart';
 
@@ -25,13 +25,13 @@ class EcgResultsPage extends StatelessWidget {
         itemCount: checkmeProvider.ecgList.length,
         itemBuilder: (_, index){
 
+          // ecg model 
           final ecg = checkmeProvider.ecgList[ index ];
 
           return Container(
             margin: const EdgeInsets.symmetric( horizontal: 15, vertical: 5 ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              //border: Border.all( width: 1, color: Colors.blueGrey ),
               color: Colors.white
             ),
             child: ListTile(
@@ -39,6 +39,8 @@ class EcgResultsPage extends StatelessWidget {
                 children: [
                   const Icon( Icons.favorite, color: Colors.red ),
                   const SizedBox( width:  5,),
+
+                  // result 
                   FutureBuilder(
                     future: DBProvider.db.getValue(tableName: 'EcgDetails', dtcDate: ecg.dtcDate ),
                     builder: (_, AsyncSnapshot<List<dynamic>> snapshot){
@@ -53,27 +55,37 @@ class EcgResultsPage extends StatelessWidget {
                         }
                       }
 
-                      return const Text('Unknow', style: TextStyle( fontSize: 20 ));
+                      return const Text(' - ', style: TextStyle( fontSize: 20 ));
           
                     } 
                   )
                 ],
               ),
+
+              // date time 
               subtitle: Text( 
                 getMeasurementDateTime( measurementDate: ecg.dtcDate ).toString().split('.')[0], 
                 style: const TextStyle( fontSize: 17 ),
               ),
-              // leading: CircleAvatar(
-              //   radius: 30,
-              //   backgroundColor: Colors.cyan,
-              //   foregroundColor: Colors.white,
-              //   child: Text( '${index + 1}' ),
-              // ),
-              trailing: const Icon( Icons.remove_red_eye ),
+              
+              // download or display icon
+              trailing: FutureBuilder(
+                future: DBProvider.db.getValue(tableName: 'EcgDetails', dtcDate: ecg.dtcDate ),
+                builder: (_, AsyncSnapshot<List<dynamic>> snapshot){
+                  if( snapshot.data != null ){
+                    if( snapshot.data!.isNotEmpty ){
+                      return const Icon( Icons.remove_red_eye, color: Colors.grey,);
+                    }
+                  }
+                  return Icon( Icons.download, color: checkmeProvider.isConnected ? Colors.greenAccent : Colors.pink );
+                } 
+              ),
               onTap: ()async {
-          
+
+                // change the current ecg model 
                 checkmeProvider.currentEcg = ecg;
-          
+
+                // find current model details
                 final search = await DBProvider.db.getValue(tableName: 'EcgDetails', dtcDate: ecg.dtcDate );
           
                 if( search.isEmpty ){
@@ -81,7 +93,9 @@ class EcgResultsPage extends StatelessWidget {
                   if(checkmeProvider.isConnected){
           
                     if( !checkmeProvider.isSync ){
+                      // current sync
                       checkmeProvider.currentSyncEcg ??= ecg;
+                      // get details by bluetooth
                       final res = await checkmeProvider.getMeasurementDetails( dtcDate: ecg.dtcDate, detail: 'ECG' );
                       if( !res ){
                         return;
@@ -106,6 +120,7 @@ class EcgResultsPage extends StatelessWidget {
                     return;
                   }
                 }else{
+                  // change the current ecg details model 
                   checkmeProvider.currentEcgDetailsModel = search[0];
                 }
           

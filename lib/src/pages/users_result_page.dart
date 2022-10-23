@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/utils_date.dart';
+import '../widgets/widgets.dart';
 
 class UserResultPage extends StatelessWidget {
   const UserResultPage({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class UserResultPage extends StatelessWidget {
           ],
         ),
         actions: [ 
-          //ConnectionIndicator(),
+          const ConnectionIndicator(),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: SvgPicture.asset('assets/svg/hoyrpm_logo.svg', width: 25, height: 25 ),
@@ -34,6 +35,7 @@ class UserResultPage extends StatelessWidget {
         itemCount: checkmeProvider.userList.length,
         itemBuilder: (_, index){
 
+          // user model 
           final user = checkmeProvider.userList[index];
 
           return GestureDetector(
@@ -79,6 +81,7 @@ class UserResultPage extends StatelessWidget {
               ),
             ),
             onTap: (){
+              // change the current user model 
               checkmeProvider.currentUser = user;
               Navigator.pushNamed(context, 'checkme/users/details');
             },

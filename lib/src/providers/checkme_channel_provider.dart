@@ -221,6 +221,7 @@ class CheckmeChannelProvider with ChangeNotifier{
 
     }
 
+    // get all basic information (  IOS ) 
     if( headerType.type == "GETALL" ){
       isSync = true;
       await Future.delayed( const Duration( milliseconds: 2000 ));
@@ -319,7 +320,6 @@ class CheckmeChannelProvider with ChangeNotifier{
           final updateUser = user..id=search[0].id;
           await DBProvider.db.updateUserById( updateUser );
         }
-        //userList.add( user );
       }
     }
 
@@ -396,6 +396,7 @@ class CheckmeChannelProvider with ChangeNotifier{
    notifyListeners();
   }
 
+  // load information from the database
   Future<void> loadData( { required String tableName } )async{
     final data = await DBProvider.db.getAllDb( tableName );
 
@@ -440,6 +441,7 @@ class CheckmeChannelProvider with ChangeNotifier{
     }
   }
 
+  // load information from the database by id 
   Future<void> loadDataById( { required String tableName, required int userId } )async{
     dlcList = [];
     pedList = [];

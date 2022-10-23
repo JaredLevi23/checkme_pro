@@ -1,8 +1,7 @@
-import 'dart:developer';
-import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
-import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:checkme_pro_develop/src/providers/providers.dart';
+import 'package:checkme_pro_develop/src/widgets/widgets.dart';
 
 class SelectUserPage extends StatelessWidget {
   const SelectUserPage({Key? key}) : super(key: key);
@@ -11,7 +10,7 @@ class SelectUserPage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final checkmeProvider = Provider.of<CheckmeChannelProvider>(context);
-
+    // title : PED or DLC 
     final typeFile = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final title = typeFile['title'] ?? 'None';
 
@@ -32,8 +31,11 @@ class SelectUserPage extends StatelessWidget {
         ),
         itemCount: checkmeProvider.userList.length,
         itemBuilder: (_, index){
-
+          
+          // user model 
           final user = checkmeProvider.userList[ index ];
+
+          // regular expression to remove unnecessary characters
           final userName = user.userName.replaceAll( RegExp('[^A-Za-z0-9 ]'), '' );
           return GestureDetector(
             child: Container(
@@ -41,22 +43,28 @@ class SelectUserPage extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular( 15 ),
                 color: Colors.white,
-                //border: Border.all( width: 2, color: Colors.grey )
               ) ,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+
+                  // Icon User
                   const Icon( Icons.person, size: 80, color: Colors.deepOrange,),
+
+                  // User Name
                   Text( 
                     userName, 
                     style: const TextStyle( fontSize:  18 ), 
                     textAlign: TextAlign.center
                   ),
+
+                  // Id User
                   Text( 'ID: ${user.userId}' )
                 ],
               )
             ),
             onTap: title == 'PED' 
+            // pedometer per user
             ? ()async{
                 if( checkmeProvider.isConnected ){
                   await checkmeProvider.beginReadFileList( 
@@ -64,11 +72,12 @@ class SelectUserPage extends StatelessWidget {
                     userId: user.userId
                   );
                 }
-
                 await checkmeProvider.loadDataById(tableName: 'Ped', userId: user.userId );
                 Navigator.pushNamed(context, 'checkme/ped');
               }
-            : () async{
+            : 
+            // daily check per user 
+            () async{
 
                 if( checkmeProvider.isConnected ){
                   await checkmeProvider.beginReadFileList( 
@@ -76,7 +85,6 @@ class SelectUserPage extends StatelessWidget {
                     userId: user.userId
                   );
                 }
-
                 await checkmeProvider.loadDataById(tableName: 'Dlc', userId: user.userId );
                 Navigator.pushNamed(context, 'checkme/dlc');
               }

@@ -1,12 +1,14 @@
+// Custom Button 
+
 import 'package:flutter/material.dart';
 
-class SyncButton extends StatelessWidget {
+class CustomButton extends StatelessWidget {
   final Function()? onPressed;
   final String title;
   final Color? backgroundColor;
   final Color? fontColor;
 
-  const SyncButton({
+  const CustomButton({
     Key? key,
     required this.title,
     required this.onPressed,

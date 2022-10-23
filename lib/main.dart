@@ -10,6 +10,7 @@ import 'package:checkme_pro_develop/src/theme/theme.dart';
 void main() async {
   
   WidgetsFlutterBinding.ensureInitialized();
+  // load shared preferences 
   final devicePrefs = DevicePreferences();
   await devicePrefs.initPrefs();
 
@@ -25,15 +26,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers:[
+        // providers 
         ChangeNotifierProvider(create: (_) => CheckmeChannelProvider() ),
         ChangeNotifierProvider(create: (_) => BluetoothProvider() ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Material App',
-        initialRoute: 'home',
-        routes: routes(),
-        theme: themeData()
+        title: 'Hoy RPM CheckmePRO',
+        initialRoute: 'home', // initial route 
+        routes: routes(), // routes 
+        theme: themeData() 
       ),
     );
   }

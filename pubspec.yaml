@@ -41,7 +41,7 @@ dependencies:
   path_provider: ^2.0.11
   sqflite: ^2.0.2+1
   flutter_svg: ^1.0.3
-  ##flutter_blue: ^0.8.0
+  http: ^0.13.5
 
 dev_dependencies:
   flutter_test:

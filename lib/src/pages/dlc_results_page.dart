@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:checkme_pro_develop/src/providers/checkme_channel_provider.dart';
+import 'package:checkme_pro_develop/src/providers/providers.dart';
 import 'package:checkme_pro_develop/src/db/db_provider.dart';
 import 'package:checkme_pro_develop/src/utils/utils_date.dart';
 import '../utils/utils_date.dart';
@@ -25,17 +25,16 @@ class DlcResultsPage extends StatelessWidget {
       ),
 
       body: ListView.builder(
-        //itemCount: checkmeProvider.dlcList.length,
         itemCount: checkmeProvider.dlcList.length,
         itemBuilder: (_, index){
 
+          // daily check model 
           final dlc = checkmeProvider.dlcList[index];
 
           return Container(
             margin: const EdgeInsets.symmetric( horizontal: 10, vertical: 5 ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular( 15 ),
-              // border: Border.all( width: 2, color: Color.fromRGBO(50, 97, 148, 1) ),
               color: Colors.white
             ),
             child: MaterialButton(
@@ -46,14 +45,15 @@ class DlcResultsPage extends StatelessWidget {
               child: Column(
                 children: [
                   
+                  // date time 
                   Text( 
                     getMeasurementDateTime( measurementDate: dlc.dtcDate ).toString().split('.')[0],
                     style: const TextStyle( fontSize: 19, fontWeight: FontWeight.bold ),
                   ),
 
-                  //const SizedBox( height: 5,),
                   const Divider(),
 
+                  // results 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -65,9 +65,22 @@ class DlcResultsPage extends StatelessWidget {
                           _description('HR: ', '${dlc.hrValue}/min' ),
                         ],
                       ),
+
+                      // download or display icon
                       Column(
-                        children: const [
-                          Icon( Icons.remove_red_eye, color: Colors.blue,)
+                        children: [
+                          FutureBuilder(
+                            future: DBProvider.db.getValue(tableName: 'EcgDetails', dtcDate: dlc.dtcDate ),
+                            builder: ( context, AsyncSnapshot<List> snapshot ){
+                              if( snapshot.data != null ){
+
+                                if( snapshot.data!.isNotEmpty ){
+                                  return const Icon( Icons.remove_red_eye, color: Colors.grey,);
+                                }
+                              }
+                              return Icon( Icons.download, color: checkmeProvider.isConnected ? Colors.greenAccent : Colors.pink );
+                            }
+                          )
                         ],
                       ),
                     ],
@@ -75,12 +88,18 @@ class DlcResultsPage extends StatelessWidget {
                 ],
               ),
               onPressed: ()async {
+
+                // change the current daily check model 
                 checkmeProvider.currentDlc = dlc;
 
+                // find current model details
                 final search = await DBProvider.db.getValue(tableName: 'EcgDetails', dtcDate: dlc.dtcDate );
 
                 if( search.isEmpty ){
                   if( checkmeProvider.isConnected ){
+                    // current sync
+                    checkmeProvider.currentSyncDlc ??= dlc;
+                    // get details by bluetooth
                    final res = await checkmeProvider.getMeasurementDetails( dtcDate: dlc.dtcDate, detail: 'DLC' );
                     if( !res ){
                       showDialog(
@@ -107,6 +126,7 @@ class DlcResultsPage extends StatelessWidget {
                       return;
                   }
                 }else{
+                  // details found in the database
                   checkmeProvider.currentEcgDetailsModel = search[0];
                 }
 

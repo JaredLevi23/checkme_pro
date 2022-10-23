@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+// Spo2 Graph 
 
+import 'package:flutter/material.dart';
 
 class Spo2Graph extends StatelessWidget {
   const Spo2Graph({Key? key, required this.spoList}) : super(key: key);
@@ -8,36 +9,45 @@ class Spo2Graph extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all( color: const Color.fromRGBO(203, 232, 250, 1), width: 2 ),
-            color: Colors.white
-          ),
-          width: double.infinity,
-          height: double.infinity,
-          child: CustomPaint(
-            painter: _GraphGridSp(),
-          )
-        ),
-        SizedBox(
-          width: double.infinity,
-          height: double.infinity,
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                CustomPaint(
-                  painter: Spo2GraphPainter(spo2List: spoList ),
-                  size: Size( spoList.length.toDouble() , double.infinity ),
-                ),
-              ],
+    return Card(
+      elevation: 2.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15)
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all( color: const Color.fromRGBO(203, 232, 250, 1), width: 2 ),
+                color: Colors.white
+              ),
+              width: double.infinity,
+              height: double.infinity,
+              child: CustomPaint(
+                painter: _GraphGridSp(),
+              )
             ),
-          )
+            SizedBox(
+              width: double.infinity,
+              height: double.infinity,
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    CustomPaint(
+                      painter: Spo2GraphPainter(spo2List: spoList ),
+                      size: Size( spoList.length.toDouble() , double.infinity ),
+                    ),
+                  ],
+                ),
+              )
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -51,8 +61,8 @@ class Spo2GraphPainter extends CustomPainter{
   void paint(Canvas canvas, Size size) {
 
     final paint = Paint();
-    paint.color = Colors.black;
-    paint.strokeWidth = 1;
+    paint.color = Colors.red;
+    paint.strokeWidth = 1.2;
     paint.style = PaintingStyle.stroke;
 
     final path = Path();
